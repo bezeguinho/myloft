@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt">
+
+<head>
+  <meta charset="utf-8">
+  <title>MYLOFT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f7ff 0%, #d1e4ff 100%);
+      min-height: 100vh;
+      color: #1e293b;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .navbar {
+      backdrop-filter: blur(10px);
+      background-color: rgba(13, 110, 253, 0.9) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 0.75rem 1rem;
+    }
+
+    .navbar-brand-text {
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 12px;
+      background-color: #ffffff;
+      padding: 4px;
+      margin-right: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-nav .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      margin: 0 2px;
+    }
+
+    @media (min-width: 992px) {
+      .navbar-nav .nav-link {
+        font-size: 1.1rem;
+      }
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.show {
+      color: #ffffff !important;
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .navbar-nav .nav-item {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      background-color: #ffffff;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      padding: 0.75rem;
+      min-width: 220px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+       from { opacity: 0; transform: translateY(10px); }
+       to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-item {
+      color: #334155;
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f1f5f9;
+      color: #0d6efd;
+      transform: translateX(5px);
+    }
+
+    .main-container {
+      max-width: 1300px;
+      padding-top: 2rem;
+      padding-bottom: 3rem;
+    }
+
+    .card-main {
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
+      overflow: hidden;
+    }
+
+    .btn {
+      border-radius: 12px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0d6efd 0%, #004dc0 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+    }
+
+    .btn-yellow {
+      background: linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%);
+      color: #422006;
+      border: none;
+      box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
+    }
+
+    .btn-yellow:hover {
+      background: linear-gradient(135deg, #fff176 0%, #fdd835 100%);
+      color: #422006;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(251, 192, 45, 0.4);
+    }
+
+    /* Mobile Improvements */
+    @media (max-width: 768px) {
+      .main-container {
+        padding-top: 1rem;
+      }
+      .card-main {
+        border-radius: 16px;
+      }
+      .navbar-brand-text {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="{{ url_for('static', filename='img/myloft_logo.png') }}" alt="MYLOFT"
+          class="brand-logo d-none d-sm-inline-block" onerror="this.style.display='none';">
+        <span class="navbar-brand-text">MYLOFT</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- GESTÃO DE POMBOS -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              GESTÃO DE POMBOS
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='reprodutor') }}">REPRODUTORES</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='voador') }}">VOADORES</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='cedido') }}">CEDIDOS</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='oculto') }}">POMBOS OCULTOS</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">
+              PEDIGREE
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('ver_dados') }}">
+              OS MEUS DADOS
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#">SAIR</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-container px-3 px-md-4 {% block main_extra_class %}{% endblock %}">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+      role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="{% block card_extra_class %}card card-main{% endblock %}">
+      <div class="card-body py-4 py-md-5">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Fecha todos os dropdowns sempre que a página é mostrada (navegação normal ou bfcache)
+    window.addEventListener('pageshow', function () {
+      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function (toggle) {
+        toggle.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+      document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+        menu.classList.remove('show');
+      });
+    });
+
+    // Hover nos menus — apenas em dispositivos com rato (desktop), não em mobile/touch
+    if (window.matchMedia('(hover: hover)').matches) {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.nav-item.dropdown').forEach(function (item) {
+          item.addEventListener('mouseenter', function () {
+            var toggle = this.querySelector('[data-bs-toggle="dropdown"]');
+            if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+          });
+          item.addEventListener('mouseleave', function () {
+            var toggle = this.querySelector('[data-bs-toggle="dropdown"]');
+            if (toggle) {
+              var dd = bootstrap.Dropdown.getInstance(toggle);
+              if (dd) dd.hide();
+            }
+          });
+        });
+      });
+    }
+  </script>
+
+</body>
+
+</html>

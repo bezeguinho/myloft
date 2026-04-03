@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .profile-card {
+        border: none;
+        background: transparent;
+    }
+
+    .profile-photo {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 1rem;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .data-label {
+        font-weight: 700;
+        color: #495057;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+
+    .data-value {
+        font-size: 1.1rem;
+        color: #212529;
+        margin-bottom: 1.2rem;
+    }
+
+    .empty-photo {
+        width: 180px;
+        height: 180px;
+        background-color: #e9ecef;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="mb-4">
+            <h2 class="fw-bold mb-0">Os Meus Dados</h2>
+        </div>
+
+        <div class="card profile-card">
+            <div class="card-body p-0">
+                <div class="row g-4 g-lg-5">
+                    <!-- Coluna Foto -->
+                    <div class="col-12 col-md-auto text-center order-md-2">
+                        {% if utilizador.foto %}
+                        <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Foto de Perfil"
+                            class="profile-photo">
+                        {% else %}
+                        <div class="empty-photo mx-auto">
+                            <span class="fs-1">👤</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Coluna Dados -->
+                    <div class="col order-md-1">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="data-label">Nome</div>
+                                <div class="data-value">{{ utilizador.nome or 'Não definido' }}</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="data-label">Localidade</div>
+                                <div class="data-value">{{ utilizador.localidade or 'Não definida' }}</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="data-label">Telefone</div>
+                                <div class="data-value">{{ utilizador.telefone or 'Não definido' }}</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="data-label">E-mail</div>
+                                <div class="data-value">{{ utilizador.email or 'Não definido' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <a href="{{ url_for('editar_dados') }}" class="btn btn-primary px-4">
+                <i class="bi bi-pencil-square"></i> Editar Dados
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-yellow px-4">← Voltar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

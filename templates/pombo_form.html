@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center pt-0 mt-0">
+    <div class="col-12 col-md-10 col-lg-8">
+        <h2 class="fw-bold mb-3">{{ 'Editar Pombo' if modo_edicao else 'Inserir Novo Pombo' }}</h2>
+
+        <form action="{{ url_for('editar_pombo', anilha=pombo.anilha) if modo_edicao else url_for('novo_pombo') }}" method="POST" class="needs-validation" novalidate>
+            <input type="hidden" name="de" value="{{ de }}">
+            <div class="row g-3">
+                <!-- Identificação -->
+                <div id="div-duplicado" class="alert bg-white text-danger border border-danger d-none py-2 px-3 mb-2 fw-bold text-center">
+                    Pombo já existente
+                </div>
+                <div class="col-auto">
+                    <label for="numero" class="form-label fw-bold mb-0">Número:</label>
+                    <input type="text" class="form-control {{ 'bg-light' if modo_edicao else '' }}" id="numero" name="numero" 
+                        value="{{ pombo.numero if modo_edicao else suggested_num }}" placeholder="Número"
+                        maxlength="10" style="max-width: 180px;" required {{ 'readonly' if modo_edicao else '' }}>
+                </div>
+                <div class="col-auto">
+                    <label for="ano" class="form-label fw-bold mb-0">Ano:</label>
+                    <input type="text" class="form-control {{ 'bg-light' if modo_edicao else '' }}" id="ano" name="ano" 
+                        value="{{ pombo.ano if modo_edicao else '' }}" placeholder="Ano" 
+                        minlength="4" maxlength="4" pattern="\d{4}" 
+                        inputmode="numeric" list="anosList" style="max-width: 100px;" required {{ 'readonly' if modo_edicao else '' }}>
+                    <datalist id="anosList"></datalist>
+                </div>
+
+                <!-- Nome -->
+                <div class="col-md-8">
+                    <label for="nome" class="form-label fw-bold mb-0">Nome:</label>
+                    <input type="text" class="form-control" id="nome" name="nome"
+                        value="{{ pombo.nome if modo_edicao else '' }}" placeholder="Nome do pombo (máx 30)" maxlength="30">
+                </div>
+                <div class="col-md-4 d-flex align-items-end pb-1">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">Ocultar pombo:</span>
+                        <div class="form-check m-0 p-0">
+                            <input class="form-check-input ms-0" type="checkbox" id="oculto" name="oculto" value="true" {{ 'checked' if modo_edicao and pombo.oculto else '' }} style="width: 1.5em; height: 1.5em; float: none; position: static;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Características -->
+                <div class="col-md-6">
+                    <label for="sexo" class="form-label fw-bold mb-0">Sexo:</label>
+                    <select class="form-select" id="sexo" name="sexo">
+                        <option value="" disabled {{ 'selected' if not modo_edicao }}>Escolha o sexo...</option>
+                        <option value="Macho" {{ 'selected' if modo_edicao and pombo.sexo == 'Macho' else '' }}>Macho</option>
+                        <option value="Fêmea" {{ 'selected' if modo_edicao and pombo.sexo == 'Fêmea' else '' }}>Fêmea</option>
+                        <option value="Indefinido" {{ 'selected' if modo_edicao and (pombo.sexo == 'Indefinido' or pombo.sexo == 'Por Definir') else '' }}>Indefinido</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="cor" class="form-label fw-bold mb-0">Cor:</label>
+                    <input type="text" class="form-control" id="cor" name="cor" 
+                        value="{{ pombo.cor if modo_edicao else '' }}" placeholder="Cor" maxlength="25">
+                </div>
+
+                <!-- Genealogia -->
+                <div class="col-md-6">
+                    <label for="pai" class="form-label fw-bold mb-0">Pai:</label>
+                    <input type="text" class="form-control" id="pai" name="pai" 
+                        value="{{ pombo.pai if modo_edicao else '' }}" placeholder="Número do Pai" maxlength="12" list="listaPais">
+                    <datalist id="listaPais"></datalist>
+                    <div id="pai-aviso" class="small text-danger d-none">Pai não registado.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="mae" class="form-label fw-bold mb-0">Mãe:</label>
+                    <input type="text" class="form-control" id="mae" name="mae" 
+                        value="{{ pombo.mae if modo_edicao else '' }}" placeholder="Número da Mãe" maxlength="12" list="listaMaes">
+                    <datalist id="listaMaes"></datalist>
+                    <div id="mae-aviso" class="small text-danger d-none">Mãe não registada.</div>
+                </div>
+
+                <!-- Categorias -->
+                <div class="col-md-6">
+                    <label for="categoria" class="form-label fw-bold mb-0">Categoria:</label>
+                    <select class="form-select" id="categoria" name="categoria">
+                        <option value="" disabled {{ 'selected' if not modo_edicao else '' }}>Escolha a categoria...</option>
+                        <option value="Voador" {{ 'selected' if modo_edicao and pombo.categoria == 'Voador' else '' }}>Voador</option>
+                        <option value="Reprodutor" {{ 'selected' if modo_edicao and pombo.categoria == 'Reprodutor' else '' }}>Reprodutor</option>
+                        <option value="Cedido" {{ 'selected' if modo_edicao and pombo.categoria == 'Cedido' else '' }}>Cedido</option>
+                    </select>
+                </div>
+                <div class="col-md-6 {{ 'd-none' if not (modo_edicao and pombo.categoria == 'Cedido') else '' }}" id="bloco-cedido">
+                    <label for="cedido_para" class="form-label fw-bold mb-0">Cedido a:</label>
+                    <input type="text" class="form-control" id="cedido_para" name="cedido_para"
+                        value="{{ pombo.cedido_para if modo_edicao else '' }}" placeholder="Nome">
+                </div>
+
+                <!-- Descrição e Botões -->
+                <div class="col-12 mt-1">
+                    <label for="descricao" class="form-label fw-bold mb-1">Descrição Sobre o Pombo:</label>
+                    <div class="d-flex align-items-start gap-3">
+                        <textarea class="form-control" id="descricao" name="descricao" rows="10" 
+                            style="width: 32ch; font-family: monospace !important; resize: none; overflow-y: auto;"
+                            placeholder="Descrição para o Pedigree...">{{ pombo.descricao if modo_edicao else '' }}</textarea>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-3 py-2 shadow-sm">{{ 'Gravar' if not modo_edicao else 'Atualizar' }}</button>
+                            <a href="{{ url_for('lista_pombos', categoria=de) if de else (url_for('lista_pombos', categoria='editar') if modo_edicao else url_for('index')) }}" class="btn btn-yellow px-3 py-2 shadow-sm d-inline-flex align-items-center">← Voltar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Validação rápida do Bootstrap e preenchimento de anos
+    (function () {
+        'use strict'
+
+        // Popular datalist de anos (últimos 15 anos)
+        const anosList = document.getElementById('anosList');
+        const currentYear = new Date().getFullYear();
+        for (let i = 0; i < 15; i++) {
+            const option = document.createElement('option');
+            option.value = currentYear - i;
+            anosList.appendChild(option);
+        }
+
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+
+        // Verificação de Pais
+        const verificarPombo = async (input, avisoId) => {
+            const valor = input.value.trim();
+            const aviso = document.getElementById(avisoId);
+            if (valor.length > 0) {
+                try {
+                    const response = await fetch(`/api/pombo/existe/${valor}`);
+                    const data = await response.json();
+                    if (data.existe) {
+                        aviso.classList.add('d-none');
+                    } else {
+                        aviso.classList.remove('d-none');
+                    }
+                } catch (e) { console.error(e); }
+            } else {
+                aviso.classList.add('d-none');
+            }
+        };
+
+        const paiInput = document.getElementById('pai');
+        const maeInput = document.getElementById('mae');
+
+        paiInput.addEventListener('blur', () => verificarPombo(paiInput, 'pai-aviso'));
+        maeInput.addEventListener('blur', () => verificarPombo(maeInput, 'mae-aviso'));
+
+        // Dinamismo do campo Cedido para
+        const categoriaSelect = document.getElementById('categoria');
+        const blocoCedido = document.getElementById('bloco-cedido');
+        const cedidoInput = document.getElementById('cedido_para');
+
+        categoriaSelect.addEventListener('change', function () {
+            if (this.value === 'Cedido') {
+                blocoCedido.classList.remove('d-none');
+                cedidoInput.required = true;
+                cedidoInput.focus(); // Foca imediatamente na caixa para escrever
+            } else {
+                blocoCedido.classList.add('d-none');
+                cedidoInput.required = false;
+                cedidoInput.value = '';
+            }
+        });
+
+        // Lógica de Sugestão de Pais (Datalists Dinâmicos)
+        const todosPombos = {{ todos_pombos_data | tojson | safe if todos_pombos_data else '[]' }};
+        const anoInput = document.getElementById('ano');
+        const numeroInput = document.getElementById('numero');
+        const listaPais = document.getElementById('listaPais');
+        const listaMaes = document.getElementById('listaMaes');
+
+        const atualizarDatalistsPais = () => {
+            const anoAtualStr = anoInput.value.trim();
+            if (anoAtualStr.length < 4) return;
+            const anoMax = parseInt(anoAtualStr);
+            if (isNaN(anoMax)) return;
+
+            listaPais.innerHTML = '';
+            listaMaes.innerHTML = '';
+
+            todosPombos.forEach(p => {
+                const pAno = parseInt(p.a);
+                if (!isNaN(pAno) && pAno <= anoMax) {
+                    const opt = document.createElement('option');
+                    opt.value = p.n;
+                    if (p.s === 'Macho') {
+                        listaPais.appendChild(opt);
+                    } else if (p.s === 'Fêmea') {
+                        listaMaes.appendChild(opt);
+                    }
+                }
+            });
+        };
+
+        anoInput.addEventListener('input', atualizarDatalistsPais);
+        // Inicializar se já houver ano
+        atualizarDatalistsPais();
+
+        // Limpar valores sugeridos ao clicar
+        const suggestedYear = "{{ suggested_ano }}";
+        const suggestedNum = "{{ suggested_num }}";
+        const modoEdicao = {{ 'true' if modo_edicao else 'false' }};
+
+        // Verificação de Duplicado (Anilha)
+        const divDuplicado = document.getElementById('div-duplicado');
+        const checkDuplicado = async () => {
+            const numVal = numeroInput.value.trim();
+            const anoVal = anoInput.value.trim();
+            
+            if (numVal && anoVal.length === 4 && !modoEdicao) {
+                try {
+                    const anilha = `PORT-${numVal}-${anoVal}`;
+                    const response = await fetch(`/api/pombo/existe/${anilha}`);
+                    const data = await response.json();
+                    if (data.existe) {
+                        divDuplicado.classList.remove('d-none');
+                    } else {
+                        divDuplicado.classList.add('d-none');
+                    }
+                } catch (e) { console.error(e); }
+            } else {
+                divDuplicado.classList.add('d-none');
+            }
+        };
+
+        if (!modoEdicao) {
+            numeroInput.addEventListener('input', checkDuplicado);
+            anoInput.addEventListener('input', checkDuplicado);
+        }
+
+        if (!modoEdicao) {
+            anoInput.addEventListener('click', function() {
+                if (this.value === suggestedYear) {
+                    this.value = '';
+                }
+            });
+
+            numeroInput.addEventListener('click', function() {
+                if (this.value === suggestedNum) {
+                    this.value = '';
+                }
+            });
+        }
+    })()
+</script>
+{% endblock %}

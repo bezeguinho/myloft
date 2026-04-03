@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set is_todos_pombos = (not categoria or categoria == 'editar') %}
+
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-6 text-center text-md-start">
+        <h2 class="fw-bold mb-1">{{ titulo }}</h2>
+        <div class="d-inline-flex align-items-center gap-2 mt-1 no-print bg-light border p-1 px-2 rounded-3" 
+             onclick="new bootstrap.Modal(document.getElementById('statsModal')).show()" 
+             style="cursor: pointer; transition: all 0.2s;">
+            <span class="fw-bold text-muted small text-uppercase">Total</span>
+            <span class="badge bg-primary fs-6">{{ pombos|length }}</span>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center no-print">
+        <a href="{{ url_for('index') }}" class="btn btn-yellow order-2 order-md-1">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+        <a href="{{ url_for('novo_pombo', de=categoria) }}" class="btn btn-primary order-1 order-md-2">
+            <i class="bi bi-plus-lg me-1"></i> Adicionar Novo
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4 no-print g-3">
+    <div class="col-12 col-md-6 col-lg-5">
+        <div class="input-group shadow-sm rounded-3 overflow-hidden">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-primary"></i>
+            </span>
+            <input type="text" id="pomboSearch" class="form-control border-start-0 py-2" 
+                placeholder="Pesquisar por número, nome ou anilha..." autofocus>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-7 d-flex justify-content-md-end align-items-center">
+        {% if is_todos_pombos %}
+        <button type="button" class="btn btn-outline-primary no-print w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#printOptionsModal">
+            <i class="bi bi-printer me-2"></i> Imprimir Lista
+        </button>
+        {% else %}
+        <button onclick="window.print()" class="btn btn-outline-primary no-print w-100 w-md-auto">
+            <i class="bi bi-printer me-2"></i> Imprimir Lista
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- DESKTOP VIEW (Table) -->
+<div class="d-none d-md-block">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="pomboTableDesktop">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Anilha</th>
+                        <th>Nome</th>
+                        <th class="text-center">Sexo</th>
+                        <th>Cor</th>
+                        <th class="text-nowrap">Pais</th>
+                        <th>{% if modo_cedidos %}Cedido{% else %}Categoria{% endif %}</th>
+                        <th class="text-center pe-4 no-print">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pombo in pombos %}
+                    <tr class="pombo-row" data-search="{{ pombo.numero }} {{ pombo.nome }} {{ pombo.anilha }}">
+                        <td class="ps-4">
+                            <div class="fw-bold text-primary">{{ pombo.numero }}</div>
+                            <div class="small text-muted">{{ pombo.ano }}</div>
+                        </td>
+                        <td>{{ pombo.nome if pombo.nome and pombo.nome != 'None' else '-' }}</td>
+                        <td class="text-center">
+                            {% if pombo.sexo == 'Macho' %}
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">M</span>
+                            {% elif pombo.sexo == 'Fêmea' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">F</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3">?</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ (pombo.cor if pombo.cor and pombo.cor != 'None' else '-') }}</td>
+                        <td>
+                            <div class="small">
+                                <span class="text-muted">P:</span> {{ pombo.pai if pombo.pai and pombo.pai != 'None' else '-' }}<br>
+                                <span class="text-muted">M:</span> {{ pombo.mae if pombo.mae and pombo.mae != 'None' else '-' }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if modo_cedidos %}
+                                <span class="text-info fw-medium">{{ pombo.cedido_para if pombo.cedido_para and pombo.cedido_para != 'None' else '-' }}</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark border">{{ (pombo.categoria | capitalize) if pombo.categoria and pombo.categoria != 'None' else '-' }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center pe-4 no-print text-nowrap">
+                            <a href="{{ url_for('editar_pombo', anilha=pombo.anilha, de=categoria) }}" class="btn btn-sm btn-light text-primary border me-1" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-sm btn-light text-danger border" 
+                                    title="Apagar"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal"
+                                    data-anilha="{{ pombo.anilha }}"
+                                    data-numero="{{ pombo.numero }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            Nenhum pombo encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MOBILE VIEW (Cards) -->
+<div class="d-md-none" id="pomboCardsMobile">
+    {% for pombo in pombos %}
+    <div class="card mb-3 border-0 shadow-sm rounded-4 overflow-hidden pombo-card" data-search="{{ pombo.numero }} {{ pombo.nome }} {{ pombo.anilha }}">
+        <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white p-2 rounded-3 me-2 text-center" style="min-width: 50px;">
+                        <span class="d-block fw-bold fs-5">{{ pombo.numero }}</span>
+                        <span class="d-block small" style="font-size: 0.65rem;">{{ pombo.ano }}</span>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">{{ pombo.nome if pombo.nome and pombo.nome != 'None' else 'Sem Nome' }}</h6>
+                        <span class="text-muted small">{{ pombo.cor if pombo.cor and pombo.cor != 'None' else 'Cor indefinida' }}</span>
+                    </div>
+                </div>
+                <div>
+                    {% if pombo.sexo == 'Macho' %}
+                        <span class="badge bg-primary rounded-pill px-3">M</span>
+                    {% elif pombo.sexo == 'Fêmea' %}
+                        <span class="badge bg-danger rounded-pill px-3">F</span>
+                    {% else %}
+                        <span class="badge bg-secondary rounded-pill px-3">?</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row g-2 mb-3 bg-light p-2 rounded-3 mx-0">
+                <div class="col-6">
+                    <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">Pai</span>
+                    <span class="fw-medium small">{{ pombo.pai if pombo.pai and pombo.pai != 'None' else '-' }}</span>
+                </div>
+                <div class="col-6 border-start">
+                    <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">Mãe</span>
+                    <span class="fw-medium small">{{ pombo.mae if pombo.mae and pombo.mae != 'None' else '-' }}</span>
+                </div>
+                <div class="col-12 mt-1 border-top pt-1">
+                    <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">{% if modo_cedidos %}Cedido Para{% else %}Categoria{% endif %}</span>
+                    <span class="fw-bold text-primary small">
+                        {% if modo_cedidos %}
+                            {{ pombo.cedido_para if pombo.cedido_para and pombo.cedido_para != 'None' else '-' }}
+                        {% else %}
+                            {{ (pombo.categoria | capitalize) if pombo.categoria and pombo.categoria != 'None' else '-' }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('editar_pombo', anilha=pombo.anilha, de=categoria) }}" class="btn btn-outline-primary btn-sm flex-grow-1 py-2 rounded-3">
+                    <i class="bi bi-pencil me-1"></i> Editar
+                </a>
+                <button type="button" 
+                        class="btn btn-outline-danger btn-sm px-3 rounded-3" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteModal"
+                        data-anilha="{{ pombo.anilha }}"
+                        data-numero="{{ pombo.numero }}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        Nenhum pombo encontrado.
+    </div>
+    {% endfor %}
+</div>
+
+
+<!-- Modal de Estatísticas -->
+<div class="modal fade no-print" id="statsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 class="modal-title fw-bold" style="color: #000;">ESTATÍSTICAS</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="text-uppercase small text-muted">
+                                <th>Grupo</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center text-danger">Fêmeas</th>
+                                <th class="text-center text-primary">Machos</th>
+                                <th class="text-center text-secondary">Indef.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-bottom fw-bold">
+                                <td>GERAL</td>
+                                <td class="text-center"><span class="badge bg-dark rounded-pill">{{ stats.total }}</span></td>
+                                <td class="text-center"><span class="badge bg-danger rounded-pill">{{ stats.total_f }}</span></td>
+                                <td class="text-center"><span class="badge bg-primary rounded-pill">{{ stats.total_m }}</span></td>
+                                <td class="text-center"><span class="badge bg-secondary rounded-pill">{{ stats.total_i }}</span></td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>Voadores</td>
+                                <td class="text-center">{{ stats.voadores }}</td>
+                                <td class="text-center">{{ stats.voadores_f }}</td>
+                                <td class="text-center">{{ stats.voadores_m }}</td>
+                                <td class="text-center">{{ stats.voadores_i }}</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>Reprodutores</td>
+                                <td class="text-center">{{ stats.reprodutores }}</td>
+                                <td class="text-center">{{ stats.reprodutores_f }}</td>
+                                <td class="text-center">{{ stats.reprodutores_m }}</td>
+                                <td class="text-center">{{ stats.reprodutores_i }}</td>
+                            </tr>
+                            <tr>
+                                <td>Cedidos</td>
+                                <td class="text-center">{{ stats.cedidos }}</td>
+                                <td class="text-center">{{ stats.cedidos_f }}</td>
+                                <td class="text-center">{{ stats.cedidos_m }}</td>
+                                <td class="text-center">{{ stats.cedidos_i }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light border w-100" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Opções de Impressão -->
+<div class="modal fade no-print" id="printOptionsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-primary text-white border-0 py-3 rounded-top-4">
+                <h5 class="modal-title fw-bold">Opções de Impressão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Categoria</label>
+                    <select class="form-select border-primary-subtle" id="printFilterCategoria">
+                        <option value="Todas">Todas</option>
+                        <option value="Voador">Voador</option>
+                        <option value="Reprodutor">Reprodutor</option>
+                        <option value="Cedido">Cedido</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Sexo</label>
+                    <select class="form-select border-primary-subtle" id="printFilterSexo">
+                        <option value="Todos">Todos</option>
+                        <option value="Fêmea">Fêmea</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Indefinido">Indefinido</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Ano</label>
+                    <div class="input-group">
+                        <select class="form-select border-primary-subtle" id="printFilterAnoType" style="max-width: 120px;">
+                            <option value="Todos">Todos</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                        <input type="text" id="printFilterAnoValue" class="form-control border-primary-subtle" placeholder="Ex: 2024" maxlength="4" list="yearsList" disabled>
+                        <datalist id="yearsList"></datalist>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light border flex-grow-1" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" id="btnConfirmPrint" class="btn btn-primary flex-grow-1">Imprimir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Eliminação -->
+<div class="modal fade no-print" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body py-4 text-center">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-exclamation-octagon fs-1"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Eliminar Pombo?</h5>
+                <p class="text-muted small">Tem a certeza que quer eliminar o pombo <span id="pomboNumero" class="fw-bold text-dark"></span>?</p>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <a id="confirmDeleteLink" href="#" class="btn btn-danger">Sim, eliminar</a>
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pesquisa Dinâmica
+        const searchInput = document.getElementById('pomboSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                
+                // Filtra Desktop
+                document.querySelectorAll('.pombo-row').forEach(row => {
+                    const content = row.getAttribute('data-search').toLowerCase();
+                    row.style.display = content.includes(term) ? '' : 'none';
+                });
+                
+                // Filtra Mobile
+                document.querySelectorAll('.pombo-card').forEach(card => {
+                    const content = card.getAttribute('data-search').toLowerCase();
+                    card.style.display = content.includes(term) ? '' : 'none';
+                });
+            });
+        }
+
+        // Modal Eliminação
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                const anilha = btn.getAttribute('data-anilha');
+                const numero = btn.getAttribute('data-numero');
+                
+                document.getElementById('pomboNumero').textContent = numero;
+                document.getElementById('confirmDeleteLink').href = "{{ url_for('apagar_pombo', anilha='PLACEHOLDER') }}".replace('PLACEHOLDER', anilha);
+            });
+        }
+
+        // Mock/Draft Impressão (Mantendo lógica original integrada)
+        const btnConfirmPrint = document.getElementById('btnConfirmPrint');
+        if (btnConfirmPrint) {
+            btnConfirmPrint.addEventListener('click', function() {
+                // Implementação simplificada para o novo layout
+                window.print();
+                bootstrap.Modal.getInstance(document.getElementById('printOptionsModal')).hide();
+            });
+        }
+    });
+</script>
+
+<style>
+    @media print {
+        .btn, .no-print, .navbar, footer { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        .d-md-none { display: none !important; }
+        .d-none.d-md-block { display: block !important; }
+        body { background: white !important; }
+    }
+</style>
+{% endblock %}

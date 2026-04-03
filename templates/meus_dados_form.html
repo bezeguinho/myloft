@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .main-container {
+        max-width: 900px;
+    }
+
+    .card-body {
+        padding: 1.5rem 2rem !important;
+    }
+
+    .photo-box {
+        width: 160px;
+        height: 160px;
+        background-color: #ffffff;
+        border: 2px dashed #aab7c9;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+        transition: border-color 0.2s;
+        flex-shrink: 0;
+    }
+
+    .photo-box:hover {
+        border-color: #0d6efd;
+    }
+
+    .photo-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-box .placeholder-text {
+        color: #8899aa;
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 0.5rem;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <h2 class="fw-bold mb-4">Inserir Dados</h2>
+
+        <form action="{{ url_for('inserir_dados') }}" method="POST" enctype="multipart/form-data">
+            <div class="row g-3 align-items-start">
+
+                <!-- Coluna esquerda: campos -->
+                <div class="col">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nome" class="form-label fw-bold">Nome:</label>
+                            <input type="text" class="form-control" id="nome" name="nome" maxlength="60"
+                                placeholder="O seu nome completo (máx 60 carateres)">
+                        </div>
+
+
+                        <div class="col-12">
+                            <label for="localidade" class="form-label fw-bold">Localidade:</label>
+                            <input type="text" class="form-control" id="localidade" name="localidade" maxlength="40"
+                                placeholder="Localidade (máx 40 carateres)">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="telefone" class="form-label fw-bold">Telefone:</label>
+                            <input type="tel" class="form-control" id="telefone" name="telefone" maxlength="25"
+                                placeholder="Ex: 912 345 678">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="email" class="form-label fw-bold">E-mail:</label>
+                            <input type="email" class="form-control" id="email" name="email" maxlength="40"
+                                placeholder="exemplo@email.com (máx 40 carateres)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna direita: foto -->
+                <div class="col-auto d-flex flex-column align-items-center">
+                    <label class="form-label fw-bold">Foto:</label>
+                    <div class="photo-box" id="photoBox" title="Clique para adicionar foto">
+                        <span class="placeholder-text" id="photoPlaceholder">Clique para<br>inserir foto</span>
+                        <img id="photoPreview" class="d-none" alt="Pré-visualização">
+                    </div>
+                    <input type="file" class="d-none" id="fotoInput" name="foto" accept="image/*">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary px-4">Gravar Dados</button>
+                <a href="{{ url_for('index') }}" class="btn btn-yellow px-4">← Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const photoBox = document.getElementById('photoBox');
+        const fotoInput = document.getElementById('fotoInput');
+        const preview = document.getElementById('photoPreview');
+        const placeholder = document.getElementById('photoPlaceholder');
+
+        photoBox.addEventListener('click', () => fotoInput.click());
+
+        fotoInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    })();
+</script>
+{% endblock %}

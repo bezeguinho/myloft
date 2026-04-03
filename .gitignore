@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+myloft.db
+instance/
+
+# Flask
+.env
+.flaskenv
+
+# Project specific
+static/uploads/*
+!static/uploads/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+.gemini/

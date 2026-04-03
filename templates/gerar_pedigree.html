@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+        <h2 class="fw-bold mb-4">Gerar Pedigree</h2>
+
+        <form action="{{ url_for('view_pedigree') }}" method="POST" class="needs-validation" novalidate target="_blank">
+            <div class="row g-3">
+                <div class="col-8 col-sm-auto">
+                    <label for="numero" class="form-label fw-bold">Nº do Pombo:</label>
+                    <input type="text" class="form-control" id="numero" name="numero" placeholder="Máx 12 chars"
+                        maxlength="12" pattern="\d*" inputmode="numeric" style="max-width: 180px;" required>
+                    <div class="invalid-feedback">O número é obrigatório (até 7 algarismos).</div>
+                    <div id="pombo-aviso" class="small mt-1 text-danger d-none">
+                        Pombo não encontrado.
+                    </div>
+                </div>
+                <div class="col-4 col-sm-auto">
+                    <label for="ano" class="form-label fw-bold">Ano:</label>
+                    <input type="text" class="form-control bg-light" id="ano" name="ano" placeholder="Ano" maxlength="4"
+                        style="max-width: 100px;" readonly>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary px-4">Gerar</button>
+                <a href="{{ url_for('index') }}" class="btn btn-yellow px-4">← Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        'use strict'
+
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+
+        const numeroInput = document.getElementById('numero');
+        const anoInput = document.getElementById('ano');
+        const aviso = document.getElementById('pombo-aviso');
+
+        numeroInput.addEventListener('blur', async () => {
+            const valor = numeroInput.value.trim();
+            if (valor.length > 0) {
+                try {
+                    const response = await fetch(`/api/pombo/existe/${valor}`);
+                    const data = await response.json();
+                    if (data.existe) {
+                        aviso.classList.add('d-none');
+                        // Preenche o ano correspondente
+                        if (data.ano) {
+                            anoInput.value = data.ano;
+                        } else {
+                            anoInput.value = '';
+                        }
+                    } else {
+                        aviso.classList.remove('d-none');
+                        anoInput.value = '';
+                    }
+                } catch (e) {
+                    console.error('Erro ao verificar pombo:', e);
+                }
+            } else {
+                aviso.classList.add('d-none');
+                anoInput.value = '';
+            }
+        });
+    })()
+</script>
+{% endblock %}
