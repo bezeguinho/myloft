@@ -5,16 +5,20 @@ from models import db, Pombo, Utilizador
 
 app = Flask(__name__)
 
-IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
+DATABASE_URL = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 
-if IS_VERCEL:
-    db_path = '/tmp/myloft.db'
-    UPLOAD_FOLDER = '/tmp/uploads'
+if DATABASE_URL:
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    db_path = DATABASE_URL
 else:
-    db_path = 'myloft.db'
-    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+    IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
+    if IS_VERCEL:
+        db_path = 'sqlite:////tmp/myloft.db'
+    else:
+        db_path = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'myloft.db')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_DATABASE_URI'] = db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'myloft-secret-key-123' # Necessário para flash messages
 
