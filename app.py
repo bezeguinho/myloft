@@ -10,6 +10,14 @@ DATABASE_URL = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        
+    # Assegurar que a conexão exige SSL (para Neon / Vercel Postgres)
+    if "sslmode=" not in DATABASE_URL:
+        if "?" in DATABASE_URL:
+            DATABASE_URL += "&sslmode=require"
+        else:
+            DATABASE_URL += "?sslmode=require"
+            
     db_path = DATABASE_URL
 else:
     IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
