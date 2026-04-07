@@ -237,6 +237,11 @@ def get_colony_stats():
 def index():
     return render_template("index.html")
 
+@app.route("/estatisticas")
+def estatisticas():
+    stats = get_colony_stats()
+    return render_template("estatisticas.html", stats=stats)
+
 @app.route("/pombo/apagar/<anilha>")
 def apagar_pombo(anilha):
     pombo = Pombo.query.filter_by(anilha=anilha).first()

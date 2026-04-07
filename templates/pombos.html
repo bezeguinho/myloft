@@ -6,11 +6,12 @@
 <div class="row align-items-center mb-4 g-3">
     <div class="col-12 col-md-6 text-center text-md-start">
         <h2 class="fw-bold mb-1">{{ titulo }}</h2>
-        <div class="d-inline-flex align-items-center gap-2 mt-1 no-print bg-light border p-1 px-2 rounded-3" 
-             onclick="new bootstrap.Modal(document.getElementById('statsModal')).show()" 
-             style="cursor: pointer; transition: all 0.2s;">
-            <span class="fw-bold text-muted small text-uppercase">Total</span>
-            <span class="badge bg-primary fs-6">{{ pombos|length }}</span>
+        <div class="d-inline-flex align-items-center mt-1 no-print">
+            <span class="fw-bold text-muted small text-uppercase me-2">Total</span>
+            <span class="badge bg-primary fs-6 me-4">{{ pombos|length }}</span>
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-table me-1"></i> Tabela de Pombos
+            </a>
         </div>
     </div>
     <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end gap-2 text-center no-print">
@@ -225,65 +226,7 @@
 </div>
 
 
-<!-- Modal de Estatísticas -->
-<div class="modal fade no-print" id="statsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h4 class="modal-title fw-bold" style="color: #000;">ESTATÍSTICAS</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr class="text-uppercase small text-muted">
-                                <th>Grupo</th>
-                                <th class="text-center">Total</th>
-                                <th class="text-center text-danger">Fêmeas</th>
-                                <th class="text-center text-primary">Machos</th>
-                                <th class="text-center text-secondary">Indef.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-bottom fw-bold">
-                                <td>GERAL</td>
-                                <td class="text-center"><span class="badge bg-dark rounded-pill">{{ stats.total }}</span></td>
-                                <td class="text-center"><span class="badge bg-danger rounded-pill">{{ stats.total_f }}</span></td>
-                                <td class="text-center"><span class="badge bg-primary rounded-pill">{{ stats.total_m }}</span></td>
-                                <td class="text-center"><span class="badge bg-secondary rounded-pill">{{ stats.total_i }}</span></td>
-                            </tr>
-                            <tr class="border-bottom">
-                                <td>Voadores</td>
-                                <td class="text-center">{{ stats.voadores }}</td>
-                                <td class="text-center">{{ stats.voadores_f }}</td>
-                                <td class="text-center">{{ stats.voadores_m }}</td>
-                                <td class="text-center">{{ stats.voadores_i }}</td>
-                            </tr>
-                            <tr class="border-bottom">
-                                <td>Reprodutores</td>
-                                <td class="text-center">{{ stats.reprodutores }}</td>
-                                <td class="text-center">{{ stats.reprodutores_f }}</td>
-                                <td class="text-center">{{ stats.reprodutores_m }}</td>
-                                <td class="text-center">{{ stats.reprodutores_i }}</td>
-                            </tr>
-                            <tr>
-                                <td>Cedidos</td>
-                                <td class="text-center">{{ stats.cedidos }}</td>
-                                <td class="text-center">{{ stats.cedidos_f }}</td>
-                                <td class="text-center">{{ stats.cedidos_m }}</td>
-                                <td class="text-center">{{ stats.cedidos_i }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer border-0 p-4 pt-0">
-                <button type="button" class="btn btn-light border w-100" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Modal de Opções de Impressão -->
 <div class="modal fade no-print" id="printOptionsModal" tabindex="-1" aria-hidden="true">
