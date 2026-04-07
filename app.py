@@ -235,8 +235,7 @@ def get_colony_stats():
 
 @app.route("/")
 def index():
-    stats = get_colony_stats()
-    return render_template("index.html", stats=stats)
+    return redirect(url_for('lista_pombos'))
 
 @app.route("/pombo/apagar/<anilha>")
 def apagar_pombo(anilha):
