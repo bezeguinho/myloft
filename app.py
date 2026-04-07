@@ -32,6 +32,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'myloft-secret-key-123' # Necessário para flash messages
 
+IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
+if IS_VERCEL:
+    UPLOAD_FOLDER = '/tmp/uploads'
+else:
+    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+
 try:
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 except Exception:
