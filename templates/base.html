@@ -22,6 +22,7 @@
       background-color: rgba(13, 110, 253, 0.9) !important;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       padding: 0.75rem 1rem;
+      z-index: 2000;
     }
 
     .navbar-brand-text {
@@ -59,8 +60,8 @@
 
     .navbar-nav .nav-link:hover,
     .navbar-nav .nav-link.show {
-      color: #ffffff !important;
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: #ffeb3b;
+      color: #000000 !important;
     }
 
     .navbar-nav .nav-item {
@@ -75,6 +76,7 @@
       padding: 0.75rem;
       min-width: 220px;
       animation: fadeIn 0.2s ease-out;
+      z-index: 2000;
     }
 
     @keyframes fadeIn {
@@ -159,7 +161,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="{{ url_for('static', filename='img/myloft_logo.png') }}" alt="MYLOFT"
@@ -202,6 +204,12 @@
               </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='oculto') }}">POMBOS OCULTOS</a></li>
             </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">
+              DASHBOARD
+            </a>
           </li>
 
           <li class="nav-item">

@@ -4,15 +4,31 @@ from werkzeug.utils import secure_filename
 from models import db, Pombo, Utilizador
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///myloft.db'
+
+IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
+
+if IS_VERCEL:
+    db_path = '/tmp/myloft.db'
+    UPLOAD_FOLDER = '/tmp/uploads'
+else:
+    db_path = 'myloft.db'
+    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'myloft-secret-key-123' # Necessário para flash messages
 
-UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+try:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except Exception:
+    pass
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 @app.route("/api/pombo/existe/<search>")
 def api_pombo_existe(search):
@@ -30,6 +46,16 @@ def api_pombo_existe(search):
     if pombo:
         return {"existe": True, "numero": pombo.numero, "ano": pombo.ano}
     return {"existe": False}
+
+@app.route("/pombo/pelo-numero/<numero>")
+def ver_pombo_por_numero(numero):
+    # Procura o pombo pelo número e redireciona para a edição
+    pombo = Pombo.query.filter_by(numero=numero).first()
+    if pombo:
+        return redirect(url_for('editar_pombo', anilha=pombo.anilha))
+    flash(f"Pombo {numero} não encontrado.", "warning")
+    return redirect(request.referrer or url_for('lista_pombos'))
+
 
 @app.route("/pombo/novo", methods=['GET', 'POST'])
 def novo_pombo():

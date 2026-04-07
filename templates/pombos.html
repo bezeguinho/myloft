@@ -30,16 +30,16 @@
                 <i class="bi bi-search text-primary"></i>
             </span>
             <input type="text" id="pomboSearch" class="form-control border-start-0 py-2" 
-                placeholder="Pesquisar por número, nome ou anilha..." autofocus>
+                placeholder="Pesquisar por número, nome ou anilha..." autofocus style="height: 48px;">
         </div>
     </div>
     <div class="col-12 col-md-6 col-lg-7 d-flex justify-content-md-end align-items-center">
         {% if is_todos_pombos %}
-        <button type="button" class="btn btn-outline-primary no-print w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#printOptionsModal">
+        <button type="button" class="btn btn-outline-primary no-print w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#printOptionsModal" style="height: 48px;">
             <i class="bi bi-printer me-2"></i> Imprimir Lista
         </button>
         {% else %}
-        <button onclick="window.print()" class="btn btn-outline-primary no-print w-100 w-md-auto">
+        <button onclick="window.print()" class="btn btn-outline-primary no-print w-100 w-md-auto" style="height: 48px;">
             <i class="bi bi-printer me-2"></i> Imprimir Lista
         </button>
         {% endif %}
@@ -72,18 +72,41 @@
                         <td>{{ pombo.nome if pombo.nome and pombo.nome != 'None' else '-' }}</td>
                         <td class="text-center">
                             {% if pombo.sexo == 'Macho' %}
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">M</span>
+                                <span class="text-primary fs-5" title="Macho"><i class="bi bi-gender-male"></i></span>
                             {% elif pombo.sexo == 'Fêmea' %}
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">F</span>
+                                <span class="text-danger fs-5" title="Fêmea"><i class="bi bi-gender-female"></i></span>
                             {% else %}
-                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3">?</span>
+                                <span class="text-secondary fs-5" title="Indefinido"><i class="bi bi-question-circle"></i></span>
                             {% endif %}
                         </td>
                         <td>{{ (pombo.cor if pombo.cor and pombo.cor != 'None' else '-') }}</td>
                         <td>
-                            <div class="small">
-                                <span class="text-muted">P:</span> {{ pombo.pai if pombo.pai and pombo.pai != 'None' else '-' }}<br>
-                                <span class="text-muted">M:</span> {{ pombo.mae if pombo.mae and pombo.mae != 'None' else '-' }}
+                            <div class="d-flex flex-column gap-1">
+                                {% if pombo.pai and pombo.pai != 'None' %}
+                                    <a href="{{ url_for('ver_pombo_por_numero', numero=pombo.pai) }}" 
+                                       class="d-flex align-items-center justify-content-center text-decoration-none border rounded bg-white text-primary fw-bold" 
+                                       style="width: 100px; height: 28px; font-size: 0.75rem; border-color: #dee2e6 !important;">
+                                        P: {{ pombo.pai }}
+                                    </a>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center border rounded bg-light text-muted" 
+                                         style="width: 100px; height: 28px; font-size: 0.75rem; border-color: #dee2e6 !important;">
+                                        P: -
+                                    </div>
+                                {% endif %}
+                                
+                                {% if pombo.mae and pombo.mae != 'None' %}
+                                    <a href="{{ url_for('ver_pombo_por_numero', numero=pombo.mae) }}" 
+                                       class="d-flex align-items-center justify-content-center text-decoration-none border rounded bg-white text-primary fw-bold" 
+                                       style="width: 100px; height: 28px; font-size: 0.75rem; border-color: #dee2e6 !important;">
+                                        M: {{ pombo.mae }}
+                                    </a>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center border rounded bg-light text-muted" 
+                                         style="width: 100px; height: 28px; font-size: 0.75rem; border-color: #dee2e6 !important;">
+                                        M: -
+                                    </div>
+                                {% endif %}
                             </div>
                         </td>
                         <td>
@@ -140,11 +163,11 @@
                 </div>
                 <div>
                     {% if pombo.sexo == 'Macho' %}
-                        <span class="badge bg-primary rounded-pill px-3">M</span>
+                        <span class="text-primary"><i class="bi bi-gender-male fs-3"></i></span>
                     {% elif pombo.sexo == 'Fêmea' %}
-                        <span class="badge bg-danger rounded-pill px-3">F</span>
+                        <span class="text-danger"><i class="bi bi-gender-female fs-3"></i></span>
                     {% else %}
-                        <span class="badge bg-secondary rounded-pill px-3">?</span>
+                        <span class="text-secondary"><i class="bi bi-question-circle fs-3"></i></span>
                     {% endif %}
                 </div>
             </div>
@@ -152,11 +175,19 @@
             <div class="row g-2 mb-3 bg-light p-2 rounded-3 mx-0">
                 <div class="col-6">
                     <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">Pai</span>
-                    <span class="fw-medium small">{{ pombo.pai if pombo.pai and pombo.pai != 'None' else '-' }}</span>
+                    {% if pombo.pai and pombo.pai != 'None' %}
+                        <a href="{{ url_for('ver_pombo_por_numero', numero=pombo.pai) }}" class="text-decoration-none fw-bold small">{{ pombo.pai }}</a>
+                    {% else %}
+                        <span class="fw-medium small">-</span>
+                    {% endif %}
                 </div>
                 <div class="col-6 border-start">
                     <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">Mãe</span>
-                    <span class="fw-medium small">{{ pombo.mae if pombo.mae and pombo.mae != 'None' else '-' }}</span>
+                    {% if pombo.mae and pombo.mae != 'None' %}
+                        <a href="{{ url_for('ver_pombo_por_numero', numero=pombo.mae) }}" class="text-decoration-none fw-bold small">{{ pombo.mae }}</a>
+                    {% else %}
+                        <span class="fw-medium small">-</span>
+                    {% endif %}
                 </div>
                 <div class="col-12 mt-1 border-top pt-1">
                     <span class="d-block text-muted small text-uppercase" style="font-size: 0.6rem;">{% if modo_cedidos %}Cedido Para{% else %}Categoria{% endif %}</span>
