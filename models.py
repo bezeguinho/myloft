@@ -1,37 +1,52 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
     
-    anilha = db.Column(db.String(50), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) # Adicionado para bater com o Supabase
+    anilha = db.Column(db.String(50), unique=True, nullable=False)
     numero = db.Column(db.String(20))
-    ano = db.Column(db.String(10))
+    ano = db.Column(db.Integer)
     nome = db.Column(db.String(100))
-    sexo = db.Column(db.String(20), default='Indefinido') # Macho, Fêmea, Indefinido
+    sexo = db.Column(db.String(20), default='Indefinido')
     cor = db.Column(db.String(50), default='Indefinido')
-    pai = db.Column(db.String(50)) # Anilha do pai
-    mae = db.Column(db.String(50)) # Anilha da mãe
-    categoria = db.Column(db.String(50)) # Reprodutor, Voador, Cedido, etc.
-    status = db.Column(db.String(20), default='Ativo') # Mantido por retrocompatibilidade
-    cedido_para = db.Column(db.String(100)) # Registar para quem foi cedido
-    descricao = db.Column(db.Text)
+    linhagem = db.Column(db.String(200))
+    pai_anilha = db.Column(db.String(50))
+    mae_anilha = db.Column(db.String(50))
+    categoria = db.Column(db.String(50))
+    status = db.Column(db.String(20), default='Ativo')
+    cedido_para = db.Column(db.String(100))
+    observacoes = db.Column(db.Text)
     oculto = db.Column(db.Boolean, default=False)
+    
+    # ESTA LINHA É A CHAVE: Liga o pombo a um utilizador específico
+    user_id = db.Column(db.Integer, db.ForeignKey('utilizadores.id'))
 
     def __repr__(self):
         return f'<Pombo {self.anilha}>'
 
 
-class Utilizador(db.Model):
+class Utilizador(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
     __tablename__ = 'utilizadores'
 
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.Text, nullable=False) # Para guardar a senha segura
+    role = db.Column(db.String(20), default='user')    # 'user' ou 'admin'
+    is_active = db.Column(db.Boolean, default=True)   # Para tu bloqueares contas
+    
+    # Campos de perfil que já tinhas
     nome = db.Column(db.String(60))
     telefone = db.Column(db.String(25))
-    email = db.Column(db.String(60))
     localidade = db.Column(db.String(60))
-    foto = db.Column(db.String(300))  # caminho para o ficheiro da foto
+    foto = db.Column(db.String(300))
+
+    # Relacionamento: permite ver todos os pombos de um user facilmente
+    pombos = db.relationship('Pombo', backref='dono', lazy=True)
 
     def __repr__(self):
-        return f'<Utilizador {self.nome}>'
+        return f'<Utilizador {self.username}>'

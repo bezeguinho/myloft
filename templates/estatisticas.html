@@ -3,8 +3,8 @@
 {% block content %}
 <div class="row align-items-center mb-4">
     <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-        <h2 class="fw-bold mb-0 text-dark">TABELA DE POMBOS TOTAIS</h2>
-        <a href="{{ request.referrer or url_for('lista_pombos') }}" class="btn btn-yellow">
+        <h2 class="fw-bold mb-0 text-dark"><i class="bi bi-grid-3x3-gap me-2"></i>ESTATÍSTICAS DO POMBAL</h2>
+        <a href="{{ request.referrer or url_for('lista_pombos') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Voltar
         </a>
     </div>
@@ -12,45 +12,46 @@
 
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr class="text-uppercase small text-muted">
-                    <th class="ps-4 py-3">Grupo</th>
+                    <th class="ps-4 py-3">Categoria</th>
                     <th class="text-center">Total</th>
-                    <th class="text-center text-danger">Fêmeas</th>
-                    <th class="text-center text-primary">Machos</th>
+                    <th class="text-center text-danger"><i class="bi bi-gender-female"></i> Fêmeas</th>
+                    <th class="text-center text-primary"><i class="bi bi-gender-male"></i> Machos</th>
                     <th class="text-center text-secondary">Indef.</th>
                 </tr>
             </thead>
             <tbody>
-                <tr class="border-bottom fw-bold bg-white">
-                    <td class="ps-4 py-3">GERAL</td>
-                    <td class="text-center"><span class="badge bg-dark rounded-pill fs-6">{{ stats.total }}</span></td>
-                    <td class="text-center"><span class="badge bg-danger rounded-pill">{{ stats.total_f }}</span></td>
-                    <td class="text-center"><span class="badge bg-primary rounded-pill">{{ stats.total_m }}</span></td>
-                    <td class="text-center"><span class="badge bg-secondary rounded-pill">{{ stats.total_i }}</span></td>
+                <tr class="table-dark fw-bold">
+                    <td class="ps-4 py-3">TOTAL GERAL</td>
+                    <td class="text-center"><span class="badge bg-light text-dark rounded-pill fs-6">{{ stats.total
+                            }}</span></td>
+                    <td class="text-center">{{ stats.total_f }}</td>
+                    <td class="text-center">{{ stats.total_m }}</td>
+                    <td class="text-center">{{ stats.total_i }}</td>
                 </tr>
-                <tr class="border-bottom bg-white">
-                    <td class="ps-4 py-3">Voadores</td>
-                    <td class="text-center fw-medium">{{ stats.voadores }}</td>
-                    <td class="text-center text-danger fw-medium">{{ stats.voadores_f }}</td>
-                    <td class="text-center text-primary fw-medium">{{ stats.voadores_m }}</td>
-                    <td class="text-center text-secondary fw-medium">{{ stats.voadores_i }}</td>
-                </tr>
-                <tr class="border-bottom bg-white">
-                    <td class="ps-4 py-3">Reprodutores</td>
-                    <td class="text-center fw-medium">{{ stats.reprodutores }}</td>
-                    <td class="text-center text-danger fw-medium">{{ stats.reprodutores_f }}</td>
-                    <td class="text-center text-primary fw-medium">{{ stats.reprodutores_m }}</td>
-                    <td class="text-center text-secondary fw-medium">{{ stats.reprodutores_i }}</td>
-                </tr>
+
+                {% set categorias = [
+                {'nome': 'Voadores', 'icon': 'bi-send', 'total': stats.voadores, 'f': stats.voadores_f, 'm':
+                stats.voadores_m, 'i': stats.voadores_i},
+                {'nome': 'Reprodutores', 'icon': 'bi-house-heart', 'total': stats.reprodutores, 'f':
+                stats.reprodutores_f, 'm': stats.reprodutores_m, 'i': stats.reprodutores_i},
+                {'nome': 'Cedidos', 'icon': 'bi-person-up', 'total': stats.cedidos, 'f': stats.cedidos_f, 'm':
+                stats.cedidos_m, 'i': stats.cedidos_i}
+                ] %}
+
+                {% for cat in categorias %}
                 <tr class="bg-white">
-                    <td class="ps-4 py-3">Cedidos</td>
-                    <td class="text-center fw-medium">{{ stats.cedidos }}</td>
-                    <td class="text-center text-danger fw-medium">{{ stats.cedidos_f }}</td>
-                    <td class="text-center text-primary fw-medium">{{ stats.cedidos_m }}</td>
-                    <td class="text-center text-secondary fw-medium">{{ stats.cedidos_i }}</td>
+                    <td class="ps-4 py-3">
+                        <i class="{{ cat.icon }} text-muted me-2"></i>{{ cat.nome }}
+                    </td>
+                    <td class="text-center fw-bold text-dark">{{ cat.total }}</td>
+                    <td class="text-center text-danger fw-medium">{{ cat.f }}</td>
+                    <td class="text-center text-primary fw-medium">{{ cat.m }}</td>
+                    <td class="text-center text-secondary fw-medium">{{ cat.i }}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
