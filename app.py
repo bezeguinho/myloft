@@ -14,7 +14,7 @@ login_manager.login_view = 'login' # Se tentar aceder sem login, vai para aqui
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Utilizador.query.get(int(user_id))
+    return db.session.get(Utilizador, int(user_id))
 
 DATABASE_URL = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 
@@ -144,10 +144,10 @@ def novo_pombo():
         
         new_pombo = Pombo(
             anilha=anilha, numero=numero, ano=ano, nome=nome, sexo=sexo,
-            cor=request.form.get('cor'), pai=request.form.get('pai'),
-            mae=request.form.get('mae'), categoria=request.form.get('categoria'),
+            cor=request.form.get('cor'), pai_anilha=request.form.get('pai'),
+            mae_anilha=request.form.get('mae'), categoria=request.form.get('categoria'),
             status='Ativo', cedido_para=request.form.get('cedido_para'),
-            descricao=request.form.get('descricao'),
+            observacoes=request.form.get('descricao'),
             oculto=True if request.form.get('oculto') else False
         )
 
@@ -172,11 +172,11 @@ def editar_pombo(anilha):
         pombo.nome = request.form.get('nome')
         pombo.sexo = request.form.get('sexo')
         pombo.cor = request.form.get('cor')
-        pombo.pai = request.form.get('pai')
-        pombo.mae = request.form.get('mae')
+        pombo.pai_anilha = request.form.get('pai')
+        pombo.mae_anilha = request.form.get('mae')
         pombo.categoria = request.form.get('categoria')
         pombo.cedido_para = request.form.get('cedido_para')
-        pombo.descricao = request.form.get('descricao')
+        pombo.observacoes = request.form.get('descricao')
         pombo.oculto = True if request.form.get('oculto') else False
         if not pombo.status: pombo.status = 'Ativo'
 
@@ -229,10 +229,6 @@ if __name__ == "__main__":
         db.create_all()
         seed_data()
     app.run(debug=True)
-
-@app.route("/pedigree/gerar")
-def gerar_pedigree():
-    return render_template("gerar_pedigree.html")
 
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 def gerar_pedigree():
