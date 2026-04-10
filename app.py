@@ -94,7 +94,20 @@ def estatisticas_pombos():
     return render_template('estatisticas.html', stats=stats)
 
 # --- OUTRAS ROTAS ---
-
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        user = Utilizador.query.filter_by(username=username).first()
+        
+        # Como estamos a testar, ele vai deixar entrar se o utilizador existir
+        if user:
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Utilizador não encontrado!')
+            
+    return render_template('login.html')
 @app.route("/")
 def index():
     return render_template("index.html")
