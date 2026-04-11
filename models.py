@@ -23,14 +23,14 @@ class Pombo(db.Model):
     oculto = db.Column(db.Boolean, default=False)
     
     # ESTA LINHA É A CHAVE: Liga o pombo a um utilizador específico
-    user_id = db.Column(db.Integer, db.ForeignKey('utilizadores.id'))
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'))
 
     def __repr__(self):
         return f'<Pombo {self.anilha}>'
 
 
 class Utilizador(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
-    __tablename__ = 'utilizadores'
+    __tablename__ = 'users'
 
     id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
