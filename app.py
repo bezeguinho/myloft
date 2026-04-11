@@ -53,11 +53,17 @@ except Exception:
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db.init_app(app)
 
+from sqlalchemy import text
+
 with app.app_context():
     try:
         db.create_all()
+        # Auto-correção do esquema: Adiciona colunas se não existirem
+        db.session.execute(text("ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'"))
+        db.session.execute(text("ALTER TABLE pombos ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES utilizadores(id)"))
+        db.session.commit()
     except Exception as e:
-        print(f"Warning: Could not create tables on startup. {e}")
+        print(f"Warning: Could not update database schema on startup. {e}")
 
 # --- ROTAS DE ESTATÍSTICAS ---
 
