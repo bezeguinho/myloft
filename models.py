@@ -6,7 +6,7 @@ db = SQLAlchemy()
 class Pombo(db.Model):
     __tablename__ = 'pombos'
     
-    id = db.Column(db.Integer, primary_key=True) # Adicionado para bater com o Supabase
+    id = db.Column(db.BigInteger, primary_key=True) # BigInteger para alinhar com Supabase
     anilha = db.Column(db.String(50), unique=True, nullable=False)
     numero = db.Column(db.String(20))
     ano = db.Column(db.Integer)
@@ -32,7 +32,7 @@ class Pombo(db.Model):
 class Utilizador(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
     __tablename__ = 'utilizadores'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True)
     password_hash = db.Column(db.Text, nullable=False) # Para guardar a senha segura

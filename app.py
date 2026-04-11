@@ -46,11 +46,8 @@ except Exception:
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db.init_app(app)
 
-with app.app_context():
-    try:
-        db.create_all()
-    except Exception as e:
-        print(f"Warning: Could not create tables on startup. {e}")
+# Inicialização automática de tabelas removida para evitar erros no Vercel.
+# As tabelas já foram criadas manualmente no Supabase.
 
 # --- ROTAS DE ESTATÍSTICAS ---
 
@@ -347,7 +344,4 @@ def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        seed_data()
     app.run(debug=True)
