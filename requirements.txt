@@ -1,7 +1,6 @@
-Flask==3.0.3
-Flask-SQLAlchemy==3.1.1
-Flask-Login==0.6.3
-Flask-Session==0.8.0
-psycopg2-binary==2.9.9
-Werkzeug==3.0.3
-SQLAlchemy==2.0.30
+flask
+flask-sqlalchemy
+flask-login
+psycopg2-binary
+werkzeug
+sqlalchemy

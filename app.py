@@ -4,7 +4,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from models import db, Pombo, Utilizador
-from flask_session import Session
 
 app = Flask(__name__)
 
@@ -64,12 +63,7 @@ except Exception:
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db.init_app(app)
 
-# Configuração da Sessão
-app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SESSION_SQLALCHEMY'] = db
-Session(app)
-
-# Inicialização automática de tabelas (incluindo a tabela de sessões)
+# Inicialização automática de tabelas
 with app.app_context():
     db.create_all()
 
