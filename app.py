@@ -42,6 +42,10 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
 # Rota de Registo
 @app.route('/register', methods=['GET', 'POST'])
 def register():
