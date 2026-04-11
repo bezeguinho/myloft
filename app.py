@@ -19,16 +19,9 @@ def load_user(user_id):
 DATABASE_URL = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
-    # Garantir que o protocolo usa pg8000 para compatibilidade com SQLAlchemy 2.0+ e PostgreSQL
+    # Garantir que o protocolo usa postgresql:// (psycopg2)
     if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
-    elif DATABASE_URL.startswith("postgresql://"):
-        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
-    
-    # Garantir SSL para Supabase/Vercel
-    if "sslmode=" not in DATABASE_URL:
-        separator = "&" if "?" in DATABASE_URL else "?"
-        DATABASE_URL += f"{separator}sslmode=require"
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
             
     db_path = DATABASE_URL
 else:
@@ -53,17 +46,11 @@ except Exception:
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db.init_app(app)
 
-from sqlalchemy import text
-
 with app.app_context():
     try:
         db.create_all()
-        # Auto-correção do esquema: Adiciona colunas se não existirem
-        db.session.execute(text("ALTER TABLE utilizadores ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'"))
-        db.session.execute(text("ALTER TABLE pombos ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES utilizadores(id)"))
-        db.session.commit()
     except Exception as e:
-        print(f"Warning: Could not update database schema on startup. {e}")
+        print(f"Warning: Could not create tables on startup. {e}")
 
 # --- ROTAS DE ESTATÍSTICAS ---
 
