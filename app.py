@@ -16,7 +16,7 @@ login_manager.login_view = 'login' # Se tentar aceder sem login, vai para aqui
 def load_user(user_id):
     return db.session.get(Utilizador, int(user_id))
 
-DATABASE_URL = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if DATABASE_URL:
     # Garantir que o protocolo usa postgresql:// (psycopg2)
@@ -37,7 +37,11 @@ app.config['SECRET_KEY'] = 'myloft-secret-key-123'
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "connect_args": {
         "sslmode": "require"
-    }
+    },
+    "pool_size": 10,
+    "max_overflow": 20,
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
 }
 
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
