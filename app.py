@@ -1,13 +1,13 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
-from models import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'uma_chave_muito_segura_123')
 
-# Configuração da Base de Dados
+# 1. Configuração da Base de Dados (Corrigida para o Vercel)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -19,10 +19,10 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True
 }
 
-# Inicializar Base de Dados
-db.init_app(app)
+# 2. Inicializar SQLAlchemy diretamente aqui
+db = SQLAlchemy(app)
 
-# Modelo de Utilizador (Garantindo nomes de colunas exatos)
+# 3. Modelo de Utilizador (Integrado no app.py)
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -31,7 +31,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default='user')
 
-# Configurar Flask-Login
+# 4. Configurar Flask-Login
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.login_message = 'Por favor, inicie sessão para aceder a esta página.'
@@ -46,7 +46,12 @@ def load_user(user_id):
 def shutdown_session(exception=None):
     db.session.remove()
 
-# Rota de Registo
+# --- ROTAS ---
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -57,7 +62,6 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        # Verificar se o utilizador já existe
         if User.query.filter((User.username == username) | (User.email == email)).first():
             flash('Utilizador ou Email já existem.', 'danger')
             return render_template('register.html')
@@ -76,7 +80,6 @@ def register():
             
     return render_template('register.html')
 
-# Rota de Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -103,11 +106,8 @@ def logout():
     flash('Sessão terminada.', 'info')
     return redirect(url_for('login'))
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# --- PÁGINAS DO DASHBOARD ---
 
-# Placeholder routes for navigation links used in base.html
 @app.route('/dashboard')
 @login_required
 def dashboard():
