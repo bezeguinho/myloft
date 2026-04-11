@@ -1,6 +1,10 @@
-Pillow>=10.0.0
-Flask>=3.0.0
-Flask-SQLAlchemy>=3.0.0
-Flask-Login>=0.6.3
-psycopg2-binary>=2.9.9
-SQLAlchemy>=2.0.0
+import os
+database_url = os.getenv('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "connect_args": {"sslmode": "require"},
+    "pool_pre_ping": True
+}
