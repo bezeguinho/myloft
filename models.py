@@ -29,7 +29,7 @@ class Pombo(db.Model):
         return f'<Pombo {self.anilha}>'
 
 
-class Utilizador(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
+class User(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
     __tablename__ = 'users'
 
     id = db.Column(db.BigInteger, primary_key=True)
@@ -49,4 +49,4 @@ class Utilizador(db.Model, UserMixin): # UserMixin permite que o Flask-Login fun
     pombos = db.relationship('Pombo', backref='dono', lazy=True)
 
     def __repr__(self):
-        return f'<Utilizador {self.username}>'
+        return f'<User {self.username}>'
