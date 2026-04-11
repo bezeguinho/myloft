@@ -19,9 +19,17 @@ def load_user(user_id):
 DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.strip()
     # Garantir que o protocolo usa postgresql:// (psycopg2)
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        
+    # Adicionar sslmode=require se não estiver presente no link
+    if "sslmode=" not in DATABASE_URL:
+        if "?" in DATABASE_URL:
+            DATABASE_URL += "&sslmode=require"
+        else:
+            DATABASE_URL += "?sslmode=require"
             
     db_path = DATABASE_URL
 else:
