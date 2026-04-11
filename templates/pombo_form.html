@@ -62,14 +62,14 @@
                 <div class="col-md-6">
                     <label for="pai" class="form-label fw-bold mb-0">Pai:</label>
                     <input type="text" class="form-control" id="pai" name="pai" 
-                        value="{{ pombo.pai if modo_edicao else '' }}" placeholder="Número do Pai" maxlength="12" list="listaPais">
+                        value="{{ pombo.pai_anilha if modo_edicao else '' }}" placeholder="Número do Pai" maxlength="12" list="listaPais">
                     <datalist id="listaPais"></datalist>
                     <div id="pai-aviso" class="small text-danger d-none">Pai não registado.</div>
                 </div>
                 <div class="col-md-6">
                     <label for="mae" class="form-label fw-bold mb-0">Mãe:</label>
                     <input type="text" class="form-control" id="mae" name="mae" 
-                        value="{{ pombo.mae if modo_edicao else '' }}" placeholder="Número da Mãe" maxlength="12" list="listaMaes">
+                        value="{{ pombo.mae_anilha if modo_edicao else '' }}" placeholder="Número da Mãe" maxlength="12" list="listaMaes">
                     <datalist id="listaMaes"></datalist>
                     <div id="mae-aviso" class="small text-danger d-none">Mãe não registada.</div>
                 </div>
@@ -96,7 +96,7 @@
                     <div class="d-flex align-items-start gap-3">
                         <textarea class="form-control" id="descricao" name="descricao" rows="10" 
                             style="width: 32ch; font-family: monospace !important; resize: none; overflow-y: auto;"
-                            placeholder="Descrição para o Pedigree...">{{ pombo.descricao if modo_edicao else '' }}</textarea>
+                            placeholder="Descrição para o Pedigree...">{{ pombo.observacoes if modo_edicao else '' }}</textarea>
                         
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary px-3 py-2 shadow-sm">{{ 'Gravar' if not modo_edicao else 'Atualizar' }}</button>

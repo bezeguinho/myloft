@@ -163,7 +163,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
     <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="#">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
         <img src="{{ url_for('static', filename='img/myloft_logo.png') }}" alt="MYLOFT"
           class="brand-logo d-none d-sm-inline-block" onerror="this.style.display='none';">
         <span class="navbar-brand-text">MYLOFT</span>
@@ -175,6 +175,14 @@
 
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if current_user.is_authenticated %}
+          <!-- DASHBOARD -->
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard') }}">
+              DASHBOARD
+            </a>
+          </li>
+
           <!-- GESTÃO DE POMBOS -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -182,30 +190,16 @@
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='reprodutor') }}">REPRODUTORES</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='reprodutor') }}">REPRODUTORES</a></li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='voador') }}">VOADORES</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='cedido') }}">CEDIDOS</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='oculto') }}">POMBOS OCULTOS</a></li>
             </ul>
           </li>
-
 
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">
@@ -219,9 +213,25 @@
             </a>
           </li>
 
+          {% if current_user.role == 'admin' %}
           <li class="nav-item">
-            <a class="nav-link" href="#">SAIR</a>
+            <a class="nav-link text-warning fw-bold" href="{{ url_for('admin_panel') }}">
+              ADMIN
+            </a>
           </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">CRIAR CONTA</a>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>

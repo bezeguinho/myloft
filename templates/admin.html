@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary mb-2">Painel de Administração</h1>
+            <p class="text-muted fs-5">Bem-vindo, {{ current_user.nome or current_user.username }}. Aqui podes gerir todos os aspetos da plataforma.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Estatísticas Rápidas -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">--</h3>
+                    <p class="text-muted mb-0">Utilizadores Totais</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body text-center p-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-calendar-check fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">--</h3>
+                    <p class="text-muted mb-0">Novos hoje</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações do Administrador -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">Gestão Rápida</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center py-3">
+                            <i class="bi bi-people-fill text-primary me-3 fs-5"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Ver Todos os Utilizadores</h6>
+                                <small class="text-muted">Listar, editar ou banir contas.</small>
+                            </div>
+                            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center py-3">
+                            <i class="bi bi-database-fill-gear text-warning me-3 fs-5"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Backup da Base de Dados</h6>
+                                <small class="text-muted">Exportar dados do Supabase.</small>
+                            </div>
+                            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
