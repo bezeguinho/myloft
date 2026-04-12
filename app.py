@@ -7,25 +7,36 @@ from models import db, User, Pombo
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'uma_chave_muito_segura_123')
 
-# 1. Configuração da Base de Dados com Correção de Protocolo
-uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
-if uri and uri.startswith('postgres://'):
-    uri = uri.replace('postgres://', 'postgresql://', 1)
+# 1. Configuração da Base de Dados com Múltiplos Fallbacks (Vercel/Supabase)
+uri = os.getenv('DATABASE_URL') or \
+      os.getenv('POSTGRES_URL') or \
+      os.getenv('POSTGRES_URL_NON_POOLING')
+
+if uri:
+    if uri.startswith('postgres://'):
+        uri = uri.replace('postgres://', 'postgresql://', 1)
+else:
+    # Caso extremo: usa sqlite se nenhuma variável estiver definida para evitar FUNCTION_INVOCATION_FAILED
+    uri = 'sqlite:///fallback.db'
+    print("AVISO: Nenhuma variável de base de dados (DATABASE_URL/POSTGRES_URL) encontrada.")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # 2. SQLALCHEMY_ENGINE_OPTIONS (Para evitar o Timeout no Supabase)
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    "connect_args": {
-        "sslmode": "require",
-        "connect_timeout": 10
-    },
-    "pool_pre_ping": True,
-    "pool_recycle": 300,
-    "pool_size": 5,
-    "max_overflow": 10
-}
+if uri.startswith('postgresql'):
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {
+            "sslmode": "require",
+            "connect_timeout": 10
+        },
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+        "pool_size": 5,
+        "max_overflow": 10
+    }
+else:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 
 db.init_app(app)
 
