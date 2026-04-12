@@ -177,7 +177,7 @@
         });
 
         // Lógica de Sugestão de Pais (Datalists Dinâmicos)
-        const todosPombos = {{ todos_pombos_data | tojson | safe if todos_pombos_data else '[]' }};
+        const todosPombos = JSON.parse('{{ (todos_pombos_data | tojson | safe) if todos_pombos_data else "[]" }}');
         const anoInput = document.getElementById('ano');
         const numeroInput = document.getElementById('numero');
         const listaPais = document.getElementById('listaPais');
@@ -213,7 +213,7 @@
         // Limpar valores sugeridos ao clicar
         const suggestedYear = "{{ suggested_ano }}";
         const suggestedNum = "{{ suggested_num }}";
-        const modoEdicao = {{ 'true' if modo_edicao else 'false' }};
+        const modoEdicao = "{{ modo_edicao }}" === "True" || "{{ modo_edicao }}" === "true" || "{{ modo_edicao }}" === "1";
 
         // Verificação de Duplicado (Anilha)
         const divDuplicado = document.getElementById('div-duplicado');
