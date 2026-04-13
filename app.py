@@ -65,9 +65,21 @@ def init_db():
     try:
         with app.app_context():
             db.create_all()
-        return "Tabelas criadas com sucesso!", 200
+        return "Tabelas criadas com sucesso! (se não existissem)", 200
     except Exception as e:
-        return f"Erro ao criar tabelas: {str(e)}", 500
+        return f"Erro ao criar BD: {str(e)}", 500
+
+@app.route('/recreate_db')
+def recreate_db_route():
+    # Rota especial para "Limpar" as tabelas velhas do primeiro teste
+    # e criá-las de novo com as colunas novas (is_active, fotos, etc)
+    try:
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
+        return "Base de dados destruída e reconstruída com sucesso!! Podes criar conta agora.", 200
+    except Exception as e:
+        return f"Erro crítico ao reconstruir BD: {str(e)}", 500
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
