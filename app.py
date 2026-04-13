@@ -15,6 +15,14 @@ uri = os.getenv('DATABASE_URL') or \
 if uri:
     if uri.startswith('postgres://'):
         uri = uri.replace('postgres://', 'postgresql://', 1)
+    
+    if 'pgbouncer' in uri:
+        from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse
+        parsed = urlparse(uri)
+        query = parse_qsl(parsed.query, keep_blank_values=True)
+        query = [(k, v) for k, v in query if k != 'pgbouncer']
+        parsed = parsed._replace(query=urlencode(query))
+        uri = urlunparse(parsed)
 else:
     # Caso extremo: usa sqlite se nenhuma variável estiver definida para evitar FUNCTION_INVOCATION_FAILED
     uri = 'sqlite:///fallback.db'
