@@ -73,6 +73,19 @@ def init_db():
 def shutdown_session(exception=None):
     db.session.remove()
 
+import traceback
+from werkzeug.exceptions import HTTPException
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Passa erros HTTP normais (como 404, 403)
+    if isinstance(e, HTTPException):
+        return e
+    
+    # Formata a exceção e retorna ao utilizador (seguro para debug)
+    error_trace = traceback.format_exc()
+    return f"<h1>DETALHE DO ERRO 500</h1><pre>{error_trace}</pre><p>Por favor tira print a isto e envia-me!</p>", 500
+
 # --- ROTAS DE AUTENTICAÇÃO ---
 
 @app.route('/')
@@ -97,36 +110,38 @@ def register():
             flash('As senhas não coincidem. Tenta novamente.', 'danger')
             return render_template('register.html')
         
-        # Gerar um username a partir do email para não quebrar a base de dados
-        # Limitar a 50 caracteres para respeitar o limite da BD
-        username = email.split('@')[0]
-        if len(username) > 40:
-            username = username[:40]
-            
-        # Verificar se o email já existe
-        user_exist = User.query.filter_by(email=email).first()
-        if user_exist:
-            flash('Este email já está registado.', 'danger')
-            return render_template('register.html')
-            
-        # Verificar e garantir que o username gerado é único (caso dois emails comecem pelo mesmo prefixo)
-        base_username = username
-        counter = 1
-        while User.query.filter_by(username=username).first():
-            username = f"{base_username}{counter}"
-            counter += 1
-            
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, email=email, password_hash=hashed_password)
-        
         try:
+            # Gerar um username a partir do email para não quebrar a base de dados
+            # Limitar a 50 caracteres para respeitar o limite da BD
+            username = email.split('@')[0]
+            if len(username) > 40:
+                username = username[:40]
+                
+            # Verificar se o email já existe
+            user_exist = User.query.filter_by(email=email).first()
+            if user_exist:
+                flash('Este email já está registado.', 'danger')
+                return render_template('register.html')
+                
+            # Verificar e garantir que o username gerado é único
+            base_username = username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+                
+            hashed_password = generate_password_hash(password)
+            new_user = User(username=username, email=email, password_hash=hashed_password)
+            
             db.session.add(new_user)
             db.session.commit()
             flash('Conta criada com sucesso! Podes agora fazer login.', 'success')
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
-            flash(f"Erro ao criar conta: {str(e)}", 'danger')
+            # Mostramos o erro detalhado da base de dados no ecrã para identificar falhas no Supabase
+            flash(f"CRÍTICO - Erro na base de dados: {str(e)}", 'danger')
+            return render_template('register.html')
             
     return render_template('register.html')
 
@@ -137,11 +152,14 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            return redirect(url_for('dashboard'))
-        flash('Login falhou. Verifique o seu email e senha.', 'danger')
+        try:
+            user = User.query.filter_by(email=email).first()
+            if user and check_password_hash(user.password_hash, password):
+                login_user(user)
+                return redirect(url_for('dashboard'))
+            flash('Login falhou. Verifique o seu email e senha.', 'danger')
+        except Exception as e:
+            flash(f"CRÍTICO - Erro de ligação à BD ao fazer login: {str(e)}", 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -296,6 +314,17 @@ def editar_dados():
             db.session.rollback()
             flash(f'Erro ao atualizar dados: {str(e)}', 'danger')
     return render_template('meus_dados_editar.html')
+
+@app.route('/admin_panel')
+@login_required
+def admin_panel():
+    return render_template('admin.html')
+
+@app.route('/inserir_dados', methods=['POST'])
+@login_required
+def inserir_dados():
+    # Rota de placeholder para evitar falhas no meus_dados_form.html
+    return redirect(url_for('ver_dados'))
 
 # --- API ENDPOINTS ---
 
