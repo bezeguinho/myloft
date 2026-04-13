@@ -85,13 +85,36 @@ def register():
         return redirect(url_for('dashboard'))
         
     if request.method == 'POST':
-        username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
         
-        if User.query.filter((User.username == username) | (User.email == email)).first():
-            flash('Utilizador ou Email já existem.', 'danger')
+        if not email or not password:
+            flash('Por favor, preenche todos os campos obrigatórios.', 'danger')
             return render_template('register.html')
+            
+        if password != confirm_password:
+            flash('As senhas não coincidem. Tenta novamente.', 'danger')
+            return render_template('register.html')
+        
+        # Gerar um username a partir do email para não quebrar a base de dados
+        # Limitar a 50 caracteres para respeitar o limite da BD
+        username = email.split('@')[0]
+        if len(username) > 40:
+            username = username[:40]
+            
+        # Verificar se o email já existe
+        user_exist = User.query.filter_by(email=email).first()
+        if user_exist:
+            flash('Este email já está registado.', 'danger')
+            return render_template('register.html')
+            
+        # Verificar e garantir que o username gerado é único (caso dois emails comecem pelo mesmo prefixo)
+        base_username = username
+        counter = 1
+        while User.query.filter_by(username=username).first():
+            username = f"{base_username}{counter}"
+            counter += 1
             
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, email=email, password_hash=hashed_password)
@@ -99,7 +122,7 @@ def register():
         try:
             db.session.add(new_user)
             db.session.commit()
-            flash('Conta criada com sucesso!', 'success')
+            flash('Conta criada com sucesso! Podes agora fazer login.', 'success')
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
@@ -112,13 +135,13 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             return redirect(url_for('dashboard'))
-        flash('Login falhou. Verifique as suas credenciais.', 'danger')
+        flash('Login falhou. Verifique o seu email e senha.', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
