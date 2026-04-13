@@ -269,6 +269,34 @@ def ver_pombo_por_numero(numero):
 def estatisticas():
     return render_template('estatisticas.html')
 
+@app.route('/gerar_pedigree')
+@login_required
+def gerar_pedigree():
+    # Passa também os pombos do utilizador se o template precisar
+    pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    return render_template('gerar_pedigree.html', pombos=pombos)
+
+@app.route('/ver_dados')
+@login_required
+def ver_dados():
+    return render_template('meus_dados_ver.html')
+
+@app.route('/editar_dados', methods=['GET', 'POST'])
+@login_required
+def editar_dados():
+    if request.method == 'POST':
+        current_user.nome = request.form.get('nome')
+        current_user.telefone = request.form.get('telefone')
+        current_user.localidade = request.form.get('localidade')
+        try:
+            db.session.commit()
+            flash('Dados atualizados com sucesso!', 'success')
+            return redirect(url_for('ver_dados'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erro ao atualizar dados: {str(e)}', 'danger')
+    return render_template('meus_dados_editar.html')
+
 # --- API ENDPOINTS ---
 
 @app.route('/api/pombo/existe/<anilha>')
