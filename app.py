@@ -57,9 +57,17 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Garantir que as tabelas existem
-with app.app_context():
-    db.create_all()
+# Tabela criação está desativada no arranque para evitar Vercel FUNCTION_INVOCATION_FAILED (timeout)
+# Para forçar a criação de tabelas usa um script local ou uma rota específica.
+
+@app.route('/init_db')
+def init_db():
+    try:
+        with app.app_context():
+            db.create_all()
+        return "Tabelas criadas com sucesso!", 200
+    except Exception as e:
+        return f"Erro ao criar tabelas: {str(e)}", 500
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
