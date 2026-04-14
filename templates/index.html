@@ -1,29 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container text-center py-5">
-  <h1 class="display-4 mb-5">Bem-vindo ao MYLOFT</h1>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 60vh;">
 
-  <div class="row justify-content-center g-4">
-    <div class="col-md-5 col-lg-4">
-      <div class="card h-100 shadow-sm border-primary">
-        <div class="card-body p-4 p-md-5">
-          <i class="bi bi-person-check fs-1 text-primary mb-3"></i>
-          <h2 class="h4 mb-4">Iniciar Sessão</h2>
-          <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">Entrar</a>
-        </div>
-      </div>
+  {% if current_user.is_authenticated %}
+  <div class="text-center">
+    <h1 class="display-1 fw-bold text-primary" style="letter-spacing: 5px; opacity: 0.9;">
+      GESTÃO DE COLÓNIAS
+    </h1>
+    <div class="mt-4"
+      style="width: 100px; height: 4px; background-color: var(--amarelo-myloft); margin: 0 auto; border-radius: 2px;">
     </div>
+  </div>
 
-    <div class="col-md-5 col-lg-4">
-      <div class="card h-100 shadow-sm border-success">
-        <div class="card-body p-4 p-md-5">
-          <i class="bi bi-plus-circle fs-1 text-success mb-3"></i>
-          <h2 class="h4 mb-4">Criar Conta</h2>
-          <a href="{{ url_for('register') }}" class="btn btn-success btn-lg w-100">Registar</a>
-        </div>
+  {% else %}
+  <div class="text-center py-5">
+    <img src="{{ url_for('static', filename='img/novo_logo.jpg') }}" alt="MYLOFT" class="mb-4 shadow"
+      style="width: 150px; border-radius: 20px;">
+    <h1 class="display-4 fw-bold text-primary mb-3">Bem-vindo ao MYLOFT</h1>
+    <p class="lead mb-5">A sua plataforma profissional de gestão columbófila.</p>
+
+    <div class="row justify-content-center">
+      <div class="col-md-5 mb-3">
+        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100 py-3 shadow">
+          <i class="bi bi-box-arrow-in-right me-2"></i> ENTRAR NO LOFT
+        </a>
+      </div>
+      <div class="col-md-5 mb-3">
+        <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100 py-3">
+          <i class="bi bi-person-plus me-2"></i> CRIAR CONTA
+        </a>
       </div>
     </div>
   </div>
+  {% endif %}
+
 </div>
 {% endblock %}
