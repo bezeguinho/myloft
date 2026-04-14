@@ -122,6 +122,11 @@ def ver_dados():
 @login_required
 def admin_panel():
     return "Painel de Admin (Em construção)"
+   
+@app.route('/estatisticas')
+@login_required
+def estatisticas():
+    return "Página de Estatísticas (Em construção)"
 
 # --- O "RAIO-X" DE ERROS ---
 @app.errorhandler(Exception)
