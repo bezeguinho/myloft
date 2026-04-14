@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'chave-secreta-myloft-2024'
+app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
 # Configuração da Base de Dados
 uri = os.getenv("DATABASE_URL")
@@ -84,12 +84,12 @@ def register():
         
     return render_template('register.html')
 
+# AQUI ESTÁ A CORREÇÃO DO NOME DA ROTA
 @app.route('/recuperar-password', methods=['GET', 'POST'])
 def recuperar_password():
     if request.method == 'POST':
         flash('Se o email estiver registado, receberá instruções em breve.', 'info')
         return redirect(url_for('login'))
-    # Aqui usamos o nome exato do teu ficheiro
     return render_template('recuperar_password.html')
 
 @app.route('/dashboard')
