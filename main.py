@@ -7,11 +7,13 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração da Base de Dados
+# Proteção da Base de Dados para evitar o erro 500 no arranque
 uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+
+# Se o Vercel não encontrar o link do Supabase, não crasha
+app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -76,6 +78,9 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+# Exportação obrigatória para o Vercel reconhecer a aplicação
+application = app
 
 if __name__ == '__main__':
     app.run(debug=True)
