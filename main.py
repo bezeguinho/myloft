@@ -126,4 +126,225 @@ def login():
         flash('Email ou password incorretos.', 'danger')
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated: return redirect(url_for('lista_pombos'))
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        password = request.form.get('password')
+        if User.query.filter_by(email=email).first():
+            flash('Email já existe.', 'warning')
+            return redirect(url_for('register'))
+        new_user = User(email=email, password_hash=generate_password_hash(password))
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Conta criada com sucesso! Faça login.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/recuperar-password', methods=['GET', 'POST'])
+def recuperar_password():
+    if request.method == 'POST':
+        flash('Se o email estiver registado, receberá instruções em breve.', 'info')
+        return redirect(url_for('login'))
+    return render_template('recuperar_password.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# --- ROTAS DE POMBOS E FUNCIONALIDADES ---
+@app.route("/lista_pombos")
+@login_required
+def lista_pombos():
+    categoria = request.args.get('categoria')
+    query = Pombo.query.filter_by(user_id=current_user.id)
+    
+    if categoria == 'reprodutor':
+        pombos = query.filter_by(categoria='Reprodutor', status='Ativo', oculto=False).all()
+        titulo = "LISTA DE REPRODUTORES"
+    elif categoria == 'voador':
+        pombos = query.filter_by(categoria='Voador', status='Ativo', oculto=False).all()
+        titulo = "LISTA DE VOADORES"
+    elif categoria == 'cedido':
+        pombos = query.filter_by(categoria='Cedido', oculto=False).all()
+        titulo = "LISTA DE CEDIDOS"
+    elif categoria == 'oculto':
+        pombos = query.filter_by(oculto=True).all()
+        titulo = "LISTA DE POMBOS OCULTOS"
+    elif categoria == 'editar':
+        pombos = query.all()
+        titulo = "LISTA DE TODOS OS POMBOS"
+    else:
+        pombos = query.filter_by(oculto=False).all()
+        titulo = "TODOS OS POMBOS"
+
+    nomes_pombos = {p.numero: p.nome for p in query.all()}
+    stats = get_colony_stats()
+
+    return render_template("pombos.html", pombos=pombos, titulo=titulo, 
+                           nomes_pombos=nomes_pombos, modo_pesquisa=(categoria == 'editar'),
+                           modo_cedidos=(categoria == 'cedido'), categoria=categoria, stats=stats)
+
+@app.route("/novo_pombo", methods=['GET', 'POST'])
+@login_required
+def novo_pombo():
+    last_num = request.args.get('last_num', '')
+    last_ano = request.args.get('last_ano', '')
+    suggested_num = str(int(last_num) + 1) if last_num.isdigit() else last_num
+    suggested_ano = last_ano
+
+    if request.method == 'POST':
+        numero, ano = request.form.get('numero'), request.form.get('ano')
+        anilha = f"PORT-{numero}-{ano}"
+        
+        if Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first():
+            flash('Este pombo já está registado.', 'warning')
+            return redirect(url_for('novo_pombo'))
+
+        novo = Pombo(
+            anilha=anilha, numero=numero, ano=ano,
+            nome=request.form.get('nome'),
+            sexo=request.form.get('sexo', 'Por Definir'),
+            cor=request.form.get('cor'),
+            pai=request.form.get('pai'),
+            mae=request.form.get('mae'),
+            categoria=request.form.get('categoria'),
+            cedido_para=request.form.get('cedido_para'),
+            descricao=request.form.get('descricao'),
+            oculto=True if request.form.get('oculto') else False,
+            user_id=current_user.id
+        )
+        db.session.add(novo)
+        db.session.commit()
+        flash('Pombo inserido com sucesso!', 'success')
+        return redirect(url_for('novo_pombo', last_num=numero, last_ano=ano))
+
+    pombos_db = Pombo.query.filter_by(user_id=current_user.id).all()
+    todos_pombos_data = [{"n": p.numero, "s": p.sexo, "a": p.ano} for p in pombos_db]
+    return render_template("pombo_form.html", suggested_num=suggested_num, suggested_ano=suggested_ano, 
+                           todos_pombos_data=todos_pombos_data, de=request.args.get('de', ''))
+
+@app.route("/editar_pombo/<anilha>", methods=['GET', 'POST'])
+@login_required
+def editar_pombo(anilha):
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first_or_404()
+    if request.method == 'POST':
+        pombo.nome = request.form.get('nome')
+        pombo.sexo = request.form.get('sexo', 'Por Definir')
+        pombo.cor = request.form.get('cor')
+        pombo.pai = request.form.get('pai')
+        pombo.mae = request.form.get('mae')
+        pombo.categoria = request.form.get('categoria')
+        pombo.cedido_para = request.form.get('cedido_para')
+        pombo.descricao = request.form.get('descricao')
+        pombo.oculto = True if request.form.get('oculto') else False
+        db.session.commit()
+        flash('Pombo atualizado com sucesso!', 'success')
+        return redirect(url_for('lista_pombos', categoria=request.form.get('de', '')))
+        
+    pombos_db = Pombo.query.filter_by(user_id=current_user.id).all()
+    todos_pombos_data = [{"n": p.numero, "s": p.sexo, "a": p.ano} for p in pombos_db]
+    return render_template("pombo_form.html", pombo=pombo, modo_edicao=True, 
+                           todos_pombos_data=todos_pombos_data, de=request.args.get('de', ''))
+
+@app.route("/apagar_pombo/<anilha>")
+@login_required
+def apagar_pombo(anilha):
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
+    if pombo:
+        db.session.delete(pombo)
+        db.session.commit()
+        flash('Pombo apagado.', 'success')
+    return redirect(request.referrer or url_for('lista_pombos'))
+
+@app.route("/estatisticas")
+@login_required
+def estatisticas():
+    return render_template("estatisticas.html", stats=get_colony_stats())
+
+@app.route("/pedigree/gerar")
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/pedigree/view", methods=['POST'])
+@login_required
+def view_pedigree():
+    numero = request.form.get('numero')
+    tree = get_pombo_tree(numero, current_user.id)
+    if not tree:
+        flash('Pombo não encontrado.', 'danger')
+        return redirect(url_for('gerar_pedigree'))
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    return render_template("pedigree_view.html", tree=tree, utilizador=utilizador)
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        flash('Ainda não inseriu os seus dados.', 'warning')
+        return redirect(url_for('inserir_dados'))
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
+@app.route("/meus-dados/inserir", methods=['GET', 'POST'])
+@login_required
+def inserir_dados():
+    if Utilizador.query.filter_by(user_id=current_user.id).first():
+        return redirect(url_for('editar_dados'))
+        
+    if request.method == 'POST':
+        novo = Utilizador(
+            nome=request.form.get('nome'), localidade=request.form.get('localidade'),
+            telefone=request.form.get('telefone'), email=request.form.get('email'),
+            user_id=current_user.id
+        )
+        foto = request.files.get('foto')
+        if foto and foto.filename:
+            filename = secure_filename(foto.filename)
+            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            novo.foto = 'uploads/' + filename
+            
+        db.session.add(novo)
+        db.session.commit()
+        flash('Dados inseridos com sucesso!', 'success')
+        return redirect(url_for('ver_dados'))
+    return render_template("meus_dados_form.html")
+
+@app.route("/meus-dados/editar", methods=['GET', 'POST'])
+@login_required
+def editar_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'POST':
+        utilizador.nome = request.form.get('nome')
+        utilizador.localidade = request.form.get('localidade')
+        utilizador.telefone = request.form.get('telefone')
+        utilizador.email = request.form.get('email')
+        
+        foto = request.files.get('foto')
+        if foto and foto.filename:
+            filename = secure_filename(foto.filename)
+            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            utilizador.foto = 'uploads/' + filename
+            
+        db.session.commit()
+        flash('Dados atualizados com sucesso!', 'success')
+        return redirect(url_for('ver_dados'))
+    return render_template("meus_dados_editar.html", utilizador=utilizador)
+
+@app.route("/api/pombo/existe/<search>")
+@login_required
+def api_pombo_existe(search):
+    pombo = Pombo.query.filter(((Pombo.anilha == search) | (Pombo.numero == search)), Pombo.user_id == current_user.id).first()
+    if pombo: return {"existe": True, "numero": pombo.numero, "ano": pombo.ano}
+    return {"existe": False}
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return f"<h3>Erro detetado no código:</h3><pre>{traceback.format_exc()}</pre>", 500
+
+application = app
+if __name__ == '__main__': app.run(debug=True)
