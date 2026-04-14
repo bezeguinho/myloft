@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container text-center py-4">
+
+    {% if categoria %}
+    <h2 class="fw-bold mb-4 text-primary">Lista de Pombos: {{ categoria | capitalize }}</h2>
+    {% else %}
+    <h2 class="fw-bold mb-4 text-primary">Todos os Pombos</h2>
+    {% endif %}
+
+    <p class="lead text-muted">Bem-vindo ao novo ecrã principal da sua colónia.</p>
+
+    <div class="alert alert-success mt-4 d-inline-block">
+        <i class="bi bi-check-circle me-2"></i> Esta página substitui o antigo Dashboard. Está pronta para receber a sua
+        base de dados!
+    </div>
+
+    <div class="mt-5 p-5 border rounded bg-light">
+        <i class="bi bi-table fs-1 text-secondary mb-3"></i>
+        <h4 class="text-secondary">A tabela de pombos vai aparecer aqui</h4>
+        <p class="text-muted small">Em breve adicionaremos a grelha com as anilhas, cores e sexos.</p>
+    </div>
+</div>
+{% endblock %}

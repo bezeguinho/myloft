@@ -54,7 +54,7 @@ def login():
         
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            return redirect(url_for('lista_pombos')) # Direto para os pombos!
+            return redirect(url_for('lista_pombos'))
         flash('Email ou password incorretos.', 'danger')
         
     return render_template('login.html')
@@ -97,25 +97,37 @@ def recuperar_password():
 
 # --- ROTAS DAS FUNCIONALIDADES ---
 
+# 1. A NOVA PÁGINA PRINCIPAL
+@app.route('/lista_pombos')
+@app.route('/lista_pombos/<categoria>')
+@login_required
+def lista_pombos(categoria=None):
+    return render_template('lista_pombos.html', categoria=categoria)
+
+# 2. PÁGINAS "EM CONSTRUÇÃO" (Em vez de ecrã branco, avisam e ficam na página principal)
 @app.route('/novo_pombo')
 @login_required
-def novo_pombo(): return "Página de Inserir Pombo (Em construção)"
-
-@app.route('/lista_pombos')
-@login_required
-def lista_pombos(): return "Página da Lista de Pombos (Bem-vindo ao novo ecrã principal!)"
+def novo_pombo(): 
+    flash('A página de Inserir Pombo ainda está a ser construída!', 'info')
+    return redirect(url_for('lista_pombos'))
 
 @app.route('/gerar_pedigree')
 @login_required
-def gerar_pedigree(): return "Página de Pedigree (Em construção)"
+def gerar_pedigree(): 
+    flash('A geração de Pedigrees estará disponível em breve!', 'info')
+    return redirect(url_for('lista_pombos'))
 
 @app.route('/ver_dados')
 @login_required
-def ver_dados(): return "Página dos Meus Dados (Em construção)"
+def ver_dados(): 
+    flash('O painel "Os Meus Dados" está em construção.', 'info')
+    return redirect(url_for('lista_pombos'))
 
 @app.route('/admin_panel')
 @login_required
-def admin_panel(): return "Painel de Admin (Em construção)"
+def admin_panel(): 
+    flash('Painel de Administrador em manutenção.', 'info')
+    return redirect(url_for('lista_pombos'))
 
 @app.route('/logout')
 @login_required
