@@ -11,7 +11,6 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -19,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# Modelo de Utilizador (Tabela 'users')
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -31,28 +29,20 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROTAS ---
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-    
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             return redirect(url_for('dashboard'))
-        else:
-            flash('Email ou password incorretos.', 'danger')
-            
+        flash('Email ou password incorretos.', 'danger')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -60,34 +50,19 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        
-        if password != confirm_password:
-            flash('As passwords não coincidem!', 'danger')
+        if User.query.filter_by(email=email).first():
+            flash('Email já existe.', 'warning')
             return redirect(url_for('register'))
-            
-        user_exists = User.query.filter_by(email=email).first()
-        if user_exists:
-            flash('Este email já está registado.', 'warning')
-            return redirect(url_for('register'))
-            
-        new_user = User(
-            email=email,
-            password_hash=generate_password_hash(password),
-            role='user'
-        )
+        new_user = User(email=email, password_hash=generate_password_hash(password))
         db.session.add(new_user)
         db.session.commit()
-        
-        flash('Conta criada com sucesso! Já pode entrar.', 'success')
         return redirect(url_for('login'))
-        
     return render_template('register.html')
 
 @app.route('/recuperar-password', methods=['GET', 'POST'])
 def recuperar_password():
     if request.method == 'POST':
-        flash('Se o email estiver registado, receberá instruções em breve.', 'info')
+        flash('Instruções enviadas.', 'info')
         return redirect(url_for('login'))
     return render_template('recuperar_password.html')
 
