@@ -5,12 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'uma-chave-muito-secreta'
+app.config['SECRET_KEY'] = 'chave-secreta-myloft-2024'
 
-# Configuração da Base de Dados (Certifica-te que a DATABASE_URL no Vercel está correta)
+# Configuração da Base de Dados
 uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -18,8 +19,9 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# Modelo de Utilizador
+# Modelo de Utilizador (Tabela 'users')
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -29,7 +31,7 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROTAS DO SITE ---
+# --- ROTAS ---
 
 @app.route('/')
 def index():
@@ -41,7 +43,7 @@ def login():
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email').lower()
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
         
@@ -49,14 +51,14 @@ def login():
             login_user(user)
             return redirect(url_for('dashboard'))
         else:
-            flash('Login inválido. Verifique o email e a password.', 'danger')
+            flash('Email ou password incorretos.', 'danger')
             
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email').lower()
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         
@@ -71,28 +73,29 @@ def register():
             
         new_user = User(
             email=email,
-            password_hash=generate_password_hash(password)
+            password_hash=generate_password_hash(password),
+            role='user'
         )
         db.session.add(new_user)
         db.session.commit()
         
-        flash('Conta criada com sucesso! Faça login.', 'success')
+        flash('Conta criada com sucesso! Já pode entrar.', 'success')
         return redirect(url_for('login'))
         
     return render_template('register.html')
 
-@app.route('/forgot-password', methods=['GET', 'POST'])
-def forgot_password():
+@app.route('/recuperar-password', methods=['GET', 'POST'])
+def recuperar_password():
     if request.method == 'POST':
-        # Aqui no futuro configuramos o envio de email real
-        flash('Se o email existir no sistema, receberá instruções de recuperação em breve.', 'info')
+        flash('Se o email estiver registado, receberá instruções em breve.', 'info')
         return redirect(url_for('login'))
-    return render_template('forgot_password.html')
+    # Aqui usamos o nome exato do teu ficheiro
+    return render_template('recuperar_password.html')
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return f"Olá {current_user.email}, bem-vindo ao seu painel!"
+    return render_template('dashboard.html')
 
 @app.route('/logout')
 @login_required
