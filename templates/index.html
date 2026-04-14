@@ -11,13 +11,11 @@
   </div>
 
   {% else %}
-  <div class="card shadow-lg p-5 text-center" style="max-width: 800px; width: 100%; border-radius: 15px;">
-    <div class="mb-4">
-      <img src="{{ url_for('static', filename='img/novo_logo.jpg') }}" alt="MYLOFT"
-        style="width: 100px; border-radius: 10px;">
-    </div>
-    <h1 class="display-4 fw-bold text-primary mb-3">Bem-vindo ao MYLOFT</h1>
-    <p class="lead mb-5 text-secondary">A sua plataforma profissional de gestão columbófila.</p>
+  <div class="card shadow-lg p-5 text-center" style="max-width: 800px; width: 100%; border-radius: 15px; border: none;">
+
+    <h1 class="fw-bold text-primary mb-3">Bem-vindo ao MYLOFT</h1>
+
+    <p class="lead mb-5 text-muted">A sua plataforma profissional de gestão columbófila.</p>
 
     <div class="row g-3 justify-content-center">
       <div class="col-md-5">
@@ -25,6 +23,7 @@
           <i class="bi bi-box-arrow-in-right me-2"></i> ENTRAR NO LOFT
         </a>
       </div>
+
       <div class="col-md-5">
         <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100 py-3 fw-bold">
           <i class="bi bi-person-plus me-2"></i> CRIAR CONTA
