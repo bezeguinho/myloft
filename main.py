@@ -40,7 +40,8 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        # Mudou: Vai para a lista de pombos em vez do dashboard
+        return redirect(url_for('lista_pombos'))
     
     if request.method == 'POST':
         email = request.form.get('email')
@@ -55,7 +56,8 @@ def login():
         
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            return redirect(url_for('dashboard'))
+            # Mudou: Vai para a lista de pombos em vez do dashboard
+            return redirect(url_for('lista_pombos'))
         flash('Email ou password incorretos.', 'danger')
         
     return render_template('login.html')
@@ -63,7 +65,7 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('lista_pombos'))
         
     if request.method == 'POST':
         email = request.form.get('email')
@@ -92,21 +94,11 @@ def register():
 @app.route('/recuperar-password', methods=['GET', 'POST'])
 def recuperar_password():
     if request.method == 'POST':
-        # Nota: Futuramente configuraremos aqui o Servidor SMTP (Gmail/SendGrid)
         flash('Se o email estiver registado, receberá instruções em breve.', 'info')
         return redirect(url_for('login'))
     return render_template('recuperar_password.html')
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html')
-
-# --- ROTAS FANTASMA (O que faltava e causou o erro!) ---
-
-@app.route('/estatisticas')
-@login_required
-def estatisticas(): return "Página de Estatísticas (Em construção)"
+# --- ROTAS DAS FUNCIONALIDADES ---
 
 @app.route('/novo_pombo')
 @login_required
@@ -114,7 +106,7 @@ def novo_pombo(): return "Página de Inserir Pombo (Em construção)"
 
 @app.route('/lista_pombos')
 @login_required
-def lista_pombos(): return "Página da Lista de Pombos (Em construção)"
+def lista_pombos(): return "Página da Lista de Pombos (Bem-vindo ao novo ecrã principal!)"
 
 @app.route('/gerar_pedigree')
 @login_required
