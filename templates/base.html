@@ -9,12 +9,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    /* O truque mágico para o menu ficar amarelo ao passar o rato */
+    /* Menu amarelo ao passar o rato */
     .dropdown-menu .dropdown-item:hover {
       background-color: #ffc107 !important;
-      /* Amarelo Bootstrap */
       color: #000 !important;
-      /* Letra preta para ler bem */
       font-weight: bold;
     }
   </style>
@@ -37,6 +35,7 @@
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           {% if current_user.is_authenticated %}
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               GESTÃO DE POMBOS
@@ -107,7 +106,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
     window.addEventListener('pageshow', function () {
       document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function (toggle) {

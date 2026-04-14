@@ -8,7 +8,6 @@ import traceback
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Ligação à Base de Dados
 uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
@@ -40,7 +39,6 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        # Mudou: Vai para a lista de pombos em vez do dashboard
         return redirect(url_for('lista_pombos'))
     
     if request.method == 'POST':
@@ -56,8 +54,7 @@ def login():
         
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            # Mudou: Vai para a lista de pombos em vez do dashboard
-            return redirect(url_for('lista_pombos'))
+            return redirect(url_for('lista_pombos')) # Direto para os pombos!
         flash('Email ou password incorretos.', 'danger')
         
     return render_template('login.html')
