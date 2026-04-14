@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- LIGAÇÃO BLINDADA À BASE DE DADOS (Vercel/Supabase/SQLite) ---
+# --- LIGAÇÃO BLINDADA À BASE DE DADOS ---
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL') or os.getenv('POSTGRES_URL_NON_POOLING')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -27,7 +27,7 @@ if uri and uri.startswith('postgresql'):
         "max_overflow": 10
     }
 
-# --- CONFIGURAÇÃO DE UPLOADS (Fotos do Perfil) ---
+# --- CONFIGURAÇÃO DE UPLOADS ---
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 if IS_VERCEL:
     UPLOAD_FOLDER = '/tmp/uploads'
@@ -44,7 +44,15 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS DE DADOS (Tabelas) ---
+# --- BLOQUEIO DE CACHE (Resolve o erro do botão "Voltar" do navegador) ---
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
+# --- MODELOS DE DADOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +120,9 @@ def get_pombo_tree(numero, user_id):
 # --- ROTAS DE AUTENTICAÇÃO ---
 @app.route('/')
 def index(): 
+    # Se já tem sessão iniciada, atira logo para os pombos!
+    if current_user.is_authenticated:
+        return redirect(url_for('lista_pombos'))
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -350,7 +361,6 @@ def admin_panel():
     flash('Painel de Administração em construção.', 'info')
     return redirect(url_for('lista_pombos'))
 
-# --- ROTA DE REPARAÇÃO DA BASE DE DADOS (Agora limpa também os Users!) ---
 @app.route('/reparar_bd')
 def reparar_bd():
     from sqlalchemy import text
@@ -365,7 +375,7 @@ def reparar_bd():
             db.session.execute(text("DROP TABLE IF EXISTS users;"))
         db.session.commit()
         db.create_all()
-        return "<h3>✅ Base de Dados TOTALMENTE Reparada!</h3><br><p>Tabelas antigas removidas com sucesso.</p><a href='/register'>Clica aqui para CRIAR A TUA CONTA NOVA</a>"
+        return "<h3>✅ Base de Dados TOTALMENTE Reparada!</h3><br><a href='/register'>Clica aqui para CRIAR A TUA CONTA NOVA</a>"
     except Exception as e:
         return f"Erro ao reparar: {str(e)}"
 
