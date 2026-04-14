@@ -172,3 +172,97 @@ def lista_pombos():
         pombos = query.filter_by(categoria='Cedido', oculto=False).all()
         titulo = "LISTA DE CEDIDOS"
     elif categoria == 'oculto':
+        pombos = query.filter_by(oculto=True).all()
+        titulo = "LISTA DE POMBOS OCULTOS"
+    elif categoria == 'editar':
+        pombos = query.all()
+        titulo = "LISTA DE TODOS OS POMBOS"
+    else:
+        pombos = query.filter_by(oculto=False).all()
+        titulo = "TODOS OS POMBOS"
+
+    nomes_pombos = {p.numero: p.nome for p in query.all()}
+    stats = get_colony_stats()
+
+    return render_template("pombos.html", pombos=pombos, titulo=titulo, 
+                           nomes_pombos=nomes_pombos, modo_pesquisa=(categoria == 'editar'),
+                           modo_cedidos=(categoria == 'cedido'), categoria=categoria, stats=stats)
+
+@app.route("/novo_pombo", methods=['GET', 'POST'])
+@login_required
+def novo_pombo():
+    last_num = request.args.get('last_num', '')
+    last_ano = request.args.get('last_ano', '')
+    suggested_num = str(int(last_num) + 1) if last_num.isdigit() else last_num
+    suggested_ano = last_ano
+
+    if request.method == 'POST':
+        numero, ano = request.form.get('numero'), request.form.get('ano')
+        anilha = f"PORT-{numero}-{ano}"
+        
+        if Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first():
+            flash('Este pombo já está registado.', 'warning')
+            return redirect(url_for('novo_pombo'))
+
+        novo = Pombo(
+            anilha=anilha, numero=numero, ano=ano,
+            nome=request.form.get('nome'),
+            sexo=request.form.get('sexo', 'Por Definir'),
+            cor=request.form.get('cor'),
+            pai=request.form.get('pai'),
+            mae=request.form.get('mae'),
+            categoria=request.form.get('categoria'),
+            cedido_para=request.form.get('cedido_para'),
+            descricao=request.form.get('descricao'),
+            oculto=True if request.form.get('oculto') else False,
+            user_id=current_user.id
+        )
+        db.session.add(novo)
+        db.session.commit()
+        flash('Pombo inserido com sucesso!', 'success')
+        return redirect(url_for('novo_pombo', last_num=numero, last_ano=ano))
+
+    pombos_db = Pombo.query.filter_by(user_id=current_user.id).all()
+    todos_pombos_data = [{"n": p.numero, "s": p.sexo, "a": p.ano} for p in pombos_db]
+    return render_template("pombo_form.html", suggested_num=suggested_num, suggested_ano=suggested_ano, 
+                           todos_pombos_data=todos_pombos_data, de=request.args.get('de', ''))
+
+@app.route("/editar_pombo/<anilha>", methods=['GET', 'POST'])
+@login_required
+def editar_pombo(anilha):
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first_or_404()
+    if request.method == 'POST':
+        pombo.nome = request.form.get('nome')
+        pombo.sexo = request.form.get('sexo', 'Por Definir')
+        pombo.cor = request.form.get('cor')
+        pombo.pai = request.form.get('pai')
+        pombo.mae = request.form.get('mae')
+        pombo.categoria = request.form.get('categoria')
+        pombo.cedido_para = request.form.get('cedido_para')
+        pombo.descricao = request.form.get('descricao')
+        pombo.oculto = True if request.form.get('oculto') else False
+        db.session.commit()
+        flash('Pombo atualizado!', 'success')
+        return redirect(url_for('lista_pombos', categoria=request.form.get('de', '')))
+        
+    pombos_db = Pombo.query.filter_by(user_id=current_user.id).all()
+    todos_pombos_data = [{"n": p.numero, "s": p.sexo, "a": p.ano} for p in pombos_db]
+    return render_template("pombo_form.html", pombo=pombo, modo_edicao=True, 
+                           todos_pombos_data=todos_pombos_data, de=request.args.get('de', ''))
+
+@app.route("/apagar_pombo/<anilha>")
+@login_required
+def apagar_pombo(anilha):
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
+    if pombo:
+        db.session.delete(pombo)
+        db.session.commit()
+        flash('Pombo apagado.', 'success')
+    return redirect(request.referrer or url_for('lista_pombos'))
+
+@app.route("/estatisticas")
+@login_required
+def estatisticas():
+    return render_template("estatisticas.html", stats=get_colony_stats())
+
+@app.
