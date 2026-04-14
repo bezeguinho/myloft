@@ -112,6 +112,13 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
+@app.route('/recuperar-password', methods=['GET', 'POST'])
+def recuperar_password():
+    if request.method == 'POST':
+        flash('Se o email estiver registado, receberá instruções.', 'info')
+        return redirect(url_for('login'))
+    return render_template('login.html') # Apenas para evitar o erro de build
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -121,41 +128,23 @@ def logout():
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
-    categoria = request.args.get('categoria')
-    query = Pombo.query.filter_by(user_id=current_user.id)
-    if categoria == 'reprodutor': pombos = query.filter_by(categoria='Reprodutor', oculto=False).all()
-    elif categoria == 'voador': pombos = query.filter_by(categoria='Voador', oculto=False).all()
-    elif categoria == 'cedido': pombos = query.filter_by(categoria='Cedido', oculto=False).all()
-    else: pombos = query.filter_by(oculto=False).all()
-    
-    return render_template("pombos.html", pombos=pombos, titulo="Gestão de Pombos")
+    query = Pombo.query.filter_by(user_id=current_user.id, oculto=False)
+    pombos = query.all()
+    return render_template("pombos.html", pombos=pombos, titulo="Lista de Pombos")
 
-@app.route("/novo_pombo", methods=['GET', 'POST'])
-@login_required
-def novo_pombo():
-    if request.method == 'POST':
-        # ... lógica de inserção simplificada para brevidade ...
-        flash('Pombo inserido!', 'success')
-        return redirect(url_for('lista_pombos'))
-    return render_template("pombo_form.html")
-
-# --- ROTAS DE SUPORTE ---
-@app.route("/estatisticas")
-@login_required
-def estatisticas(): return "Em construção"
-
+# --- OUTRAS ROTAS NECESSÁRIAS ---
 @app.route("/pedigree/gerar")
 @login_required
 def gerar_pedigree(): return render_template("gerar_pedigree.html")
 
 @app.route("/meus-dados/ver")
 @login_required
-def ver_dados(): return "Em construção"
+def ver_dados(): return redirect(url_for('index'))
 
 @app.route('/reparar_bd')
 def reparar_bd():
     from sqlalchemy import text
-    db.session.execute(text("DROP TABLE IF EXISTS pombos CASCADE; DROP TABLE IF EXISTS users CASCADE;"))
+    db.session.execute(text("DROP TABLE IF EXISTS pombos CASCADE; DROP TABLE IF EXISTS users CASCADE; DROP TABLE IF EXISTS utilizadores_perfil CASCADE;"))
     db.session.commit()
     db.create_all()
     return "Base de Dados limpa! Registe-se de novo."
