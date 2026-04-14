@@ -9,17 +9,22 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    /* O Amarelo Puro e Vibrante para unificar os menus */
+    /* O Amarelo Puro e Vibrante */
     :root {
       --amarelo-myloft: #ffde00;
     }
 
-    /* Aplica a cor exata aos submenus ao passar o rato */
+    /* 1. Aplica o amarelo vibrante aos submenus */
     .dropdown-menu .dropdown-item:hover,
     .dropdown-menu .dropdown-item:focus,
     .dropdown-menu .dropdown-item:active {
       background-color: var(--amarelo-myloft) !important;
       color: #000 !important;
+    }
+
+    /* 2. OBRIGA todas as palavras do menu a serem BRANCO PURO (100%) */
+    .navbar-dark .navbar-nav .nav-link {
+      color: #ffffff !important;
     }
   </style>
 </head>
@@ -84,7 +89,7 @@
           {% endif %}
 
           <li class="nav-item">
-            <a class="nav-link text-white" href="{{ url_for('logout') }}">SAIR</a>
+            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
           </li>
 
         </ul>
