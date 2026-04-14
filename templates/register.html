@@ -16,12 +16,25 @@
 
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">PASSWORD</label>
-                <input type="password" name="password" class="form-control form-control-lg" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="regPass" class="form-control form-control-lg" required>
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="toggleVisibility('regPass', 'regEye')">
+                        <i class="bi bi-eye" id="regEye"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">CONFIRMAR PASSWORD</label>
-                <input type="password" name="confirm_password" class="form-control form-control-lg" required>
+                <div class="input-group">
+                    <input type="password" name="confirm_password" id="regPassConf" class="form-control form-control-lg"
+                        required>
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="toggleVisibility('regPassConf', 'regEyeConf')">
+                        <i class="bi bi-eye" id="regEyeConf"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="d-grid gap-2 mt-4">
@@ -35,4 +48,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+</script>
 {% endblock %}
