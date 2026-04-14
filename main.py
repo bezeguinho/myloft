@@ -350,21 +350,22 @@ def admin_panel():
     flash('Painel de Administração em construção.', 'info')
     return redirect(url_for('lista_pombos'))
 
-# --- ROTA DE REPARAÇÃO DA BASE DE DADOS ---
+# --- ROTA DE REPARAÇÃO DA BASE DE DADOS (Agora limpa também os Users!) ---
 @app.route('/reparar_bd')
 def reparar_bd():
     from sqlalchemy import text
     try:
-        # Se for Postgres, precisa de CASCADE para apagar tabelas com chaves estrangeiras
         if 'postgres' in app.config['SQLALCHEMY_DATABASE_URI']:
             db.session.execute(text("DROP TABLE IF EXISTS pombos CASCADE;"))
             db.session.execute(text("DROP TABLE IF EXISTS utilizadores_perfil CASCADE;"))
+            db.session.execute(text("DROP TABLE IF EXISTS users CASCADE;"))
         else:
             db.session.execute(text("DROP TABLE IF EXISTS pombos;"))
             db.session.execute(text("DROP TABLE IF EXISTS utilizadores_perfil;"))
+            db.session.execute(text("DROP TABLE IF EXISTS users;"))
         db.session.commit()
         db.create_all()
-        return "<h3>✅ Base de Dados Reparada!</h3><br><a href='/login'>Voltar ao Login</a>"
+        return "<h3>✅ Base de Dados TOTALMENTE Reparada!</h3><br><p>Tabelas antigas removidas com sucesso.</p><a href='/register'>Clica aqui para CRIAR A TUA CONTA NOVA</a>"
     except Exception as e:
         return f"Erro ao reparar: {str(e)}"
 
