@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Pombo
@@ -167,6 +167,10 @@ def login():
         try:
             user = User.query.filter_by(email=email).first()
             if user and check_password_hash(user.password_hash, password):
+                if not user.is_active:
+                    flash('Acesso Rejeitado! A sua conta foi suspensa por um administrador.', 'danger')
+                    return redirect(url_for('login'))
+                    
                 login_user(user)
                 return redirect(url_for('dashboard'))
             flash('Login falhou. Verifique o seu email e senha.', 'danger')
@@ -330,7 +334,62 @@ def editar_dados():
 @app.route('/admin_panel')
 @login_required
 def admin_panel():
-    return render_template('admin.html')
+    if current_user.role != 'admin':
+        abort(403) # Acesso proibido para não-admins
+        
+    try:
+        from datetime import datetime, date
+        # Estatísticas reais
+        total_users = User.query.count()
+        total_pombos = Pombo.query.count()
+        
+        # Como não guardamos a data de criação do user, vamos mostrar o rácio
+        racio = round((total_pombos / total_users), 1) if total_users > 0 else 0
+        
+        return render_template('admin.html', 
+                               total_users=total_users, 
+                               total_pombos=total_pombos,
+                               racio=racio)
+    except Exception as e:
+        flash(f'Erro ao carregar dados do administrador: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
+
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if current_user.role != 'admin':
+        abort(403)
+        
+    try:
+        users = User.query.all()
+        # Para ser eficiente, podemos também enviar a contagem de pombos num dicionário ou aproveitar o ORM
+        return render_template('admin_users.html', users=users)
+    except Exception as e:
+        flash(f'Erro ao listar utilizadores: {str(e)}', 'danger')
+        return redirect(url_for('admin_panel'))
+
+@app.route('/admin/toggle_status/<int:user_id>', methods=['POST'])
+@login_required
+def toggle_user_status(user_id):
+    if current_user.role != 'admin':
+        abort(403)
+        
+    if current_user.id == user_id:
+        flash('Não podes bloquear ou desativar a tua própria conta!', 'warning')
+        return redirect(url_for('admin_users'))
+        
+    try:
+        user = User.query.get_or_404(user_id)
+        user.is_active = not user.is_active
+        db.session.commit()
+        
+        status_text = "desbloqueada" if user.is_active else "BLOQUEADA (banida)"
+        flash(f'Conta de {user.nome or user.username} foi {status_text} com sucesso.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao alterar o estado: {str(e)}', 'danger')
+        
+    return redirect(url_for('admin_users'))
 
 @app.route('/inserir_dados', methods=['POST'])
 @login_required

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-6 fw-bold text-primary mb-1">Gestão de Utilizadores</h1>
+            <p class="text-muted">Desativar contas de acessos indesejados.</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabela de Users -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-3 px-4 border-0">Utilizador</th>
+                        <th class="py-3 px-4 border-0">Email</th>
+                        <th class="py-3 px-4 border-0">Role</th>
+                        <th class="py-3 px-4 border-0">Estado</th>
+                        <th class="py-3 px-4 border-0 text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="px-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename=u.foto) if u.foto else url_for('static', filename='img/default_avatar.png') }}" 
+                                     class="rounded-circle me-3 border shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ u.username }}</h6>
+                                    <small class="text-muted">{{ u.nome or 'Sem Nome' }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-muted">{{ u.email }}</td>
+                        <td class="px-4 py-3">
+                            {% if u.role == 'admin' %}
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-shield-fill me-1"></i> Admin</span>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2 rounded-pill">User</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if u.is_active %}
+                                <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Ativo</span>
+                            {% else %}
+                                <span class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i> Bloqueado</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-end">
+                            {% if u.id != current_user.id %}
+                                <form action="{{ url_for('toggle_user_status', user_id=u.id) }}" method="POST" class="d-inline">
+                                    {% if u.is_active %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 m-1" onclick="return confirm('Tens a certeza que queres BANIR esta pessoa de entrar na aplicação?');">
+                                            Bloquear
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 m-1" onclick="return confirm('Desejas DEVOLVER o acesso a esta conta?');">
+                                            Desbloquear
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            {% else %}
+                                <span class="text-muted small fst-italic">A tua conta</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">Ainda não existem utilizadores criados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
