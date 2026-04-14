@@ -178,6 +178,19 @@ def login():
             flash(f"CRÍTICO - Erro de ligação à BD ao fazer login: {str(e)}", 'danger')
     return render_template('login.html')
 
+@app.route('/recuperar_password', methods=['GET', 'POST'])
+def recuperar_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email')
+        # Lógica simulada: na realidade aqui seria gerado um token e enviado um email real
+        flash('Se o email existir no sistema, receberá instruções fáceis para redefinir a palavra-passe em breve.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('recuperar_password.html')
+
 @app.route('/logout')
 @login_required
 def logout():
