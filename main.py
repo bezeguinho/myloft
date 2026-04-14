@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- LIGAÇÃO BLINDADA À BASE DE DADOS ---
+# --- LIGAÇÃO BLINDADA À BASE DE DADOS (Vercel/Supabase/SQLite) ---
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL') or os.getenv('POSTGRES_URL_NON_POOLING')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -21,25 +21,30 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 if uri and uri.startswith('postgresql'):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {"sslmode": "require", "connect_timeout": 10},
-        "pool_pre_ping": True, "pool_recycle": 300, "pool_size": 5, "max_overflow": 10
+        "pool_pre_ping": True, 
+        "pool_recycle": 300, 
+        "pool_size": 5, 
+        "max_overflow": 10
     }
 
-# --- CONFIGURAÇÃO DE UPLOADS (Fotos do Utilizador) ---
+# --- CONFIGURAÇÃO DE UPLOADS (Fotos do Perfil) ---
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 if IS_VERCEL:
     UPLOAD_FOLDER = '/tmp/uploads'
 else:
     UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 
-try: os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-except Exception: pass
+try: 
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except Exception: 
+    pass
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS DE DADOS ---
+# --- MODELOS DE DADOS (Tabelas) ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +56,7 @@ class Utilizador(db.Model):
     __tablename__ = 'utilizadores_perfil'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
-    localidade = db.Column(db.String(100))
+    localberry = db.Column(db.String(100)) # localidade
     telefone = db.Column(db.String(20))
     email = db.Column(db.String(120))
     foto = db.Column(db.String(255))
@@ -78,9 +83,10 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-with app.app_context(): db.create_all()
+with app.app_context(): 
+    db.create_all()
 
-# --- FUNÇÕES AUXILIARES (Estatísticas e Pedigree) ---
+# --- FUNÇÕES AUXILIARES ---
 def get_colony_stats():
     todos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return {
@@ -89,13 +95,7 @@ def get_colony_stats():
         'total_m': sum(1 for p in todos if p.sexo == 'Macho'),
         'total_i': sum(1 for p in todos if p.sexo not in ['Fêmea', 'Macho']),
         'voadores': sum(1 for p in todos if p.categoria == 'Voador'),
-        'voadores_f': sum(1 for p in todos if p.categoria == 'Voador' and p.sexo == 'Fêmea'),
-        'voadores_m': sum(1 for p in todos if p.categoria == 'Voador' and p.sexo == 'Macho'),
-        'voadores_i': sum(1 for p in todos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
         'reprodutores': sum(1 for p in todos if p.categoria == 'Reprodutor'),
-        'reprodutores_f': sum(1 for p in todos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
-        'reprodutores_m': sum(1 for p in todos if p.categoria == 'Reprodutor' and p.sexo == 'Macho'),
-        'reprodutores_i': sum(1 for p in todos if p.categoria == 'Reprodutor' and p.sexo not in ['Fêmea', 'Macho']),
         'cedidos': sum(1 for p in todos if p.categoria == 'Cedido'),
     }
 
@@ -111,11 +111,13 @@ def get_pombo_tree(numero, user_id):
 
 # --- ROTAS DE AUTENTICAÇÃO ---
 @app.route('/')
-def index(): return render_template('index.html')
+def index(): 
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated: return redirect(url_for('lista_pombos'))
+    if current_user.is_authenticated: 
+        return redirect(url_for('lista_pombos'))
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
@@ -128,7 +130,8 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated: return redirect(url_for('lista_pombos'))
+    if current_user.is_authenticated: 
+        return redirect(url_for('lista_pombos'))
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
@@ -138,7 +141,7 @@ def register():
         new_user = User(email=email, password_hash=generate_password_hash(password))
         db.session.add(new_user)
         db.session.commit()
-        flash('Conta criada! Faça login.', 'success')
+        flash('Conta criada com sucesso! Faça login.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -155,7 +158,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# --- ROTAS DE POMBOS E FUNCIONALIDADES ---
+# --- ROTAS DE GESTÃO DE POMBOS ---
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
@@ -242,7 +245,7 @@ def editar_pombo(anilha):
         pombo.descricao = request.form.get('descricao')
         pombo.oculto = True if request.form.get('oculto') else False
         db.session.commit()
-        flash('Pombo atualizado!', 'success')
+        flash('Pombo atualizado com sucesso!', 'success')
         return redirect(url_for('lista_pombos', categoria=request.form.get('de', '')))
         
     pombos_db = Pombo.query.filter_by(user_id=current_user.id).all()
@@ -260,9 +263,115 @@ def apagar_pombo(anilha):
         flash('Pombo apagado.', 'success')
     return redirect(request.referrer or url_for('lista_pombos'))
 
+# --- ROTAS DE SUPORTE (Estatísticas, Pedigree, Dados) ---
 @app.route("/estatisticas")
 @login_required
 def estatisticas():
     return render_template("estatisticas.html", stats=get_colony_stats())
 
-@app.
+@app.route("/pedigree/gerar")
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/pedigree/view", methods=['POST'])
+@login_required
+def view_pedigree():
+    numero = request.form.get('numero')
+    tree = get_pombo_tree(numero, current_user.id)
+    if not tree:
+        flash('Pombo não encontrado.', 'danger')
+        return redirect(url_for('gerar_pedigree'))
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    return render_template("pedigree_view.html", tree=tree, utilizador=utilizador)
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        flash('Ainda não inseriu os seus dados.', 'warning')
+        return redirect(url_for('inserir_dados'))
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
+@app.route("/meus-dados/inserir", methods=['GET', 'POST'])
+@login_required
+def inserir_dados():
+    if Utilizador.query.filter_by(user_id=current_user.id).first():
+        return redirect(url_for('editar_dados'))
+    if request.method == 'POST':
+        novo = Utilizador(
+            nome=request.form.get('nome'), 
+            localberry=request.form.get('localidade'),
+            telefone=request.form.get('telefone'), 
+            email=request.form.get('email'),
+            user_id=current_user.id
+        )
+        foto = request.files.get('foto')
+        if foto and foto.filename:
+            filename = secure_filename(foto.filename)
+            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            novo.foto = 'uploads/' + filename
+        db.session.add(novo)
+        db.session.commit()
+        flash('Dados inseridos com sucesso!', 'success')
+        return redirect(url_for('ver_dados'))
+    return render_template("meus_dados_form.html")
+
+@app.route("/meus-dados/editar", methods=['GET', 'POST'])
+@login_required
+def editar_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'POST':
+        utilizador.nome = request.form.get('nome')
+        utilizador.localberry = request.form.get('localidade')
+        utilizador.telefone = request.form.get('telefone')
+        utilizador.email = request.form.get('email')
+        foto = request.files.get('foto')
+        if foto and foto.filename:
+            filename = secure_filename(foto.filename)
+            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            utilizador.foto = 'uploads/' + filename
+        db.session.commit()
+        flash('Dados atualizados com sucesso!', 'success')
+        return redirect(url_for('ver_dados'))
+    return render_template("meus_dados_editar.html", utilizador=utilizador)
+
+@app.route("/api/pombo/existe/<search>")
+@login_required
+def api_pombo_existe(search):
+    pombo = Pombo.query.filter(((Pombo.anilha == search) | (Pombo.numero == search)), Pombo.user_id == current_user.id).first()
+    if pombo: return {"existe": True, "numero": pombo.numero, "ano": pombo.ano}
+    return {"existe": False}
+
+@app.route('/admin_panel')
+@login_required
+def admin_panel():
+    flash('Painel de Administração em construção.', 'info')
+    return redirect(url_for('lista_pombos'))
+
+# --- ROTA DE REPARAÇÃO DA BASE DE DADOS ---
+@app.route('/reparar_bd')
+def reparar_bd():
+    from sqlalchemy import text
+    try:
+        # Se for Postgres, precisa de CASCADE para apagar tabelas com chaves estrangeiras
+        if 'postgres' in app.config['SQLALCHEMY_DATABASE_URI']:
+            db.session.execute(text("DROP TABLE IF EXISTS pombos CASCADE;"))
+            db.session.execute(text("DROP TABLE IF EXISTS utilizadores_perfil CASCADE;"))
+        else:
+            db.session.execute(text("DROP TABLE IF EXISTS pombos;"))
+            db.session.execute(text("DROP TABLE IF EXISTS utilizadores_perfil;"))
+        db.session.commit()
+        db.create_all()
+        return "<h3>✅ Base de Dados Reparada!</h3><br><a href='/login'>Voltar ao Login</a>"
+    except Exception as e:
+        return f"Erro ao reparar: {str(e)}"
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return f"<h3>Erro detetado no código:</h3><pre>{traceback.format_exc()}</pre>", 500
+
+application = app
+if __name__ == '__main__': 
+    app.run(debug=True)
