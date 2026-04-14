@@ -13,7 +13,7 @@
       --amarelo-myloft: #ffde00;
     }
 
-    /* Ajustes do Menu */
+    /* Ajustes das Cores do Menu */
     .dropdown-menu .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
@@ -28,19 +28,19 @@
       color: #000000 !important;
     }
 
-    /* Removemos o fundo branco e ajustamos a frase central */
+    /* Estilo da Frase Central (Agora em Azul) */
     .frase-central {
-      color: #ffffff !important;
+      color: #0d6efd !important;
+      /* Azul Primário */
       font-size: 2.5rem !important;
-      /* Metade do tamanho anterior */
       font-weight: bold;
       letter-spacing: 3px;
       text-transform: uppercase;
     }
 
-    /* Estilo para a página de entrada sem card branco */
+    /* Área principal sem fundo branco */
     .hero-section {
-      min-height: 70vh;
+      min-height: 60vh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -64,7 +64,7 @@
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="pomboDrop" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               GESTÃO DE POMBOS
             </a>
             <ul class="dropdown-menu">
@@ -88,11 +88,11 @@
     </div>
   </nav>
 
-  <main class="container mt-5">
+  <main class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
       {{ message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
@@ -105,27 +105,17 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // CORREÇÃO DO MENU: Fecha ao tirar o rato
-    if (window.matchMedia('(hover: hover)').matches) {
-      document.querySelectorAll('.nav-item.dropdown').forEach(function (everyitem) {
-        everyitem.addEventListener('mouseover', function (e) {
-          let el_link = this.querySelector('a[data-bs-toggle]');
-          if (el_link != null) {
-            let nextEl = el_link.nextElementSibling;
-            el_link.classList.add('show');
-            nextEl.classList.add('show');
-          }
-        });
-        everyitem.addEventListener('mouseout', function (e) {
-          let el_link = this.querySelector('a[data-bs-toggle]');
-          if (el_link != null) {
-            let nextEl = el_link.nextElementSibling;
-            el_link.classList.remove('show');
-            nextEl.classList.remove('show');
-          }
-        });
+    // Fecho automático do menu ao tirar o rato
+    document.querySelectorAll('.nav-item.dropdown').forEach(function (item) {
+      item.addEventListener('mouseenter', function () {
+        let el = this.querySelector('.dropdown-toggle');
+        bootstrap.Dropdown.getOrCreateInstance(el).show();
       });
-    }
+      item.addEventListener('mouseleave', function () {
+        let el = this.querySelector('.dropdown-toggle');
+        bootstrap.Dropdown.getOrCreateInstance(el).hide();
+      });
+    });
   </script>
 </body>
 
