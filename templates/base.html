@@ -9,12 +9,16 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    /* O amarelo do submenu ajustado para ser idêntico à barra principal (e sem o negrito pesado) */
+    /* O Amarelo Puro e Vibrante para unificar os menus */
+    :root {
+      --amarelo-myloft: #ffde00;
+    }
+
+    /* Aplica a cor exata aos submenus ao passar o rato */
     .dropdown-menu .dropdown-item:hover,
     .dropdown-menu .dropdown-item:focus,
     .dropdown-menu .dropdown-item:active {
-      background-color: #ffca2c !important;
-      /* Amarelo mais suave padrão do Bootstrap */
+      background-color: var(--amarelo-myloft) !important;
       color: #000 !important;
     }
   </style>
