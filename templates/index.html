@@ -2,17 +2,15 @@
 
 {% block content %}
 <div class="container text-center py-5">
-  <h1 class="display-4 mb-4">Bem-vindo ao MYLOFT</h1>
-  <p class="lead mb-5 text-muted">A plataforma completa para gerir a sua colónia de pombos.</p>
+  <h1 class="display-4 mb-5">Bem-vindo ao MYLOFT</h1>
 
   <div class="row justify-content-center g-4">
     <div class="col-md-5 col-lg-4">
       <div class="card h-100 shadow-sm border-primary">
         <div class="card-body p-4 p-md-5">
           <i class="bi bi-person-check fs-1 text-primary mb-3"></i>
-          <h2 class="h4 mb-3">Já sou membro</h2>
-          <p class="small text-muted mb-4">Aceda aos seus pombos e registos.</p>
-          <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">Iniciar Sessão</a>
+          <h2 class="h4 mb-4">Iniciar Sessão</h2>
+          <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">Entrar</a>
         </div>
       </div>
     </div>
@@ -21,8 +19,7 @@
       <div class="card h-100 shadow-sm border-success">
         <div class="card-body p-4 p-md-5">
           <i class="bi bi-plus-circle fs-1 text-success mb-3"></i>
-          <h2 class="h4 mb-3">Criar Conta</h2>
-          <p class="small text-muted mb-4">Comece a organizar a sua colónia agora.</p>
+          <h2 class="h4 mb-4">Criar Conta</h2>
           <a href="{{ url_for('register') }}" class="btn btn-success btn-lg w-100">Registar</a>
         </div>
       </div>
