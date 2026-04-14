@@ -1,34 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container d-flex align-items-center justify-content-center" style="min-height: 50vh;">
+<div class="hero-section">
 
   {% if current_user.is_authenticated %}
-  <div class="text-center">
-    <h1 class="display-1 fw-bold text-primary" style="letter-spacing: 5px;">
+  <div class="text-center mt-5">
+    <h1 class="frase-central">
       GESTÃO DE COLÓNIAS
     </h1>
   </div>
 
   {% else %}
-  <div class="card shadow-lg p-5 text-center" style="max-width: 800px; width: 100%; border-radius: 15px; border: none;">
+  <div class="text-center">
+    <h2 class="fw-bold text-primary mb-5" style="font-size: 2.5rem;">Bem-vindo ao MYLOFT</h2>
 
-    <h1 class="fw-bold text-primary mb-3">Bem-vindo ao MYLOFT</h1>
-
-    <p class="lead mb-5 text-muted">A sua plataforma profissional de gestão columbófila.</p>
-
-    <div class="row g-3 justify-content-center">
-      <div class="col-md-5">
-        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100 py-3 fw-bold">
-          <i class="bi bi-box-arrow-in-right me-2"></i> ENTRAR NO LOFT
-        </a>
-      </div>
-
-      <div class="col-md-5">
-        <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100 py-3 fw-bold">
-          <i class="bi bi-person-plus me-2"></i> CRIAR CONTA
-        </a>
-      </div>
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow">
+        ENTRAR NO LOFT
+      </a>
+      <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg px-5 py-3 fw-bold bg-white">
+        CRIAR CONTA
+      </a>
     </div>
   </div>
   {% endif %}

@@ -9,61 +9,62 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    /* 1. Amarelo MyLoft Vibrante em todo o lado */
     :root {
       --amarelo-myloft: #ffde00;
     }
 
-    /* 2. Submenus: Fundo amarelo e Letras pretas ao passar o rato */
+    /* Ajustes do Menu */
     .dropdown-menu .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
     }
 
-    /* 3. Letras da barra principal: Branco Puro por defeito */
     .navbar-dark .navbar-nav .nav-link {
       color: #ffffff !important;
       opacity: 1 !important;
     }
 
-    /* 4. Letras da barra principal: Pretas quando o rato passa por cima */
     .navbar-dark .navbar-nav .nav-link:hover {
       color: #000000 !important;
     }
 
-    /* 5. GARANTIR QUE O CONTEÚDO APARECE (Correção do erro da página branca) */
-    body {
-      padding-top: 20px;
+    /* Removemos o fundo branco e ajustamos a frase central */
+    .frase-central {
+      color: #ffffff !important;
+      font-size: 2.5rem !important;
+      /* Metade do tamanho anterior */
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-transform: uppercase;
     }
 
-    .main-container {
-      display: block !important;
-      visibility: visible !important;
+    /* Estilo para a página de entrada sem card branco */
+    .hero-section {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
 
-<body>
+<body style="background-color: #e9f1f7;">
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-        <img src="{{ url_for('static', filename='img/novo_logo.jpg') }}" alt="MYLOFT"
-          class="brand-logo d-none d-sm-inline-block" onerror="this.style.display='none';"
-          style="height: 40px; margin-right: 10px; border-radius: 5px;">
         <span class="navbar-brand-text fw-bold">MYLOFT</span>
       </a>
 
       {% if current_user.is_authenticated %}
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="pomboDrop" role="button" data-bs-toggle="dropdown">
               GESTÃO DE POMBOS
             </a>
             <ul class="dropdown-menu">
@@ -72,68 +73,60 @@
                 <hr class="dropdown-divider">
               </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='reprodutor') }}">REPRODUTORES</a>
               </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='voador') }}">VOADORES</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='cedido') }}">CEDIDOS</a></li>
             </ul>
           </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a>
-          </li>
-
-          {% if current_user.role == 'admin' %}
-          <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ url_for('admin_panel') }}"
-              style="color: var(--amarelo-myloft) !important;">ADMIN</a>
-          </li>
-          {% endif %}
-
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
-          </li>
-
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
         </ul>
       </div>
       {% endif %}
     </div>
   </nav>
 
-  <main class="main-container container mt-4">
+  <main class="container mt-5">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
-      role="alert">
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
       {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endfor %}
     {% endif %}
     {% endwith %}
 
-    <div class="card shadow-sm">
-      <div class="card-body">
-        {% block content %}{% endblock %}
-      </div>
-    </div>
+    {% block content %}{% endblock %}
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // CORREÇÃO DO MENU: Fecha ao tirar o rato
+    if (window.matchMedia('(hover: hover)').matches) {
+      document.querySelectorAll('.nav-item.dropdown').forEach(function (everyitem) {
+        everyitem.addEventListener('mouseover', function (e) {
+          let el_link = this.querySelector('a[data-bs-toggle]');
+          if (el_link != null) {
+            let nextEl = el_link.nextElementSibling;
+            el_link.classList.add('show');
+            nextEl.classList.add('show');
+          }
+        });
+        everyitem.addEventListener('mouseout', function (e) {
+          let el_link = this.querySelector('a[data-bs-toggle]');
+          if (el_link != null) {
+            let nextEl = el_link.nextElementSibling;
+            el_link.classList.remove('show');
+            nextEl.classList.remove('show');
+          }
+        });
+      });
+    }
+  </script>
 </body>
 
 </html>
