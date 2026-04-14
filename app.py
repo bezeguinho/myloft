@@ -84,7 +84,6 @@ def register():
         
     return render_template('register.html')
 
-# AQUI ESTÁ A CORREÇÃO DO NOME DA ROTA
 @app.route('/recuperar-password', methods=['GET', 'POST'])
 def recuperar_password():
     if request.method == 'POST':
