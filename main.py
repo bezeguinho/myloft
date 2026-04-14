@@ -3,16 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import traceback
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Proteção da Base de Dados para evitar o erro 500 no arranque
+# Configuração da Base de Dados
 uri = os.getenv("DATABASE_URL")
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
-# Se o Vercel não encontrar o link do Supabase, não crasha
 app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -31,20 +31,28 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# --- ROTAS PRINCIPAIS ---
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
+        
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             return redirect(url_for('dashboard'))
-        flash('Email ou password incorretos.', 'danger')
+        else:
+            flash('Email ou password incorretos.', 'danger')
+            
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -52,19 +60,28 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
+        
         if User.query.filter_by(email=email).first():
-            flash('Email já existe.', 'warning')
+            flash('Este email já está registado.', 'warning')
             return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(password))
+            
+        new_user = User(
+            email=email,
+            password_hash=generate_password_hash(password),
+            role='user'
+        )
         db.session.add(new_user)
         db.session.commit()
+        
+        flash('Conta criada com sucesso! Já pode entrar.', 'success')
         return redirect(url_for('login'))
+        
     return render_template('register.html')
 
 @app.route('/recuperar-password', methods=['GET', 'POST'])
 def recuperar_password():
     if request.method == 'POST':
-        flash('Instruções enviadas.', 'info')
+        flash('Se o email estiver registado, receberá instruções em breve.', 'info')
         return redirect(url_for('login'))
     return render_template('recuperar_password.html')
 
@@ -79,7 +96,39 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# Exportação obrigatória para o Vercel reconhecer a aplicação
+# --- ROTAS EM FALTA (Resolvem o Erro do base.html) ---
+
+@app.route('/novo_pombo')
+@login_required
+def novo_pombo():
+    return "Página de Inserir Pombo (Em construção)"
+
+@app.route('/lista_pombos')
+@login_required
+def lista_pombos():
+    return "Página da Lista de Pombos (Em construção)"
+
+@app.route('/gerar_pedigree')
+@login_required
+def gerar_pedigree():
+    return "Página de Pedigree (Em construção)"
+
+@app.route('/ver_dados')
+@login_required
+def ver_dados():
+    return "Página dos Meus Dados (Em construção)"
+
+@app.route('/admin_panel')
+@login_required
+def admin_panel():
+    return "Painel de Admin (Em construção)"
+
+# --- O "RAIO-X" DE ERROS ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Se houver outro erro, isto vai mostrá-lo no ecrã em vez da página branca!
+    return f"<h3>Erro detetado no código:</h3><pre>{traceback.format_exc()}</pre>", 500
+
 application = app
 
 if __name__ == '__main__':
