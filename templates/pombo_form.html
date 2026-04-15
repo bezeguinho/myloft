@@ -2,25 +2,23 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <div class="card shadow border-0" style="border-radius: 10px; background-color: #ffffff;">
+        <div class="card shadow border-0" style="border-radius: 10px;">
             <div class="card-body p-5">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST">
                     <div class="row g-4">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Nº DA ANILHA</label>
-                            <input type="text" name="anilha" class="form-control bg-light" placeholder="Ex: 1234567"
-                                required>
+                            <input type="text" name="anilha" class="form-control bg-light" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">NOME DO POMBO</label>
-                            <input type="text" name="nome" class="form-control bg-light" placeholder="Ex: Campeão">
+                            <label class="form-label fw-bold">NOME</label>
+                            <input type="text" name="nome" class="form-control bg-light">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">ANO</label>
-                            <input type="text" name="ano" class="form-control bg-light" placeholder="Ex: 2024">
+                            <input type="text" name="ano" class="form-control bg-light">
                         </div>
-
                         <div class="col-md-4">
                             <label class="form-label fw-bold">SEXO</label>
                             <select name="sexo" class="form-select bg-light">
@@ -30,7 +28,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">COR</label>
-                            <input type="text" name="cor" class="form-control bg-light" placeholder="Ex: Azulado">
+                            <input type="text" name="cor" class="form-control bg-light">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">CATEGORIA</label>
@@ -39,27 +37,21 @@
                                 <option value="Reprodutor">Reprodutor</option>
                             </select>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-bold">ANILHA DO PAI</label>
-                            <input type="text" name="pai" class="form-control bg-light" placeholder="Nº Anilha do Pai">
+                            <input type="text" name="pai" class="form-control bg-light">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">ANILHA DA MÃE</label>
-                            <input type="text" name="mae" class="form-control bg-light" placeholder="Nº Anilha da Mãe">
+                            <input type="text" name="mae" class="form-control bg-light">
                         </div>
-
                         <div class="col-12">
                             <label class="form-label fw-bold">OBSERVAÇÕES</label>
-                            <textarea name="obs" class="form-control bg-light" rows="3"
-                                placeholder="Notas adicionais..."></textarea>
+                            <textarea name="obs" class="form-control bg-light" rows="3"></textarea>
                         </div>
                     </div>
-
                     <div class="mt-5 d-flex justify-content-center gap-3">
-                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">
-                            GRAVAR POMBO
-                        </button>
+                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">GRAVAR POMBO</button>
                         <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg px-5 shadow">
                             <i class="bi bi-arrow-left"></i> VOLTAR
                         </a>

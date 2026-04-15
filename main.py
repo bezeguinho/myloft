@@ -65,23 +65,25 @@ def index():
 @login_required
 def novo_pombo():
     if request.method == 'POST':
-        novo = Pombo(
-            anilha=request.form.get('anilha'),
-            nome=request.form.get('nome'),
-            sexo=request.form.get('sexo'),
-            cor=request.form.get('cor'),
-            categoria=request.form.get('categoria'),
-            ano=request.form.get('ano'),
-            pai=request.form.get('pai'),
-            mae=request.form.get('mae'),
-            obs=request.form.get('obs'),
-            status="Ativo",
-            user_id=current_user.id
-        )
-        db.session.add(novo)
-        db.session.commit()
-        flash("Pombo registado com sucesso!", "success")
-        return redirect(url_for('lista_pombos'))
+        try:
+            novo = Pombo(
+                anilha=request.form.get('anilha'),
+                nome=request.form.get('nome'),
+                sexo=request.form.get('sexo'),
+                cor=request.form.get('cor'),
+                categoria=request.form.get('categoria'),
+                ano=request.form.get('ano'),
+                pai=request.form.get('pai'),
+                mae=request.form.get('mae'),
+                obs=request.form.get('obs'),
+                user_id=current_user.id
+            )
+            db.session.add(novo)
+            db.session.commit()
+            return redirect(url_for('lista_pombos'))
+        except:
+            db.session.rollback()
+            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
     return render_template("pombo_form.html")
 
 @app.route("/lista_pombos")
@@ -111,6 +113,8 @@ def cedidos():
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
+    pombo = None
+    dono = None
     if request.method == 'POST':
         anilha = request.form.get('numero')
         pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
@@ -131,14 +135,3 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
-            login_user(user)
-            return redirect(url_for('index'))
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-if __name__ == "__main__":
-    app.run(debug=True)
