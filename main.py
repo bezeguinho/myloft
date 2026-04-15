@@ -51,15 +51,19 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Criar tabelas ao iniciar
 with app.app_context():
     db.create_all()
 
+# --- ROTA DE RESET CORRIGIDA ---
 @app.route("/reset_bd")
 def reset_bd():
-    db.drop_all()
-    db.create_all()
-    return "Base de dados resetada com sucesso!"
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+    return "<h3>Base de Dados limpa e sincronizada!</h3><p>Volte ao início e crie uma nova conta.</p>"
 
+# --- ROTAS PRINCIPAIS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -68,11 +72,17 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    # CRÍTICO: Buscar pombos do utilizador
-    lista_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    
+    # Busca segura de pombos
+    try:
+        pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
+    except:
+        db.session.rollback()
+        pombos_user = []
     
     if request.method == 'POST':
         try:
+            is_oculto = True if request.form.get('oculto') == 'on' else False
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -84,7 +94,7 @@ def novo_pombo():
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
                 cedido_a=request.form.get('cedido_a'),
-                oculto=True if request.form.get('oculto') == 'on' else False,
+                oculto=is_oculto,
                 user_id=current_user.id
             )
             db.session.add(novo)
@@ -92,10 +102,9 @@ def novo_pombo():
             return redirect(url_for('lista_pombos'))
         except Exception:
             db.session.rollback()
-            flash("Erro ao gravar.", "danger")
+            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
             
-    # Garantir que passamos 'pombos_user' com o nome certo
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=lista_pombos)
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
 @login_required
@@ -140,7 +149,8 @@ def login():
 def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+        passw = request.form.get('password')
+        new_user = User(email=email, password_hash=generate_password_hash(passw))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
