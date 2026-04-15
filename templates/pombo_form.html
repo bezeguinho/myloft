@@ -2,11 +2,11 @@
 {% block content %}
 
 <style>
-    /* Estilo para tonificar as caixas e suavizar as ajudas */
+    /* Borda mais forte para os campos ficarem bem visíveis */
     .caixa-input {
-        border: 1px solid #888888 !important;
-        /* Borda mais escura e visível */
+        border: 1px solid #777777 !important;
         background-color: #fdfdfd !important;
+        color: #000000 !important;
     }
 
     .caixa-input:focus {
@@ -14,25 +14,29 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
-    /* Tornar os placeholders cinzentos e discretos */
-    .caixa-input::placeholder {
-        color: #b0b0b0 !important;
-        font-weight: normal;
+    /* Regra de Ouro: "Escolha..." fica a cinzento. Mal escolhas algo, fica preto */
+    select.caixa-input:invalid {
+        color: #999999 !important;
+    }
+
+    select.caixa-input option {
+        color: #000000 !important;
     }
 </style>
 
 <div class="row justify-content-center">
-    <div class="col-md-11">
+    <div class="col-auto">
         <div class="card shadow border-0" style="border-radius: 10px; background-color: #ffffff;">
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
+
                 <form method="POST" id="pomboForm">
 
-                    <div class="row g-3 mb-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº da Anilha:</label>
                             <input type="text" name="anilha" class="form-control caixa-input" maxlength="12"
-                                style="width: 150px;" required placeholder="Ex: 1234567">
+                                style="width: 150px;" required>
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Ano:</label>
@@ -47,26 +51,26 @@
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nome do Pombo:</label>
                             <input type="text" name="nome" class="form-control caixa-input" maxlength="40"
-                                style="width: 250px;" placeholder="Nome...">
+                                style="width: 250px;">
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Cor:</label>
                             <input type="text" name="cor" class="form-control caixa-input" maxlength="40"
-                                style="width: 180px;" placeholder="Cor...">
+                                style="width: 180px;">
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3">
+                    <div class="row g-3 mb-4 align-items-start">
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº do Pai:</label>
                             <input type="text" name="pai" id="paiInput" class="form-control caixa-input" maxlength="12"
-                                style="width: 150px;" list="listaPais" placeholder="Anilha Pai...">
+                                style="width: 150px;" list="listaPais">
                             <datalist id="listaPais"></datalist>
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº da Mãe:</label>
                             <input type="text" name="mae" id="maeInput" class="form-control caixa-input" maxlength="12"
-                                style="width: 150px;" list="listaMaes" placeholder="Anilha Mãe...">
+                                style="width: 150px;" list="listaMaes">
                             <datalist id="listaMaes"></datalist>
                         </div>
                         <div class="col-auto">
@@ -78,6 +82,7 @@
                                 <option value="Indefinido">Indefinido</option>
                             </select>
                         </div>
+
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Categoria:</label>
                             <select name="categoria" id="categoriaSelect" class="form-select caixa-input"
@@ -87,25 +92,23 @@
                                 <option value="Reprodutor">Reprodutores</option>
                                 <option value="Cedido">Cedido</option>
                             </select>
+
+                            <div id="cedidoGroup" style="display: none; margin-top: 15px;">
+                                <label class="form-label fw-bold small text-uppercase">A quem cedeu:</label>
+                                <input type="text" name="cedido_a" id="cedidoInput" class="form-control caixa-input"
+                                    style="width: 160px;" onblur="esconderCedido()">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3" id="cedidoGroup" style="display: none;">
-                        <div class="col-auto">
-                            <label class="form-label fw-bold small text-uppercase">A quem cedeu:</label>
-                            <input type="text" name="cedido_a" class="form-control caixa-input" style="width: 300px;"
-                                placeholder="Nome da pessoa a quem cedeu...">
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mt-2">
+                    <div class="row g-3 mt-1">
                         <div class="col-auto d-flex align-items-center gap-4">
                             <div>
                                 <label class="form-label fw-bold small text-uppercase">Descrição para o
-                                    pedigre...</label>
+                                    pedigree...</label>
                                 <textarea name="obs" class="form-control caixa-input"
-                                    style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.15;"
-                                    maxlength="350" placeholder="Insira a descrição aqui..."></textarea>
+                                    style="width: 300px; height: 150px; resize: none; overflow: hidden; line-height: 1.25;"
+                                    maxlength="220"></textarea>
                             </div>
                             <div class="d-flex flex-column justify-content-center gap-3 pt-4" style="width: 200px;">
                                 <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
@@ -150,7 +153,27 @@
     function toggleCedido() {
         const sel = document.getElementById("categoriaSelect");
         const div = document.getElementById("cedidoGroup");
-        div.style.display = (sel.value === "Cedido") ? "block" : "none";
+        const input = document.getElementById("cedidoInput");
+
+        if (sel.value === "Cedido") {
+            div.style.display = "block";
+            input.focus(); // O cursor salta de imediato para a caixa
+        } else {
+            div.style.display = "none";
+            input.value = ""; // Limpa se mudarem de ideias
+        }
+    }
+
+    // Deteta se o utilizador tirou o rato/cursor de lá sem escrever nada
+    function esconderCedido() {
+        const input = document.getElementById("cedidoInput");
+        const sel = document.getElementById("categoriaSelect");
+        const div = document.getElementById("cedidoGroup");
+
+        if (input.value.trim() === "") {
+            div.style.display = "none";
+            sel.value = ""; // Volta a meter o campo categoria no "Escolha..."
+        }
     }
 </script>
 {% endblock %}
