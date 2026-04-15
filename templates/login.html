@@ -1,60 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold">Iniciar Sessão</h2>
-        </div>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0" style="border-radius: 10px;">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">ENTRAR</h2>
+                    <p class="text-muted">Aceda à sua conta MYLOFT</p>
+                </div>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">EMAIL</label>
-                <input type="email" name="email" class="form-control form-control-lg" required>
-            </div>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email</label>
+                        <input type="email" name="email" class="form-control bg-light" placeholder="seu@email.com"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Password</label>
+                        <input type="password" name="password" class="form-control bg-light" required>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">PASSWORD</label>
-                <div class="input-group">
-                    <input type="password" name="password" id="loginPassword" class="form-control form-control-lg"
-                        required>
-                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                        <i class="bi bi-eye" id="eyeIcon"></i>
-                    </button>
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-executar btn-lg w-100 shadow">
+                            ENTRAR
+                        </button>
+
+                        <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg w-100 shadow">
+                            <i class="bi bi-arrow-left"></i> VOLTAR
+                        </a>
+                    </div>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="mb-0">Não tem conta? <a href="{{ url_for('register') }}"
+                            class="text-primary fw-bold text-decoration-none">Registe-se aqui</a></p>
                 </div>
             </div>
-
-            <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
-            </div>
-        </form>
-
-        <div class="text-center mt-3">
-            <a href="{{ url_for('recuperar_password') }}" class="text-decoration-none">Esqueci-me da password</a>
-        </div>
-
-        <hr class="my-4">
-
-        <div class="text-center">
-            <p class="text-muted">Ainda não tem conta? <a href="{{ url_for('register') }}"
-                    class="text-decoration-none fw-bold">Criar Conta</a></p>
         </div>
     </div>
 </div>
-
-<script>
-    const togglePassword = document.querySelector('#togglePassword');
-    const password = document.querySelector('#loginPassword');
-    const eyeIcon = document.querySelector('#eyeIcon');
-
-    togglePassword.addEventListener('click', function (e) {
-        // Alternar o tipo de input
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-
-        // Alternar o ícone
-        eyeIcon.classList.toggle('bi-eye');
-        eyeIcon.classList.toggle('bi-eye-slash');
-    });
-</script>
 {% endblock %}

@@ -1,65 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold">Criar Conta</h2>
-        </div>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0" style="border-radius: 10px;">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">CRIAR CONTA</h2>
+                    <p class="text-muted">Junte-se à comunidade MYLOFT</p>
+                </div>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">EMAIL</label>
-                <input type="email" name="email" class="form-control form-control-lg" placeholder="exemplo@email.com"
-                    required>
-            </div>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email</label>
+                        <input type="email" name="email" class="form-control bg-light" placeholder="seu@email.com"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Password</label>
+                        <input type="password" name="password" class="form-control bg-light" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Confirmar Password</label>
+                        <input type="password" name="confirm_password" class="form-control bg-light" required>
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">PASSWORD</label>
-                <div class="input-group">
-                    <input type="password" name="password" id="regPass" class="form-control form-control-lg" required>
-                    <button class="btn btn-outline-secondary" type="button"
-                        onclick="toggleVisibility('regPass', 'regEye')">
-                        <i class="bi bi-eye" id="regEye"></i>
-                    </button>
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-executar btn-lg w-100 shadow">
+                            CRIAR CONTA
+                        </button>
+
+                        <a href="{{ url_for('login') }}" class="btn btn-retroceder btn-lg w-100 shadow">
+                            <i class="bi bi-arrow-left"></i> VOLTAR
+                        </a>
+                    </div>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="mb-0">Já tem conta? <a href="{{ url_for('login') }}"
+                            class="text-primary fw-bold text-decoration-none">Faça Login</a></p>
                 </div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">CONFIRMAR PASSWORD</label>
-                <div class="input-group">
-                    <input type="password" name="confirm_password" id="regPassConf" class="form-control form-control-lg"
-                        required>
-                    <button class="btn btn-outline-secondary" type="button"
-                        onclick="toggleVisibility('regPassConf', 'regEyeConf')">
-                        <i class="bi bi-eye" id="regEyeConf"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-success btn-lg">Registar</button>
-            </div>
-        </form>
-
-        <div class="text-center mt-4">
-            <p class="text-muted">Já tem conta? <a href="{{ url_for('login') }}"
-                    class="text-decoration-none fw-bold">Iniciar Sessão</a></p>
         </div>
     </div>
 </div>
-
-<script>
-    function toggleVisibility(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(iconId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.replace('bi-eye', 'bi-eye-slash');
-        } else {
-            input.type = "password";
-            icon.classList.replace('bi-eye-slash', 'bi-eye');
-        }
-    }
-</script>
 {% endblock %}
