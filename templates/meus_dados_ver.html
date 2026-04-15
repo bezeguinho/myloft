@@ -1,54 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm border-0" style="border-radius: 10px; background-color: #ffffff;">
-            <div class="card-body p-5">
-                <h3 class="fw-bold text-primary mb-4 text-center">OS MEUS DADOS</h3>
-                {% if utilizador %}
-                <div class="row align-items-center">
-                    <div class="col-md-7 pe-md-5 border-end">
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">NOME:</label>
-                            <p class="fs-5 fw-bold text-dark">{{ utilizador.nome }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">LOCALIDADE:</label>
-                            <p class="fs-5">{{ utilizador.localberry or '---' }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">EMAIL:</label>
-                            <p class="fs-5">{{ utilizador.email or '---' }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">TELEMÓVEL:</label>
-                            <p class="fs-5">{{ utilizador.telefone or '---' }}</p>
-                        </div>
-                    </div>
-                    <div class="col-md-5 text-center">
-                        <div class="mx-auto shadow-sm"
-                            style="width: 220px; height: 220px; border-radius: 10px; border: 3px solid var(--azul-myloft); overflow: hidden;">
-                            {% if utilizador.foto %}
-                            <img src="{{ url_for('static', filename=utilizador.foto) }}"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                            {% else %}
-                            <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                                <i class="bi bi-person-fill text-secondary" style="font-size: 6rem;"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+    <div class="col-auto">
+        <div class="card shadow border-0" style="border-radius: 10px; width: 400px; max-width: 100%;">
+            <div class="card-body p-4 p-md-5 text-center">
+                <h2 class="fw-bold text-primary mb-4 text-uppercase">Os Meus Dados</h2>
+
+                <div class="mb-4 text-start">
+                    <label class="form-label fw-bold small text-uppercase text-secondary">Nome / Pombal:</label>
+                    <p class="fs-5 fw-bold text-dark border-bottom pb-2">
+                        {{ utilizador.nome if utilizador else 'Não definido' }}
+                    </p>
                 </div>
-                {% else %}
-                <div class="text-center py-4">
-                    <p class="text-muted">Ainda não configurou o seu perfil.</p>
-                </div>
-                {% endif %}
-                <div class="mt-5 d-flex justify-content-center gap-3">
-                    <a href="{{ url_for('editar_dados') }}" class="btn btn-executar btn-lg px-5 shadow">EDITAR DADOS</a>
-                    <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg px-5 shadow">
-                        <i class="bi bi-arrow-left"></i> VOLTAR
-                    </a>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
                 </div>
             </div>
         </div>
