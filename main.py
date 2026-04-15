@@ -8,7 +8,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- CONFIGURAÇÃO DB ---
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -19,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -51,10 +49,10 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- FORÇA BRUTA: LIMPEZA TOTAL NO ARRANQUE ---
+# LIMPEZA FORÇADA
 with app.app_context():
-    db.drop_all()   # APAGA TUDO
-    db.create_all() # CRIA TUDO NOVO E CORRETO
+    db.drop_all()
+    db.create_all()
 
 @app.route("/")
 def index():
@@ -64,15 +62,12 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    # Envio explícito da variável para evitar o erro de 'undefined'
-    try:
-        pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
-    except:
-        db.session.rollback()
-        pombos_user = []
-        
+    # Nome da variável: pombos_user
+    pombos_do_sistema = Pombo.query.filter_by(user_id=current_user.id).all()
+    
     if request.method == 'POST':
         try:
+            is_oculto = True if request.form.get('oculto') == 'on' else False
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -84,7 +79,7 @@ def novo_pombo():
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
                 cedido_a=request.form.get('cedido_a'),
-                oculto=True if request.form.get('oculto') == 'on' else False,
+                oculto=is_oculto,
                 user_id=current_user.id
             )
             db.session.add(novo)
@@ -94,19 +89,13 @@ def novo_pombo():
             db.session.rollback()
             flash("Erro ao gravar.", "danger")
             
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_do_sistema)
 
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
