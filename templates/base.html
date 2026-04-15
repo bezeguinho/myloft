@@ -17,7 +17,6 @@
       background-color: #f8f9fa;
     }
 
-    /* BARRA DE NAVEGAÇÃO */
     .navbar {
       background-color: var(--azul-myloft) !important;
       padding: 0.5rem 1rem;
@@ -30,7 +29,6 @@
       margin-right: 2rem;
     }
 
-    /* HOVER AUTOMÁTICO */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -38,7 +36,7 @@
       }
     }
 
-    /* PADRÃO MYLOFT */
+    /* LINKS DA BARRA */
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
@@ -50,6 +48,7 @@
       display: inline-block;
     }
 
+    /* HOVER: Fundo amarelo, letra preta */
     .nav-link:hover,
     .dropdown-item:hover {
       background-color: #ffc107 !important;
@@ -77,13 +76,6 @@
       border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    /* BOTÃO SAIR DESTAQUE */
-    .btn-sair {
-      background-color: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* BOTÕES DO FORMULÁRIO */
     .btn-executar {
       background-color: var(--azul-myloft);
       color: white;
@@ -150,11 +142,11 @@
         <ul class="navbar-nav">
           {% if current_user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link btn-sair ms-lg-3" href="{{ url_for('logout') }}">SAIR</a>
+            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link btn-sair ms-lg-3" href="{{ url_for('login') }}">ENTRAR</a>
+            <a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a>
           </li>
           {% endif %}
         </ul>

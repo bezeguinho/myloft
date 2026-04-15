@@ -137,17 +137,21 @@ def pombos_ocultos():
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-# --- CORREÇÃO AQUI: Agora a bagagem vai cheia para não dar Erro 500 ---
+# --- CORREÇÃO: Cria o perfil automaticamente se não existir, evitando Erro 500 ---
 @app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
     try:
         utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    except:
+        if not utilizador:
+            utilizador = Utilizador(nome="Nome não definido", user_id=current_user.id)
+            db.session.add(utilizador)
+            db.session.commit()
+    except Exception:
         db.session.rollback()
         utilizador = None
     return render_template("meus_dados_ver.html", utilizador=utilizador)
-# ------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
