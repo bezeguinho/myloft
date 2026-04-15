@@ -1,126 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .photo-box {
-        width: 160px;
-        height: 160px;
-        background-color: #ffffff;
-        border: 2px dashed #aab7c9;
-        border-radius: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        overflow: hidden;
-        transition: border-color 0.2s;
-        flex-shrink: 0;
-    }
-
-    .photo-box:hover {
-        border-color: #0d6efd;
-    }
-
-    .photo-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .photo-box .placeholder-text {
-        color: #8899aa;
-        font-size: 0.85rem;
-        text-align: center;
-        padding: 0.5rem;
-    }
-</style>
-
 <div class="row justify-content-center">
-    <div class="col-12 col-lg-10">
-        <h2 class="fw-bold mb-4">Editar Os Meus Dados</h2>
-
-        <form action="{{ url_for('editar_dados') }}" method="POST" enctype="multipart/form-data">
-            <div class="row g-3 align-items-start">
-
-                <!-- Coluna esquerda: campos -->
-                <div class="col-12 col-md order-2 order-md-1">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label for="nome" class="form-label fw-bold">Nome:</label>
-                            <input type="text" class="form-control" id="nome" name="nome"
-                                value="{{ utilizador.nome or '' }}" maxlength="60"
-                                placeholder="O seu nome completo (máx 60 carateres)">
-                        </div>
-
-
-                        <div class="col-12">
-                            <label for="localidade" class="form-label fw-bold">Localidade:</label>
-                            <input type="text" class="form-control" id="localidade" name="localidade"
-                                value="{{ utilizador.localidade or '' }}" maxlength="60"
-                                placeholder="Localidade (máx 60 carateres)">
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label for="telefone" class="form-label fw-bold">Telefone:</label>
-                            <input type="tel" class="form-control" id="telefone" name="telefone"
-                                value="{{ utilizador.telefone or '' }}" maxlength="25" placeholder="Ex: 912 345 678">
-                        </div>
-
-                        <div class="col-12">
-                            <label for="email" class="form-label fw-bold">E-mail:</label>
-                            <input type="email" class="form-control" id="email" name="email"
-                                value="{{ utilizador.email or '' }}" maxlength="60"
-                                placeholder="exemplo@email.com (máx 60 carateres)">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coluna direita: foto -->
-                <div class="col-12 col-md-auto d-flex flex-column align-items-center order-1 order-md-2 mb-3 mb-md-0">
-                    <label class="form-label fw-bold">Foto:</label>
-                    <div class="photo-box" id="photoBox" title="Clique para alterar foto">
-                        <span class="placeholder-text d-none" id="photoPlaceholder">Clique para<br>alterar foto</span>
-                        {% if utilizador.foto %}
-                        <img id="photoPreview" src="{{ url_for('static', filename=utilizador.foto) }}"
-                            alt="Pré-visualização">
-                        {% else %}
-                        <img id="photoPreview" class="d-none" alt="Pré-visualização">
-                        <script>document.getElementById('photoPlaceholder').classList.remove('d-none');</script>
-                        {% endif %}
-                    </div>
-                    <input type="file" class="d-none" id="fotoInput" name="foto" accept="image/*">
-                </div>
+    <div class="col-md-8">
+        <div class="card shadow border-0" style="border-radius: 15px;">
+            <div class="card-header bg-primary text-white py-3" style="border-radius: 15px 15px 0 0;">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>EDITAR OS MEUS DADOS
+                </h4>
             </div>
 
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary px-4">Atualizar Dados</button>
-                <a href="{{ url_for('ver_dados') }}" class="btn btn-yellow px-4">← Cancelar</a>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Nome do Columbófilo / Pombal</label>
+                            <input type="text" name="nome" class="form-control form-control-lg"
+                                value="{{ utilizador.nome }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary">Localidade</label>
+                            <input type="text" name="localidade" class="form-control"
+                                value="{{ utilizador.localberry }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary">Telefone / Telemóvel</label>
+                            <input type="text" name="telefone" class="form-control" value="{{ utilizador.telefone }}">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Email de Contacto</label>
+                            <input type="email" name="email" class="form-control" value="{{ utilizador.email }}">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Alterar Foto de Perfil ou Logotipo</label>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if utilizador.foto %}
+                                <img src="{{ url_for('static', filename=utilizador.foto) }}"
+                                    style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px;"
+                                    class="shadow-sm">
+                                {% endif %}
+                                <input type="file" name="foto" class="form-control" accept="image/*">
+                            </div>
+                            <small class="text-muted mt-2 d-block">Deixe vazio se não pretender alterar a imagem
+                                atual.</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow">
+                            ATUALIZAR DADOS
+                        </button>
+                        <a href="{{ url_for('ver_dados') }}" class="btn btn-outline-secondary btn-lg px-4">
+                            CANCELAR
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<script>
-    (function () {
-        const photoBox = document.getElementById('photoBox');
-        const fotoInput = document.getElementById('fotoInput');
-        const preview = document.getElementById('photoPreview');
-        const placeholder = document.getElementById('photoPlaceholder');
-
-        photoBox.addEventListener('click', () => fotoInput.click());
-
-        fotoInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('d-none');
-                    if (placeholder) placeholder.classList.add('d-none');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    })();
-</script>
 {% endblock %}
