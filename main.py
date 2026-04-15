@@ -80,10 +80,12 @@ def novo_pombo():
             )
             db.session.add(novo)
             db.session.commit()
+            flash("Pombo registado com sucesso!", "success")
             return redirect(url_for('lista_pombos'))
-        except:
+        except Exception as e:
             db.session.rollback()
-            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
+            flash("Erro ao gravar pombo. Verifique se a anilha já existe.", "danger")
+            return redirect(url_for('novo_pombo'))
     return render_template("pombo_form.html")
 
 @app.route("/lista_pombos")
@@ -113,8 +115,6 @@ def cedidos():
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
-    pombo = None
-    dono = None
     if request.method == 'POST':
         anilha = request.form.get('numero')
         pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
@@ -135,3 +135,25 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        passw = request.form.get('password')
+        new_user = User(email=email, password_hash=generate_password_hash(passw))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
