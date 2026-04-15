@@ -74,7 +74,6 @@ def novo_pombo():
         )
         db.session.add(novo)
         db.session.commit()
-        flash("Pombo inserido com sucesso!", "success")
         return redirect(url_for('lista_pombos'))
     return render_template("pombo_form.html")
 
