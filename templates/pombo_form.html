@@ -1,5 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
+
+<style>
+    /* Estilo para tonificar as caixas e suavizar as ajudas */
+    .caixa-input {
+        border: 1px solid #888888 !important;
+        /* Borda mais escura e visível */
+        background-color: #fdfdfd !important;
+    }
+
+    .caixa-input:focus {
+        border-color: var(--azul-myloft) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+
+    /* Tornar os placeholders cinzentos e discretos */
+    .caixa-input::placeholder {
+        color: #b0b0b0 !important;
+        font-weight: normal;
+    }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-md-11">
         <div class="card shadow border-0" style="border-radius: 10px; background-color: #ffffff;">
@@ -10,14 +31,14 @@
                     <div class="row g-3 mb-3">
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº da Anilha:</label>
-                            <input type="text" name="anilha" class="form-control bg-light" maxlength="12"
-                                style="width: 150px;" required>
+                            <input type="text" name="anilha" class="form-control caixa-input" maxlength="12"
+                                style="width: 150px;" required placeholder="Ex: 1234567">
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Ano:</label>
-                            <select name="ano" id="pomboAno" class="form-select bg-light" style="width: 120px;" required
-                                onchange="filtrarPais()">
-                                <option value="" selected disabled>Escolha...</option>
+                            <select name="ano" id="pomboAno" class="form-select caixa-input" style="width: 120px;"
+                                required onchange="filtrarPais()">
+                                <option value="" selected disabled hidden>Escolha...</option>
                                 {% for ano in anos_lista %}
                                 <option value="{{ ano }}">{{ ano }}</option>
                                 {% endfor %}
@@ -25,33 +46,33 @@
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nome do Pombo:</label>
-                            <input type="text" name="nome" class="form-control bg-light" maxlength="40"
-                                style="width: 250px;">
+                            <input type="text" name="nome" class="form-control caixa-input" maxlength="40"
+                                style="width: 250px;" placeholder="Nome...">
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Cor:</label>
-                            <input type="text" name="cor" class="form-control bg-light" maxlength="40"
-                                style="width: 180px;">
+                            <input type="text" name="cor" class="form-control caixa-input" maxlength="40"
+                                style="width: 180px;" placeholder="Cor...">
                         </div>
                     </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº do Pai:</label>
-                            <input type="text" name="pai" id="paiInput" class="form-control bg-light" maxlength="12"
-                                style="width: 150px;" list="listaPais">
+                            <input type="text" name="pai" id="paiInput" class="form-control caixa-input" maxlength="12"
+                                style="width: 150px;" list="listaPais" placeholder="Anilha Pai...">
                             <datalist id="listaPais"></datalist>
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Nº da Mãe:</label>
-                            <input type="text" name="mae" id="maeInput" class="form-control bg-light" maxlength="12"
-                                style="width: 150px;" list="listaMaes">
+                            <input type="text" name="mae" id="maeInput" class="form-control caixa-input" maxlength="12"
+                                style="width: 150px;" list="listaMaes" placeholder="Anilha Mãe...">
                             <datalist id="listaMaes"></datalist>
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Sexo:</label>
-                            <select name="sexo" class="form-select bg-light" style="width: 150px;" required>
-                                <option value="" selected disabled>Escolha...</option>
+                            <select name="sexo" class="form-select caixa-input" style="width: 150px;" required>
+                                <option value="" selected disabled hidden>Escolha...</option>
                                 <option value="Macho">Macho</option>
                                 <option value="Fêmea">Fêmea</option>
                                 <option value="Indefinido">Indefinido</option>
@@ -59,21 +80,21 @@
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Categoria:</label>
-                            <select name="categoria" id="categoriaSelect" class="form-select bg-light"
+                            <select name="categoria" id="categoriaSelect" class="form-select caixa-input"
                                 style="width: 160px;" required onchange="toggleCedido()">
-                                <option value="" selected disabled>Escolha...</option>
+                                <option value="" selected disabled hidden>Escolha...</option>
                                 <option value="Voador">Voadores</option>
                                 <option value="Reprodutor">Reprodutores</option>
-                                <option value="Cedido">Cedido a:</option>
+                                <option value="Cedido">Cedido</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-3" id="cedidoGroup" style="display: none;">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small text-uppercase text-danger">A quem cedeu:</label>
-                            <input type="text" name="cedido_a" class="form-control border-danger bg-light"
-                                style="width: 300px;">
+                            <label class="form-label fw-bold small text-uppercase">A quem cedeu:</label>
+                            <input type="text" name="cedido_a" class="form-control caixa-input" style="width: 300px;"
+                                placeholder="Nome da pessoa a quem cedeu...">
                         </div>
                     </div>
 
@@ -82,9 +103,9 @@
                             <div>
                                 <label class="form-label fw-bold small text-uppercase">Descrição para o
                                     pedigre...</label>
-                                <textarea name="obs" class="form-control bg-light"
+                                <textarea name="obs" class="form-control caixa-input"
                                     style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.15;"
-                                    maxlength="350"></textarea>
+                                    maxlength="350" placeholder="Insira a descrição aqui..."></textarea>
                             </div>
                             <div class="d-flex flex-column justify-content-center gap-3 pt-4" style="width: 200px;">
                                 <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
