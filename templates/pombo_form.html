@@ -12,13 +12,8 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
-    /* Mantém o "Escolha..." cinzento, mas as opções reais a preto */
     select.caixa-input:invalid {
         color: #999999 !important;
-    }
-
-    select.caixa-input option {
-        color: #000000 !important;
     }
 </style>
 
@@ -110,7 +105,7 @@
                     <div class="row g-3">
                         <div class="col-auto d-flex align-items-center gap-4">
                             <div>
-                                <label class="form-label fw-bold small">DESCRIÇÃO PEDIGREE:</label>
+                                <label class="form-label fw-bold small">Descrição para o pedigree...</label>
                                 <textarea name="obs" class="form-control caixa-input"
                                     style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.25;"
                                     maxlength="230" oninput="limitarAltura(this)"></textarea>

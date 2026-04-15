@@ -22,37 +22,57 @@
       background-color: var(--azul-myloft) !important;
     }
 
-    .nav-link,
     .navbar-brand {
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
     }
 
-    /* Efeito Amarelo na barra principal */
-    .nav-link:hover {
-      color: #ffc107 !important;
-    }
-
-    /* SUBMENUS (Dropdown) */
-    .dropdown-menu {
-      border: none;
-      border-radius: 8px;
-    }
-
-    .dropdown-item {
-      color: var(--azul-myloft) !important;
-      /* Todos a Azul */
+    /* PADRÃO MYLOFT: MENUS E SUBMENUS */
+    .nav-link {
+      color: #ffffff !important;
       font-weight: bold;
+      text-transform: uppercase;
+      border-radius: 6px;
+      /* Cantos em raio */
+      padding: 8px 12px !important;
+      margin: 0 4px;
+      transition: all 0.2s ease-in-out;
     }
 
-    /* Efeito Hover nos Submenus (Fundo Amarelo, Letra Preta) */
+    /* HOVER PADRÃO: Botão Amarelo, Letra Preta, Cantos Redondos */
+    .nav-link:hover,
     .dropdown-item:hover {
       background-color: #ffc107 !important;
       color: #000000 !important;
     }
 
-    /* BOTÕES */
+    /* CAIXA DOS SUBMENUS (Azul com letras brancas) */
+    .dropdown-menu {
+      background-color: var(--azul-myloft) !important;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      /* Dá espaço ao redor dos botões */
+    }
+
+    /* ITENS DO SUBMENU */
+    .dropdown-item {
+      color: #ffffff !important;
+      /* Letras Brancas */
+      font-weight: bold;
+      border-radius: 6px;
+      /* Cantos em raio para coincidir com o hover */
+      margin-bottom: 2px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Divisória fina e clara para fundo azul */
+    .dropdown-divider {
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* BOTÕES INFERIORES */
     .btn-executar {
       background-color: var(--azul-myloft);
       color: white;
@@ -81,7 +101,7 @@
 
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
-      <a class="navbar-brand fs-4" href="{{ url_for('index') }}">MYLOFT</a>
+      <a class="navbar-brand fs-4 me-4" href="{{ url_for('index') }}">MYLOFT</a>
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
