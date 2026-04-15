@@ -30,16 +30,15 @@
       margin-right: 2rem;
     }
 
-    /* CONFIGURAÇÃO DO HOVER AUTOMÁTICO (ABRIR SEM CLICAR) */
+    /* HOVER AUTOMÁTICO */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
         margin-top: 0;
-        /* Evita que o menu feche ao mover o rato para baixo */
       }
     }
 
-    /* PADRÃO MYLOFT: LINKS DA BARRA */
+    /* PADRÃO MYLOFT */
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
@@ -51,14 +50,12 @@
       display: inline-block;
     }
 
-    /* HOVER PADRÃO: Botão Amarelo, Letra Preta, Cantos Redondos */
     .nav-link:hover,
     .dropdown-item:hover {
       background-color: #ffc107 !important;
       color: #000000 !important;
     }
 
-    /* CAIXA DOS SUBMENUS (Azul) */
     .dropdown-menu {
       background-color: var(--azul-myloft) !important;
       border: none;
@@ -67,7 +64,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    /* ITENS DO SUBMENU */
     .dropdown-item {
       color: #ffffff !important;
       font-weight: bold;
@@ -79,6 +75,12 @@
 
     .dropdown-divider {
       border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* BOTÃO SAIR DESTAQUE */
+    .btn-sair {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     /* BOTÕES DO FORMULÁRIO */
@@ -118,8 +120,9 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
+      <div class="collapse navbar-collapse d-lg-flex justify-content-between" id="navbarNav">
+
+        <ul class="navbar-nav">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button">
               GESTÃO DE POMBOS
@@ -144,17 +147,18 @@
           </li>
         </ul>
 
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav">
           {% if current_user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}" style="background-color: rgba(255,255,255,0.1);">SAIR</a>
+            <a class="nav-link btn-sair ms-lg-3" href="{{ url_for('logout') }}">SAIR</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a>
+            <a class="nav-link btn-sair ms-lg-3" href="{{ url_for('login') }}">ENTRAR</a>
           </li>
           {% endif %}
         </ul>
+
       </div>
     </div>
   </nav>

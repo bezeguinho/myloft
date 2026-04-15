@@ -49,14 +49,12 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# CRIA AS TABELAS SÓ SE NÃO EXISTIREM (SEGURO PARA O VERCEL)
 with app.app_context():
     try:
         db.create_all()
     except Exception as e:
         print("Aviso na base de dados:", e)
 
-# ROTA SECRETA DE LIMPEZA
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
@@ -134,17 +132,22 @@ def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-# --- AQUI ESTÃO AS ROTAS QUE FALTAVAM E CAUSAVAM O ERRO 500 ---
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
+# --- CORREÇÃO AQUI: Agora a bagagem vai cheia para não dar Erro 500 ---
 @app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
-    return render_template("meus_dados_ver.html")
-# -------------------------------------------------------------
+    try:
+        utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    except:
+        db.session.rollback()
+        utilizador = None
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+# ------------------------------------------------------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
