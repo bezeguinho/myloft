@@ -10,35 +10,43 @@
   <style>
     :root {
       --amarelo-myloft: #ffde00;
+      --azul-myloft: #0d6efd;
     }
 
-    /* --- REGRA UNIVERSAL DE OURO (BOTÕES ARREDONDADOS E AMARELOS) --- */
-    /* Forçamos o border-radius em repouso e no hover para garantir os cantos arredondados */
+    /* --- REGRA PARA TODOS OS BOTÕES (Retangulares com cantos suavizados) --- */
     .btn {
-      border-radius: 30px !important;
-      /* Cantos bem arredondados como pediste */
+      border-radius: 8px !important;
+      /* Cantos apenas levemente arredondados */
       transition: all 0.3s ease-in-out !important;
+      font-weight: bold;
     }
 
-    /* Comportamento quando o rato passa por cima */
-    .btn:hover,
-    .navbar-nav .nav-link:hover,
-    .dropdown-item:hover {
+    /* Hover padrão para botões azuis (Login, Criar Conta, Guardar) */
+    .btn-primary:hover {
       background-color: var(--amarelo-myloft) !important;
       border-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
-      border-radius: 30px !important;
-      /* Mantém arredondado no hover */
     }
 
-    /* Texto preto nos botões primários no hover */
-    .btn-primary:hover {
+    /* --- REGRA ESPECÍFICA PARA BOTÕES "VOLTAR" / "CANCELAR" --- */
+    /* Vamos usar a classe .btn-warning do Bootstrap como base para o teu Amarelo */
+    .btn-voltar {
+      background-color: var(--amarelo-myloft) !important;
+      border-color: var(--amarelo-myloft) !important;
+      color: #ffffff !important;
+      /* Letras brancas por padrão */
+    }
+
+    .btn-voltar:hover {
+      background-color: var(--amarelo-myloft) !important;
+      border-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
+      /* Letras pretas no hover */
     }
 
     /* Estilo da Frase Central */
     .frase-central {
-      color: #0d6efd !important;
+      color: var(--azul-myloft) !important;
       font-size: 2.5rem !important;
       font-weight: bold;
       letter-spacing: 3px;
@@ -49,11 +57,15 @@
       background-color: #e9f1f7;
     }
 
-    /* Menu de navegação arredondado no hover */
+    /* Menu de navegação */
     .navbar-dark .navbar-nav .nav-link:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
-      border-radius: 10px !important;
+      border-radius: 8px !important;
+    }
+
+    .dropdown-menu {
+      border-radius: 8px !important;
     }
   </style>
 </head>
@@ -72,7 +84,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">GESTÃO DE POMBOS</a>
-            <ul class="dropdown-menu shadow" style="border-radius: 15px; overflow: hidden;">
+            <ul class="dropdown-menu shadow">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
                 <hr class="dropdown-divider">
@@ -93,7 +105,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius: 15px;">
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius: 8px;">
       {{ message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
@@ -105,7 +117,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Menu inteligente
     document.querySelectorAll('.nav-item.dropdown').forEach(function (item) {
       item.addEventListener('mouseenter', function () {
         let el = this.querySelector('.dropdown-toggle');
