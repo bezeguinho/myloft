@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 # --- CONFIGURAÇÃO DB ---
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
-    uri = uri.replace('postgres://', 'postgres://', 1)
+    uri = uri.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -108,17 +108,6 @@ def voadores():
 def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pedigree/gerar")
-@login_required
-def gerar_pedigree():
-    return render_template("gerar_pedigree.html")
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

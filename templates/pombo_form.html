@@ -69,7 +69,7 @@
                             <textarea name="obs" class="form-control bg-light" rows="4"
                                 style="resize: none;"></textarea>
                         </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2">
+                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2 pb-1">
                             <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
                             <a href="{{ url_for('lista_pombos') }}"
                                 class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
@@ -97,7 +97,6 @@
                 if (p.ano <= anoSel) {
                     let opt = document.createElement('option');
                     opt.value = p.anilha.slice(-4);
-                    opt.textContent = p.anilha + " (Ano: " + p.ano + ")";
                     if (p.sexo === "Macho") lPai.appendChild(opt);
                     else if (p.sexo === "Fêmea") lMae.appendChild(opt);
                     else { lPai.appendChild(opt.cloneNode(true)); lMae.appendChild(opt.cloneNode(true)); }
