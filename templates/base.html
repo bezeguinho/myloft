@@ -13,63 +13,53 @@
       --azul-myloft: #0d6efd;
     }
 
-    /* --- CONFIGURAÇÃO GLOBAL DE BOTÕES --- */
+    /* --- PADRÃO DE BOTÕES (REGRA DE OURO) --- */
     .btn {
       border-radius: 8px !important;
       font-weight: bold !important;
       transition: all 0.2s ease-in-out !important;
       border: none !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      /* Espaço para a seta */
     }
 
-    /* 1. EXECUÇÃO: Azul/Branco -> Hover Azul/Preto */
-    .btn-executar,
-    .btn-primary {
+    /* 1. EXECUÇÃO (Azul/Branco -> Hover Azul/Preto) */
+    .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
     }
 
-    .btn-executar:hover,
-    .btn-primary:hover {
+    .btn-executar:hover {
       background-color: var(--azul-myloft) !important;
-      /* Mantém azul */
       color: #000000 !important;
-      /* Letra Preta */
     }
 
-    /* 2. RETROCESSO: Amarelo/Branco -> Hover Amarelo/Preto */
-    .btn-retroceder,
-    .btn-warning {
+    /* 2. RETROCESSO (Amarelo/Branco -> Hover Amarelo/Preto) */
+    .btn-retroceder {
       background-color: var(--amarelo-myloft) !important;
       color: #ffffff !important;
+      /* Letras Brancas como pediste */
     }
 
-    .btn-retroceder:hover,
-    .btn-warning:hover {
+    .btn-retroceder:hover {
       background-color: var(--amarelo-myloft) !important;
-      /* Mantém amarelo */
       color: #000000 !important;
-      /* Letra Preta */
+      /* Letras Pretas no Hover */
     }
 
-    /* --- BARRA DE MENUS E SUBMENUS --- */
-    .navbar-dark .navbar-nav .nav-link {
+    /* --- MENUS E SUBMENUS --- */
+    .navbar-nav .nav-link {
       color: #ffffff !important;
-      padding: 10px 20px !important;
       border-radius: 8px !important;
-      transition: 0.2s all;
     }
 
-    /* Menu/Submenu: Texto Branco -> Hover Amarelo/Preto */
     .navbar-nav .nav-link:hover,
     .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
-    }
-
-    .dropdown-menu {
-      border-radius: 8px !important;
-      border: none !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     }
 
     body {
@@ -81,13 +71,12 @@
       font-size: 2.5rem !important;
       font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 2px;
     }
   </style>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">MYLOFT</a>
       {% if current_user.is_authenticated %}
@@ -95,7 +84,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">GESTÃO DE POMBOS</a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu border-0 shadow">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
             </ul>

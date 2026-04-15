@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-md-5 text-center">
                             <label for="foto-upload" style="cursor: pointer;">
-                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                <div class="bg-light d-flex align-items-center justify-content-center shadow-sm"
                                     style="width: 200px; height: 200px; border-radius: 10px; border: 2px dashed var(--azul-myloft); overflow: hidden;">
                                     {% if utilizador.foto %}<img src="{{ url_for('static', filename=utilizador.foto) }}"
                                         style="width: 100%; height: 100%; object-fit: cover;">
@@ -43,9 +43,12 @@
                             <small class="text-muted d-block mt-2">Clique para selecionar foto</small>
                         </div>
                     </div>
+
                     <div class="mt-5 d-flex justify-content-center gap-3">
                         <button type="submit" class="btn btn-executar btn-lg px-5 shadow">ATUALIZAR DADOS</button>
-                        <a href="{{ url_for('ver_dados') }}" class="btn btn-retroceder btn-lg px-5 shadow">CANCELAR</a>
+                        <a href="{{ url_for('ver_dados') }}" class="btn btn-retroceder btn-lg px-5 shadow">
+                            <i class="bi bi-arrow-left"></i> CANCELAR
+                        </a>
                     </div>
                 </form>
             </div>
