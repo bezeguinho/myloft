@@ -56,7 +56,7 @@
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Cor:</label>
                             <input type="text" name="cor" class="form-control caixa-input" maxlength="40"
-                                style="width: 180px;">
+                                style="width: 350px;">
                         </div>
                     </div>
 
@@ -107,8 +107,8 @@
                                 <label class="form-label fw-bold small text-uppercase">Descrição para o
                                     pedigree...</label>
                                 <textarea name="obs" class="form-control caixa-input"
-                                    style="width: 300px; height: 150px; resize: none; overflow: hidden; line-height: 1.25;"
-                                    maxlength="220"></textarea>
+                                    style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.25;"
+                                    maxlength="230" oninput="limitarAltura(this)"></textarea>
                             </div>
                             <div class="d-flex flex-column justify-content-center gap-3 pt-4" style="width: 200px;">
                                 <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
@@ -157,14 +157,13 @@
 
         if (sel.value === "Cedido") {
             div.style.display = "block";
-            input.focus(); // O cursor salta de imediato para a caixa
+            input.focus();
         } else {
             div.style.display = "none";
-            input.value = ""; // Limpa se mudarem de ideias
+            input.value = "";
         }
     }
 
-    // Deteta se o utilizador tirou o rato/cursor de lá sem escrever nada
     function esconderCedido() {
         const input = document.getElementById("cedidoInput");
         const sel = document.getElementById("categoriaSelect");
@@ -172,7 +171,18 @@
 
         if (input.value.trim() === "") {
             div.style.display = "none";
-            sel.value = ""; // Volta a meter o campo categoria no "Escolha..."
+            sel.value = "";
+        }
+    }
+
+    // NOVA FUNÇÃO: Tranca a caixa para nunca fazer "roll up" ou sair do quadrado
+    let textoAnterior = "";
+    function limitarAltura(textarea) {
+        // Se o texto obrigar a caixa a criar "scroll", ele cancela a última letra introduzida
+        if (textarea.scrollHeight > textarea.clientHeight) {
+            textarea.value = textoAnterior;
+        } else {
+            textoAnterior = textarea.value;
         }
     }
 </script>
