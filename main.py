@@ -44,7 +44,7 @@ class Pombo(db.Model):
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
     cedido_a = db.Column(db.String(100))
-    oculto = db.Column(db.Boolean, default=False) # CAMPO NOVO
+    oculto = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(50), default="Ativo")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -57,99 +57,4 @@ with app.app_context():
 
 @app.route("/reset_bd")
 def reset_bd():
-    db.drop_all()
-    db.create_all()
-    return "<h3>Base de Dados limpa e atualizada!</h3><p>Faz um novo Registo.</p>"
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route("/novo_pombo", methods=['GET', 'POST'])
-@login_required
-def novo_pombo():
-    anos_lista = list(range(datetime.now().year, 1990, -1))
-    pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
-    if request.method == 'POST':
-        try:
-            is_oculto = True if request.form.get('oculto') == 'on' else False
-            novo = Pombo(
-                anilha=request.form.get('anilha'),
-                nome=request.form.get('nome'),
-                ano=int(request.form.get('ano') or 0),
-                sexo=request.form.get('sexo'),
-                cor=request.form.get('cor'),
-                categoria=request.form.get('categoria'),
-                pai=request.form.get('pai'),
-                mae=request.form.get('mae'),
-                obs=request.form.get('obs'),
-                cedido_a=request.form.get('cedido_a'),
-                oculto=is_oculto,
-                user_id=current_user.id
-            )
-            db.session.add(novo)
-            db.session.commit()
-            return redirect(url_for('lista_pombos'))
-        except Exception:
-            db.session.rollback()
-            flash("Erro ao gravar pombo.", "danger")
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
-
-@app.route("/lista_pombos")
-@login_required
-def lista_pombos():
-    # Mostra apenas os NÃO ocultos
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
-
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
-
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    # Mostra apenas os OCULTOS
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        user = User.query.filter_by(email=request.form.get('email').lower()).first()
-        if user and check_password_hash(user.password_hash, request.form.get('password')):
-            login_user(user)
-            return redirect(url_for('index'))
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form.get('email').lower()
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    db.drop
