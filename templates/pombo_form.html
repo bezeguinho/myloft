@@ -2,12 +2,64 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <div class="card shadow-sm border-0" style="border-radius: 10px;">
+        <div class="card shadow border-0" style="border-radius: 10px; background-color: #ffffff;">
             <div class="card-body p-5">
-                <h3 class="fw-bold text-primary mb-4">INSERIR NOVO POMBO</h3>
+                <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST">
-                    <div class="mt-5 d-flex gap-3">
-                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">GRAVAR POMBO</button>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Nº DA ANILHA</label>
+                            <input type="text" name="anilha" class="form-control bg-light" placeholder="Ex: 1234567"
+                                required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">NOME DO POMBO</label>
+                            <input type="text" name="nome" class="form-control bg-light" placeholder="Ex: Campeão">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">ANO</label>
+                            <input type="text" name="ano" class="form-control bg-light" placeholder="Ex: 2024">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">SEXO</label>
+                            <select name="sexo" class="form-select bg-light">
+                                <option value="Macho">Macho</option>
+                                <option value="Fêmea">Fêmea</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">COR</label>
+                            <input type="text" name="cor" class="form-control bg-light" placeholder="Ex: Azulado">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">CATEGORIA</label>
+                            <select name="categoria" class="form-select bg-light">
+                                <option value="Voador">Voador</option>
+                                <option value="Reprodutor">Reprodutor</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ANILHA DO PAI</label>
+                            <input type="text" name="pai" class="form-control bg-light" placeholder="Nº Anilha do Pai">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ANILHA DA MÃE</label>
+                            <input type="text" name="mae" class="form-control bg-light" placeholder="Nº Anilha da Mãe">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">OBSERVAÇÕES</label>
+                            <textarea name="obs" class="form-control bg-light" rows="3"
+                                placeholder="Notas adicionais..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 d-flex justify-content-center gap-3">
+                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">
+                            GRAVAR POMBO
+                        </button>
                         <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg px-5 shadow">
                             <i class="bi bi-arrow-left"></i> VOLTAR
                         </a>
