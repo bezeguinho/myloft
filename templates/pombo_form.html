@@ -6,14 +6,16 @@
             <div class="card-body p-4">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST" id="pomboForm">
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold small text-uppercase">Nº da Anilha (Máx 12)</label>
-                            <input type="text" name="anilha" class="form-control bg-light" maxlength="12" required>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Nº da Anilha:</label>
+                            <input type="text" name="anilha" class="form-control bg-light" maxlength="12"
+                                style="width: 150px;" required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Ano (Obrigatório)</label>
-                            <select name="ano" id="pomboAno" class="form-select bg-light" required
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Ano:</label>
+                            <select name="ano" id="pomboAno" class="form-select bg-light" style="width: 120px;" required
                                 onchange="filtrarPais()">
                                 <option value="" selected disabled>Escolha...</option>
                                 {% for ano in anos_lista %}
@@ -21,58 +23,72 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold small text-uppercase">Nome do Pombo (Máx 40)</label>
-                            <input type="text" name="nome" class="form-control bg-light" maxlength="40">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Nome do Pombo:</label>
+                            <input type="text" name="nome" class="form-control bg-light" maxlength="40"
+                                style="width: 250px;">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Cor (Máx 30)</label>
-                            <input type="text" name="cor" class="form-control bg-light" maxlength="30">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Cor:</label>
+                            <input type="text" name="cor" class="form-control bg-light" maxlength="30"
+                                style="width: 180px;">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase">Nº do Pai (4 dígitos)</label>
-                            <input type="text" name="pai" id="paiInput" class="form-control bg-light" maxlength="4"
-                                list="listaPais">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Nº do Pai:</label>
+                            <input type="text" name="pai" id="paiInput" class="form-control bg-light" maxlength="12"
+                                style="width: 150px;" list="listaPais">
                             <datalist id="listaPais"></datalist>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase">Nº da Mãe (4 dígitos)</label>
-                            <input type="text" name="mae" id="maeInput" class="form-control bg-light" maxlength="4"
-                                list="listaMaes">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Nº da Mãe:</label>
+                            <input type="text" name="mae" id="maeInput" class="form-control bg-light" maxlength="12"
+                                style="width: 150px;" list="listaMaes">
                             <datalist id="listaMaes"></datalist>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase">Sexo (Obrigatório)</label>
-                            <select name="sexo" class="form-select bg-light" required>
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Sexo:</label>
+                            <select name="sexo" class="form-select bg-light" style="width: 150px;" required>
                                 <option value="" selected disabled>Escolha...</option>
                                 <option value="Macho">Macho</option>
                                 <option value="Fêmea">Fêmea</option>
                                 <option value="Indefinido">Indefinido</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase">Categoria (Obrigatório)</label>
-                            <select name="categoria" id="categoriaSelect" class="form-select bg-light" required
-                                onchange="toggleCedido()">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small text-uppercase">Categoria:</label>
+                            <select name="categoria" id="categoriaSelect" class="form-select bg-light"
+                                style="width: 160px;" required onchange="toggleCedido()">
                                 <option value="" selected disabled>Escolha...</option>
                                 <option value="Voador">Voadores</option>
                                 <option value="Reprodutor">Reprodutores</option>
                                 <option value="Cedido">Cedido</option>
                             </select>
                         </div>
-                        <div class="col-md-12" id="cedidoGroup" style="display: none;">
+                    </div>
+
+                    <div class="row g-3 mb-3" id="cedidoGroup" style="display: none;">
+                        <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase text-danger">Cedido a:</label>
-                            <input type="text" name="cedido_a" class="form-control border-danger bg-light">
+                            <input type="text" name="cedido_a" class="form-control border-danger bg-light"
+                                style="width: 300px;">
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold small text-uppercase">Observações (Pedigree)</label>
-                            <textarea name="obs" class="form-control bg-light" rows="4"
-                                style="resize: none;"></textarea>
-                        </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2 pb-1">
-                            <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-auto d-flex align-items-end gap-4">
+                            <div>
+                                <label class="form-label fw-bold small text-uppercase">Observações:</label>
+                                <textarea name="obs" class="form-control bg-light"
+                                    style="width: 250px; height: 250px; resize: none;"></textarea>
+                            </div>
+                            <div class="d-flex flex-column justify-content-end gap-3 pb-1" style="width: 200px;">
+                                <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
+                                <a href="{{ url_for('lista_pombos') }}"
+                                    class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -87,27 +103,31 @@
     { anilha: "{{ p.anilha }}", ano: { { p.ano } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
 ];
+
     function filtrarPais() {
         const anoSel = parseInt(document.getElementById('pomboAno').value);
-        const lPai = document.getElementById('listaPais');
-        const lMae = document.getElementById('listaMaes');
-        lPai.innerHTML = ""; lMae.innerHTML = "";
+        const dPai = document.getElementById('listaPais');
+        const dMae = document.getElementById('listaMaes');
+        dPai.innerHTML = ""; dMae.innerHTML = "";
+
         if (!isNaN(anoSel)) {
             todosPombos.forEach(p => {
                 if (p.ano <= anoSel) {
                     let opt = document.createElement('option');
-                    opt.value = p.anilha.slice(-4);
-                    if (p.sexo === "Macho") lPai.appendChild(opt);
-                    else if (p.sexo === "Fêmea") lMae.appendChild(opt);
-                    else { lPai.appendChild(opt.cloneNode(true)); lMae.appendChild(opt.cloneNode(true)); }
+                    // Alterado para mostrar a anilha inteira (até 12 chars)
+                    opt.value = p.anilha;
+                    if (p.sexo === "Macho") dPai.appendChild(opt);
+                    else if (p.sexo === "Fêmea") dMae.appendChild(opt);
+                    else { dPai.appendChild(opt.cloneNode(true)); dMae.appendChild(opt.cloneNode(true)); }
                 }
             });
         }
     }
+
     function toggleCedido() {
-        const s = document.getElementById("categoriaSelect");
-        const g = document.getElementById("cedidoGroup");
-        g.style.display = (s.value === "Cedido") ? "block" : "none";
+        const sel = document.getElementById("categoriaSelect");
+        const div = document.getElementById("cedidoGroup");
+        div.style.display = (sel.value === "Cedido") ? "block" : "none";
     }
 </script>
 {% endblock %}

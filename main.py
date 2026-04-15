@@ -48,16 +48,16 @@ class Pombo(db.Model):
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
     cedido_a = db.Column(db.String(100))
+    status = db.Column(db.String(50), default="Ativo")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ZONA DE RESET DA BASE DE DADOS ---
+# JÁ RETIREI O DROP_ALL. OS DADOS ESTÃO SEGUROS!
 with app.app_context():
-    db.drop_all()   # Apaga a BD antiga viciada
-    db.create_all() # Cria a BD nova corrigida
+    db.create_all()
 
 # --- ROTAS ---
 @app.route("/")
@@ -69,6 +69,7 @@ def index():
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
+
     if request.method == 'POST':
         try:
             status_pombo = "Cedido" if request.form.get('categoria') == "Cedido" else "Ativo"
@@ -83,14 +84,16 @@ def novo_pombo():
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
                 cedido_a=request.form.get('cedido_a'),
+                status=status_pombo,
                 user_id=current_user.id
             )
             db.session.add(novo)
             db.session.commit()
             return redirect(url_for('lista_pombos'))
-        except Exception:
+        except Exception as e:
             db.session.rollback()
-            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
+            flash("Erro: Verifique se a anilha já existe.", "danger")
+            
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
