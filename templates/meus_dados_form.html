@@ -12,29 +12,30 @@
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Nome:</label>
                                 <div class="col-sm-9">
-                                    <input type="text" name="nome" class="form-control bg-light border-0"
-                                        style="height: 45px;" required>
+                                    <input type="text" name="nome" class="form-control bg-light border"
+                                        style="height: 45px;" value="{{ utilizador.nome if utilizador else '' }}"
+                                        required>
                                 </div>
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Localidade:</label>
                                 <div class="col-sm-9">
-                                    <input type="text" name="localidade" class="form-control bg-light border-0"
-                                        style="height: 45px;">
+                                    <input type="text" name="localidade" class="form-control bg-light border"
+                                        style="height: 45px;" value="{{ utilizador.localberry if utilizador else '' }}">
                                 </div>
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Email:</label>
                                 <div class="col-sm-9">
-                                    <input type="email" name="email" class="form-control bg-light border-0"
-                                        style="height: 45px;">
+                                    <input type="email" name="email" class="form-control bg-light border"
+                                        style="height: 45px;" value="{{ utilizador.email if utilizador else '' }}">
                                 </div>
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Telemóvel:</label>
                                 <div class="col-sm-9">
-                                    <input type="text" name="telefone" class="form-control bg-light border-0"
-                                        style="height: 45px;">
+                                    <input type="text" name="telefone" class="form-control bg-light border"
+                                        style="height: 45px;" value="{{ utilizador.telefone if utilizador else '' }}">
                                 </div>
                             </div>
                         </div>
@@ -42,24 +43,25 @@
                         <div class="col-md-5 text-center">
                             <label class="fw-bold d-block mb-3">Foto / Logotipo</label>
                             <label for="foto-upload" class="d-inline-block position-relative shadow-sm"
-                                style="cursor: pointer; transition: transform 0.2s;">
+                                style="cursor: pointer;">
                                 <div class="bg-light d-flex align-items-center justify-content-center"
-                                    style="width: 200px; height: 200px; border-radius: 10px; border: 2px dashed #0d6efd;">
+                                    style="width: 200px; height: 200px; border-radius: 10px; border: 2px dashed #0d6efd; overflow: hidden;">
+                                    {% if utilizador and utilizador.foto %}
+                                    <img src="{{ url_for('static', filename=utilizador.foto) }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
                                     <i class="bi bi-person-bounding-box text-primary" style="font-size: 5rem;"></i>
-                                </div>
-                                <div class="position-absolute bottom-0 end-0 bg-primary text-white p-2 shadow-sm"
-                                    style="border-radius: 5px 0 10px 0;">
-                                    <i class="bi bi-camera-fill"></i>
+                                    {% endif %}
                                 </div>
                             </label>
                             <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*">
-                            <small class="text-muted d-block mt-2">Clique no boneco para selecionar</small>
+                            <small class="text-muted d-block mt-2">Clique para selecionar foto</small>
                         </div>
                     </div>
 
                     <div class="mt-5 text-center">
                         <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm custom-btn-hover"
-                            style="border-radius: 8px; transition: 0.3s;">
+                            style="border-radius: 8px;">
                             GUARDAR DADOS
                         </button>
                     </div>
@@ -70,10 +72,14 @@
 </div>
 
 <style>
-    /* Estilo do botão para ficar amarelo com letras pretas no hover */
+    .custom-btn-hover {
+        transition: all 0.3s ease;
+    }
+
     .custom-btn-hover:hover {
-        background-color: var(--amarelo-myloft) !important;
-        border-color: var(--amarelo-myloft) !important;
+        background-color: #ffde00 !important;
+        /* Amarelo MyLoft */
+        border-color: #ffde00 !important;
         color: #000000 !important;
     }
 </style>
