@@ -8,65 +8,79 @@
                 <form method="POST" enctype="multipart/form-data">
                     <div class="row align-items-center">
 
-                        <div class="col-md-4 text-center border-end">
-                            <label class="form-label d-block fw-bold mb-3">Foto / Logotipo</label>
-                            <div class="mx-auto mb-3 shadow-sm"
-                                style="width: 180px; height: 180px; border-radius: 10px; border: 2px solid #0d6efd; overflow: hidden;">
-                                {% if utilizador.foto %}
-                                <img src="{{ url_for('static', filename=utilizador.foto) }}"
-                                    style="width: 100%; height: 100%; object-fit: cover;">
-                                {% else %}
-                                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-person-bounding-box text-primary" style="font-size: 4rem;"></i>
+                        <div class="col-md-7 pe-md-5 border-end">
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Nome:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="nome" class="form-control bg-light border-0"
+                                        style="height: 45px;" value="{{ utilizador.nome }}" required>
                                 </div>
-                                {% endif %}
                             </div>
-                            <input type="file" name="foto" class="form-control form-control-sm" accept="image/*">
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Localidade:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="localidade" class="form-control bg-light border-0"
+                                        style="height: 45px;" value="{{ utilizador.localberry }}">
+                                </div>
+                            </div>
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Email:</label>
+                                <div class="col-sm-9">
+                                    <input type="email" name="email" class="form-control bg-light border-0"
+                                        style="height: 45px;" value="{{ utilizador.email }}">
+                                </div>
+                            </div>
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Telemóvel:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="telefone" class="form-control bg-light border-0"
+                                        style="height: 45px;" value="{{ utilizador.telefone }}">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-8 ps-md-5">
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Nome:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="nome" class="form-control bg-light"
-                                        value="{{ utilizador.nome }}" required>
+                        <div class="col-md-5 text-center">
+                            <label class="fw-bold d-block mb-3">Foto / Logotipo</label>
+                            <label for="foto-upload" class="d-inline-block position-relative shadow-sm"
+                                style="cursor: pointer;">
+                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                    style="width: 200px; height: 200px; border-radius: 10px; border: 2px solid #0d6efd; overflow: hidden;">
+                                    {% if utilizador.foto %}
+                                    <img src="{{ url_for('static', filename=utilizador.foto) }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                    <i class="bi bi-person-bounding-box text-primary" style="font-size: 5rem;"></i>
+                                    {% endif %}
                                 </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Localidade:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="localidade" class="form-control bg-light"
-                                        value="{{ utilizador.localberry }}">
+                                <div class="position-absolute bottom-0 end-0 bg-primary text-white p-2"
+                                    style="border-radius: 5px 0 0 0;">
+                                    <i class="bi bi-arrow-repeat"></i>
                                 </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Email:</label>
-                                <div class="col-sm-9">
-                                    <input type="email" name="email" class="form-control bg-light"
-                                        value="{{ utilizador.email }}">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Telemóvel:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="telefone" class="form-control bg-light"
-                                        value="{{ utilizador.telefone }}">
-                                </div>
-                            </div>
+                            </label>
+                            <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*">
+                            <small class="text-muted d-block mt-2">Clique na imagem para alterar</small>
                         </div>
                     </div>
 
                     <div class="mt-5 text-center">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm"
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm custom-btn-hover"
                             style="border-radius: 8px;">
                             ATUALIZAR DADOS
                         </button>
                         <a href="{{ url_for('ver_dados') }}"
-                            class="btn btn-link text-secondary mt-2 d-block">Cancelar</a>
+                            class="btn btn-link text-secondary d-block mt-2">Cancelar</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .custom-btn-hover:hover {
+        background-color: var(--amarelo-myloft) !important;
+        border-color: var(--amarelo-myloft) !important;
+        color: #000000 !important;
+    }
+</style>
 {% endblock %}

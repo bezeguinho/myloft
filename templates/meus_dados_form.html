@@ -8,46 +8,58 @@
                 <form method="POST" enctype="multipart/form-data">
                     <div class="row align-items-center">
 
-                        <div class="col-md-4 text-center border-end">
-                            <label class="form-label d-block fw-bold mb-3">Foto / Logotipo</label>
-                            <div class="mx-auto bg-light d-flex align-items-center justify-content-center mb-3 shadow-sm"
-                                style="width: 180px; height: 180px; border-radius: 10px; border: 2px dashed #0d6efd; cursor: pointer;">
-                                <i class="bi bi-person-bounding-box text-primary" style="font-size: 4rem;"></i>
+                        <div class="col-md-7 pe-md-5 border-end">
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Nome:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="nome" class="form-control bg-light border-0"
+                                        style="height: 45px;" required>
+                                </div>
                             </div>
-                            <input type="file" name="foto" class="form-control form-control-sm" accept="image/*">
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Localidade:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="localidade" class="form-control bg-light border-0"
+                                        style="height: 45px;">
+                                </div>
+                            </div>
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Email:</label>
+                                <div class="col-sm-9">
+                                    <input type="email" name="email" class="form-control bg-light border-0"
+                                        style="height: 45px;">
+                                </div>
+                            </div>
+                            <div class="mb-4 row">
+                                <label class="col-sm-3 col-form-label fw-bold">Telemóvel:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="telefone" class="form-control bg-light border-0"
+                                        style="height: 45px;">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-8 ps-md-5">
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Nome:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="nome" class="form-control bg-light" required>
+                        <div class="col-md-5 text-center">
+                            <label class="fw-bold d-block mb-3">Foto / Logotipo</label>
+                            <label for="foto-upload" class="d-inline-block position-relative shadow-sm"
+                                style="cursor: pointer; transition: transform 0.2s;">
+                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                    style="width: 200px; height: 200px; border-radius: 10px; border: 2px dashed #0d6efd;">
+                                    <i class="bi bi-person-bounding-box text-primary" style="font-size: 5rem;"></i>
                                 </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Localidade:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="localidade" class="form-control bg-light">
+                                <div class="position-absolute bottom-0 end-0 bg-primary text-white p-2 shadow-sm"
+                                    style="border-radius: 5px 0 10px 0;">
+                                    <i class="bi bi-camera-fill"></i>
                                 </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Email:</label>
-                                <div class="col-sm-9">
-                                    <input type="email" name="email" class="form-control bg-light">
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <label class="col-sm-3 col-form-label fw-bold text-end">Telemóvel:</label>
-                                <div class="col-sm-9">
-                                    <input type="text" name="telefone" class="form-control bg-light">
-                                </div>
-                            </div>
+                            </label>
+                            <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*">
+                            <small class="text-muted d-block mt-2">Clique no boneco para selecionar</small>
                         </div>
                     </div>
 
                     <div class="mt-5 text-center">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm"
-                            style="border-radius: 8px;">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm custom-btn-hover"
+                            style="border-radius: 8px; transition: 0.3s;">
                             GUARDAR DADOS
                         </button>
                     </div>
@@ -56,4 +68,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Estilo do botão para ficar amarelo com letras pretas no hover */
+    .custom-btn-hover:hover {
+        background-color: var(--amarelo-myloft) !important;
+        border-color: var(--amarelo-myloft) !important;
+        color: #000000 !important;
+    }
+</style>
 {% endblock %}
