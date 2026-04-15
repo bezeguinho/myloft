@@ -118,9 +118,9 @@
 </div>
 
 <script>
-    // Aqui é onde o erro acontecia. Agora o Flask envia pombos_user corretamente.
+    // Correção do erro de variável indefinida
     const todosPombos = [
-        {% if pombos_user %}
+        {% if pombos_user is defined %}
     {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
@@ -155,8 +155,7 @@
 
     function esconderCedido() {
         const input = document.getElementById("cedidoInput");
-        const sel = document.getElementById("categoriaSelect");
-        if (input.value.trim() === "") { document.getElementById("cedidoGroup").style.display = "none"; sel.value = ""; }
+        if (input.value.trim() === "") { document.getElementById("cedidoGroup").style.display = "none"; document.getElementById("categoriaSelect").value = ""; }
     }
 
     let textoAnterior = "";

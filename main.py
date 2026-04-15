@@ -58,7 +58,7 @@ with app.app_context():
 def reset_bd():
     db.drop_all()
     db.create_all()
-    return "<h3>Base de Dados limpa!</h3>"
+    return "Base de dados resetada com sucesso!"
 
 @app.route("/")
 def index():
@@ -68,8 +68,8 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    # Garantimos que enviamos pombos_user para o HTML
-    pombos_lista_completa = Pombo.query.filter_by(user_id=current_user.id).all()
+    # CRÍTICO: Buscar pombos do utilizador
+    lista_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
     
     if request.method == 'POST':
         try:
@@ -94,7 +94,8 @@ def novo_pombo():
             db.session.rollback()
             flash("Erro ao gravar.", "danger")
             
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_lista_completa)
+    # Garantir que passamos 'pombos_user' com o nome certo
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=lista_pombos)
 
 @app.route("/lista_pombos")
 @login_required
@@ -102,4 +103,53 @@ def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-# ... (outras rotas omitidas para brevidade, mas devem continuar no teu ficheiro)
+@app.route("/reprodutores")
+@login_required
+def reprodutores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+
+@app.route("/voadores")
+@login_required
+def voadores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+
+@app.route("/cedidos")
+@login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos")
+@login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
