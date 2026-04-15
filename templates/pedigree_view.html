@@ -13,7 +13,7 @@
             <p><strong>SEXO:</strong> {{ pombo.sexo }}</p>
         </div>
         <div class="col-6 text-end">
-            <h5 class="fw-bold">Proprietário</h5>
+            <h5 class="fw-bold text-uppercase">Proprietário</h5>
             <p>{{ dono.nome if dono else current_user.email }}</p>
         </div>
     </div>
