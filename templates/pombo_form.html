@@ -15,13 +15,12 @@
                             <label class="form-label fw-bold small text-uppercase">Ano (Obrigatório)</label>
                             <select name="ano" id="pomboAno" class="form-select bg-light" required
                                 onchange="filtrarPais()">
-                                <option value="" selected disabled>Escolha o ano...</option>
+                                <option value="" selected disabled>Escolha...</option>
                                 {% for ano in anos_lista %}
                                 <option value="{{ ano }}">{{ ano }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-
                         <div class="col-md-8">
                             <label class="form-label fw-bold small text-uppercase">Nome do Pombo (Máx 40)</label>
                             <input type="text" name="nome" class="form-control bg-light" maxlength="40">
@@ -30,22 +29,18 @@
                             <label class="form-label fw-bold small text-uppercase">Cor (Máx 30)</label>
                             <input type="text" name="cor" class="form-control bg-light" maxlength="30">
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-uppercase">Nº do Pai (4 dígitos)</label>
                             <input type="text" name="pai" id="paiInput" class="form-control bg-light" maxlength="4"
                                 list="listaPais">
-                            <datalist id="listaPais">
-                            </datalist>
+                            <datalist id="listaPais"></datalist>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-uppercase">Nº da Mãe (4 dígitos)</label>
                             <input type="text" name="mae" id="maeInput" class="form-control bg-light" maxlength="4"
                                 list="listaMaes">
-                            <datalist id="listaMaes">
-                            </datalist>
+                            <datalist id="listaMaes"></datalist>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-uppercase">Sexo (Obrigatório)</label>
                             <select name="sexo" class="form-select bg-light" required>
@@ -65,22 +60,19 @@
                                 <option value="Cedido">Cedido</option>
                             </select>
                         </div>
-
                         <div class="col-md-12" id="cedidoGroup" style="display: none;">
                             <label class="form-label fw-bold small text-uppercase text-danger">Cedido a:</label>
                             <input type="text" name="cedido_a" class="form-control border-danger bg-light">
                         </div>
-
                         <div class="col-md-8">
                             <label class="form-label fw-bold small text-uppercase">Observações (Pedigree)</label>
                             <textarea name="obs" class="form-control bg-light" rows="4"
                                 style="resize: none;"></textarea>
                         </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2 pb-1">
+                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2">
                             <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
-                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg w-100 shadow">
-                                <i class="bi bi-arrow-left"></i> VOLTAR
-                            </a>
+                            <a href="{{ url_for('lista_pombos') }}"
+                                class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
                         </div>
                     </div>
                 </form>
@@ -90,44 +82,33 @@
 </div>
 
 <script>
-    // Dados dos pombos passados pelo Flask
     const todosPombos = [
         {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
 ];
-
     function filtrarPais() {
-        const anoSelecionado = parseInt(document.getElementById('pomboAno').value);
-        const listaPais = document.getElementById('listaPais');
-        const listaMaes = document.getElementById('listaMaes');
-
-        listaPais.innerHTML = "";
-        listaMaes.innerHTML = "";
-
-        if (!isNaN(anoSelecionado)) {
+        const anoSel = parseInt(document.getElementById('pomboAno').value);
+        const lPai = document.getElementById('listaPais');
+        const lMae = document.getElementById('listaMaes');
+        lPai.innerHTML = ""; lMae.innerHTML = "";
+        if (!isNaN(anoSel)) {
             todosPombos.forEach(p => {
-                // Regra: Pai/Mãe tem de ter ano igual ou inferior ao pombo novo
-                if (p.ano <= anoSelecionado) {
-                    let option = document.createElement('option');
-                    option.value = p.anilha.slice(-4); // Sugere os últimos 4 como ajuda
-                    option.textContent = p.anilha + " (Ano: " + p.ano + ")";
-
-                    if (p.sexo === "Macho") listaPais.appendChild(option);
-                    if (p.sexo === "Fêmea") listaMaes.appendChild(option);
-                    if (p.sexo === "Indefinido") {
-                        listaPais.appendChild(option.cloneNode(true));
-                        listaMaes.appendChild(option.cloneNode(true));
-                    }
+                if (p.ano <= anoSel) {
+                    let opt = document.createElement('option');
+                    opt.value = p.anilha.slice(-4);
+                    opt.textContent = p.anilha + " (Ano: " + p.ano + ")";
+                    if (p.sexo === "Macho") lPai.appendChild(opt);
+                    else if (p.sexo === "Fêmea") lMae.appendChild(opt);
+                    else { lPai.appendChild(opt.cloneNode(true)); lMae.appendChild(opt.cloneNode(true)); }
                 }
             });
         }
     }
-
     function toggleCedido() {
-        const select = document.getElementById("categoriaSelect");
-        const group = document.getElementById("cedidoGroup");
-        group.style.display = (select.value === "Cedido") ? "block" : "none";
+        const s = document.getElementById("categoriaSelect");
+        const g = document.getElementById("cedidoGroup");
+        g.style.display = (s.value === "Cedido") ? "block" : "none";
     }
 </script>
 {% endblock %}

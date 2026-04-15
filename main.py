@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 # --- CONFIGURAÇÃO DB ---
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
-    uri = uri.replace('postgres://', 'postgresql://', 1)
+    uri = uri.replace('postgres://', 'postgres://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -34,14 +34,14 @@ class Utilizador(db.Model):
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
-    anilha = db.Column(db.String(12), primary_key=True) # Max 12
-    nome = db.Column(db.String(40)) # Max 40
-    ano = db.Column(db.Integer, nullable=False) # Obrigatório
-    cor = db.Column(db.String(30)) # Max 30
+    anilha = db.Column(db.String(50), primary_key=True)
+    nome = db.Column(db.String(100))
+    ano = db.Column(db.Integer, nullable=False)
     sexo = db.Column(db.String(20), nullable=False)
+    cor = db.Column(db.String(50))
     categoria = db.Column(db.String(50), nullable=False)
-    pai = db.Column(db.String(4)) # Apenas 4 dígitos
-    mae = db.Column(db.String(4)) # Apenas 4 dígitos
+    pai = db.Column(db.String(50))
+    mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
     cedido_a = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -53,7 +53,6 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -61,12 +60,8 @@ def index():
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    # Lista de anos para o campo Ano (descendente)
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    
-    # Lista de pombos do utilizador para os campos Pai e Mãe
-    pombos_existentes = Pombo.query.filter_by(user_id=current_user.id).all()
-
+    pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     if request.method == 'POST':
         try:
             novo = Pombo(
@@ -85,16 +80,59 @@ def novo_pombo():
             db.session.add(novo)
             db.session.commit()
             return redirect(url_for('lista_pombos'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
-            flash("Erro ao gravar. Verifique os dados.", "danger")
-            
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_existentes)
+            flash("Erro ao gravar pombo.", "danger")
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id).all()
-    return render_template("pombos.html", pombos=pombos, titulo="LISTA DE POMBOS")
+    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-# ... (outras rotas: login, reprodutores, etc., mantêm-se iguais)
+@app.route("/reprodutores")
+@login_required
+def reprodutores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor").all()
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+
+@app.route("/voadores")
+@login_required
+def voadores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador").all()
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+
+@app.route("/cedidos")
+@login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido").all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pedigree/gerar")
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)

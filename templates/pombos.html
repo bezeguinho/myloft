@@ -11,10 +11,10 @@
                     <tr>
                         <th>Anilha</th>
                         <th>Nome</th>
+                        <th>Ano</th>
                         <th>Sexo</th>
                         <th>Cor</th>
                         <th>Categoria</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,15 +22,14 @@
                     <tr>
                         <td class="fw-bold">{{ p.anilha }}</td>
                         <td>{{ p.nome or '---' }}</td>
+                        <td>{{ p.ano }}</td>
                         <td>{{ p.sexo }}</td>
                         <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
-                        <td><span class="badge bg-primary px-3">{{ p.status }}</span></td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">Nenhum pombo encontrado nesta categoria.
-                        </td>
+                        <td colspan="6" class="text-center py-4 text-muted">Nenhum pombo encontrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
