@@ -6,7 +6,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
                         <th>Anilha</th>
@@ -14,7 +14,6 @@
                         <th>Sexo</th>
                         <th>Categoria</th>
                         <th>Status</th>
-                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,15 +23,11 @@
                         <td>{{ p.nome }}</td>
                         <td>{{ p.sexo }}</td>
                         <td>{{ p.categoria }}</td>
-                        <td><span class="badge bg-info text-dark">{{ p.status }}</span></td>
-                        <td>
-                            <a href="#" class="btn btn-sm btn-executar"><i class="bi bi-eye"></i></a>
-                        </td>
+                        <td>{{ p.status }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">Nenhum pombo encontrado nesta categoria.
-                        </td>
+                        <td colspan="5" class="text-center py-4">Nenhum pombo encontrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

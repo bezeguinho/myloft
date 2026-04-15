@@ -6,58 +6,22 @@
         <h1 class="fw-bold text-primary text-uppercase">Pedigree Columbófilo</h1>
         <p class="text-muted fw-bold">MYLOFT - GESTÃO DIGITAL</p>
     </div>
-
     <div class="row mb-5">
         <div class="col-6">
-            <h4 class="fw-bold text-uppercase">Pombo: {{ pombo.anilha }}</h4>
+            <h4 class="fw-bold">Pombo: {{ pombo.anilha }}</h4>
             <p><strong>NOME:</strong> {{ pombo.nome or '---' }}</p>
             <p><strong>SEXO:</strong> {{ pombo.sexo }}</p>
         </div>
         <div class="col-6 text-end">
-            <h5 class="fw-bold text-uppercase">Proprietário</h5>
+            <h5 class="fw-bold">Proprietário</h5>
             <p>{{ dono.nome if dono else current_user.email }}</p>
         </div>
     </div>
-
-    <div class="row g-4">
-        <div class="col-md-6 border p-4" style="background-color: #f8f9fa; border-radius: 10px;">
-            <h5 class="fw-bold text-primary">PAI</h5>
-            <p class="fs-5">{{ pombo.pai or 'DESCONHECIDO' }}</p>
-        </div>
-        <div class="col-md-6 border p-4" style="background-color: #f8f9fa; border-radius: 10px;">
-            <h5 class="fw-bold text-danger">MÃE</h5>
-            <p class="fs-5">{{ pombo.mae or 'DESCONHECIDA' }}</p>
-        </div>
-    </div>
 </div>
-
 <div class="mt-5 text-center no-print pb-5">
-    <button onclick="window.print();" class="btn btn-executar btn-lg px-5 shadow">
-        <i class="bi bi-printer"></i> IMPRIMIR
-    </button>
-    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-retroceder btn-lg px-5 shadow">
-        <i class="bi bi-arrow-left"></i> VOLTAR
-    </a>
+    <button onclick="window.print();" class="btn btn-executar btn-lg px-5 shadow"><i class="bi bi-printer"></i>
+        IMPRIMIR</button>
+    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-retroceder btn-lg px-5 shadow"><i
+            class="bi bi-arrow-left"></i> VOLTAR</a>
 </div>
-
-<style>
-    @media print {
-
-        .no-print,
-        nav {
-            display: none !important;
-        }
-
-        body {
-            background-color: white !important;
-        }
-
-        .container {
-            box-shadow: none !important;
-            border: none !important;
-            width: 100% !important;
-            margin: 0 !important;
-        }
-    }
-</style>
 {% endblock %}

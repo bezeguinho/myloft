@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -20,30 +21,40 @@ login_manager.login_view = 'login'
 
 # --- MODELOS ---
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
 
+class Utilizador(db.Model):
+    __tablename__ = 'utilizadores_perfil'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    localberry = db.Column(db.String(100))
+    telefone = db.Column(db.String(20))
+    email = db.Column(db.String(120))
+    foto = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
 class Pombo(db.Model):
+    __tablename__ = 'pombos'
     anilha = db.Column(db.String(50), primary_key=True)
     nome = db.Column(db.String(100))
     sexo = db.Column(db.String(20))
-    categoria = db.Column(db.String(50)) # Reprodutor, Voador, etc
+    categoria = db.Column(db.String(50)) # Reprodutor, Voador
     status = db.Column(db.String(50))    # Ativo, Cedido
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-class Utilizador(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROTAS DE GESTÃO (SUBMENUS) ---
+with app.app_context():
+    db.create_all()
+
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -72,7 +83,6 @@ def lista_cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, status="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-# --- PEDIGREE (CORRIGIDO) ---
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
@@ -80,17 +90,15 @@ def gerar_pedigree():
         anilha = request.form.get('numero')
         pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
         if pombo:
-            # Busca os dados do dono para o pedigree
             dono = Utilizador.query.filter_by(user_id=current_user.id).first()
             return render_template("pedigree_view.html", pombo=pombo, dono=dono)
         flash("Pombo não encontrado!", "warning")
     return render_template("gerar_pedigree.html")
 
-# --- LOGIN / REGISTER / DADOS (SIMPLIFICADO PARA O EXEMPLO) ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(email=request.form.get('email')).first()
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
             return redirect(url_for('index'))
@@ -101,11 +109,8 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route("/ver_dados")
+@app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    return render_template("meus_dados_ver.html", utilizador=
