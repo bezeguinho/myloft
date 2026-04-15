@@ -41,23 +41,18 @@
                     </div>
                 </div>
 
-                <div class="mt-5 text-center">
-                    <a href="{{ url_for('editar_dados') }}"
-                        class="btn btn-primary btn-lg px-5 fw-bold shadow-sm custom-btn-hover"
+                <div class="mt-5 d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('editar_dados') }}" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm"
                         style="border-radius: 8px;">
                         EDITAR DADOS
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm"
+                        style="border-radius: 8px;">
+                        VOLTAR
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .custom-btn-hover:hover {
-        background-color: #ffde00 !important;
-        border-color: #ffde00 !important;
-        color: #000000 !important;
-    }
-</style>
 {% endblock %}
