@@ -39,19 +39,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-5 d-flex justify-content-center">
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">Ainda não configurou o seu perfil.</p>
+                </div>
+                {% endif %}
+                <div class="mt-5 d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('editar_dados') }}" class="btn btn-executar btn-lg px-5 shadow">EDITAR DADOS</a>
                     <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg px-5 shadow">
                         <i class="bi bi-arrow-left"></i> VOLTAR
                     </a>
                 </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <p class="fs-5 text-muted">Ainda não configurou os seus dados de perfil.</p>
-                    <a href="{{ url_for('index') }}" class="btn btn-retroceder px-5 shadow">
-                        <i class="bi bi-arrow-left"></i> VOLTAR
-                    </a>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>

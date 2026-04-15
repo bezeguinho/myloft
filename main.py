@@ -41,8 +41,8 @@ class Pombo(db.Model):
     nome = db.Column(db.String(100))
     sexo = db.Column(db.String(20))
     cor = db.Column(db.String(50))
-    categoria = db.Column(db.String(50))
-    status = db.Column(db.String(50))
+    categoria = db.Column(db.String(50)) 
+    status = db.Column(db.String(50))    
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -54,11 +54,12 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-# --- ROTAS ---
+# --- ROTAS PRINCIPAIS ---
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# --- GESTÃO DE POMBOS ---
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
@@ -101,6 +102,7 @@ def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, status="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
+# --- PEDIGREE ---
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
@@ -113,12 +115,30 @@ def gerar_pedigree():
         flash("Pombo não encontrado!", "warning")
     return render_template("gerar_pedigree.html")
 
+# --- MEUS DADOS ---
 @app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
 
+@app.route("/meus-dados/editar", methods=['GET', 'POST'])
+@login_required
+def editar_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'POST':
+        if not utilizador:
+            utilizador = Utilizador(user_id=current_user.id)
+            db.session.add(utilizador)
+        utilizador.nome = request.form.get('nome')
+        utilizador.localberry = request.form.get('localberry')
+        utilizador.telefone = request.form.get('telefone')
+        utilizador.email = request.form.get('email')
+        db.session.commit()
+        return redirect(url_for('ver_dados'))
+    return render_template("meus_dados_editar.html", utilizador=utilizador)
+
+# --- AUTENTICAÇÃO ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -127,6 +147,17 @@ def login():
             login_user(user)
             return redirect(url_for('index'))
     return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        passw = request.form.get('password')
+        new_user = User(email=email, password_hash=generate_password_hash(passw))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
