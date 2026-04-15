@@ -3,29 +3,36 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow-sm border-0 text-center p-4" style="border-radius: 15px;">
-            {% if utilizador.foto %}
-            <img src="{{ url_for('static', filename=utilizador.foto) }}" class="mx-auto shadow mb-3"
-                style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 4px solid #0d6efd;">
-            {% else %}
-            <div class="mx-auto bg-light d-flex align-items-center justify-content-center mb-3 shadow-sm"
-                style="width: 120px; height: 120px; border-radius: 50%;">
-                <i class="bi bi-person text-secondary" style="font-size: 3rem;"></i>
+        <div class="card shadow border-0 p-4 text-center" style="border-radius: 20px; background-color: #ffffff;">
+            <div class="mb-4">
+                {% if utilizador.foto %}
+                <img src="{{ url_for('static', filename=utilizador.foto) }}" class="shadow"
+                    style="width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 4px solid #0d6efd;">
+                {% else %}
+                <div class="mx-auto bg-light d-flex align-items-center justify-content-center shadow-sm"
+                    style="width: 140px; height: 140px; border-radius: 50%;">
+                    <i class="bi bi-person text-secondary" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
 
-            <h2 class="fw-bold text-primary">{{ utilizador.nome }}</h2>
-            <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill me-1"></i>{{ utilizador.localberry or 'Localidade
-                não definida' }}</p>
+            <h2 class="fw-bold text-primary mb-1">{{ utilizador.nome }}</h2>
+            <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill me-1 text-primary"></i>{{ utilizador.localberry or
+                'Localidade' }}</p>
 
-            <ul class="list-group list-group-flush text-start mb-4">
-                <li class="list-group-item"><i class="bi bi-telephone-fill text-primary me-3"></i>{{ utilizador.telefone
-                    or '---' }}</li>
-                <li class="list-group-item"><i class="bi bi-envelope-at-fill text-primary me-3"></i>{{ utilizador.email
-                    or '---' }}</li>
-            </ul>
+            <div class="text-start mx-auto w-100 px-3">
+                <div class="d-flex align-items-center mb-3 py-2 border-bottom">
+                    <i class="bi bi-telephone-fill text-primary me-3 fs-4"></i>
+                    <span class="fw-semibold">{{ utilizador.telefone or '---' }}</span>
+                </div>
+                <div class="d-flex align-items-center mb-4 py-2 border-bottom">
+                    <i class="bi bi-envelope-at-fill text-primary me-3 fs-4"></i>
+                    <span class="fw-semibold">{{ utilizador.email or '---' }}</span>
+                </div>
+            </div>
 
-            <a href="{{ url_for('editar_dados') }}" class="btn btn-outline-primary fw-bold">
+            <a href="{{ url_for('editar_dados') }}" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow mt-2"
+                style="border-radius: 12px;">
                 <i class="bi bi-pencil-square me-2"></i>EDITAR PERFIL
             </a>
         </div>

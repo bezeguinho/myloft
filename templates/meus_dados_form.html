@@ -5,52 +5,62 @@
     <div class="col-md-8">
         <div class="card shadow border-0" style="border-radius: 15px;">
             <div class="card-header bg-primary text-white py-3" style="border-radius: 15px 15px 0 0;">
-                <h4 class="mb-0 fw-bold">
-                    <i class="bi bi-person-lines-fill me-2"></i>
-                    {% if modo_edicao %}EDITAR OS MEUS DADOS{% else %}INSERIR OS MEUS DADOS{% endif %}
-                </h4>
+                <h4 class="mb-0 fw-bold"><i class="bi bi-person-vcard me-2"></i>OS MEUS DADOS</h4>
             </div>
             <div class="card-body p-4">
                 <form method="POST" enctype="multipart/form-data">
-                    <div class="row g-3">
+                    <div class="row g-4">
                         <div class="col-md-12">
-                            <label class="form-label fw-bold">Nome do Columbófilo / Pombal</label>
-                            <input type="text" name="nome" class="form-control"
-                                value="{{ utilizador.nome if utilizador else '' }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Localidade</label>
-                            <input type="text" name="localidade" class="form-control"
-                                value="{{ utilizador.localberry if utilizador else '' }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Telefone</label>
-                            <input type="text" name="telefone" class="form-control"
-                                value="{{ utilizador.telefone if utilizador else '' }}">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold">Email de Contacto</label>
-                            <input type="email" name="email" class="form-control"
-                                value="{{ utilizador.email if utilizador else '' }}">
-                        </div>
-                        <div class="col-md-12 mt-4">
-                            <label class="form-label fw-bold">Foto de Perfil ou Logotipo do Pombal</label>
-                            <input type="file" name="foto" class="form-control" accept="image/*">
-                            {% if utilizador and utilizador.foto %}
-                            <div class="mt-2">
-                                <small class="text-muted">Foto atual:</small><br>
-                                <img src="{{ url_for('static', filename=utilizador.foto) }}"
-                                    style="height: 60px; border-radius: 5px;" class="shadow-sm">
+                            <label class="form-label fw-bold text-secondary">Nome do Columbófilo / Pombal</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary border-end-0"><i
+                                        class="bi bi-person-fill"></i></span>
+                                <input type="text" name="nome" class="form-control border-start-0 bg-light"
+                                    placeholder="Ex: Loft João Silva" required>
                             </div>
-                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary">Localidade</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary border-end-0"><i
+                                        class="bi bi-geo-alt-fill"></i></span>
+                                <input type="text" name="localidade" class="form-control border-start-0 bg-light"
+                                    placeholder="Ex: Lisboa">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary">Telefone / Telemóvel</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary border-end-0"><i
+                                        class="bi bi-telephone-fill"></i></span>
+                                <input type="text" name="telefone" class="form-control border-start-0 bg-light"
+                                    placeholder="Ex: 912 345 678">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Email de Contacto</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary border-end-0"><i
+                                        class="bi bi-envelope-at-fill"></i></span>
+                                <input type="email" name="email" class="form-control border-start-0 bg-light"
+                                    placeholder="Ex: joao@email.com">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Foto de Perfil ou Logotipo</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-primary border-end-0"><i
+                                        class="bi bi-image"></i></span>
+                                <input type="file" name="foto" class="form-control border-start-0 bg-light"
+                                    accept="image/*">
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mt-5 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow">
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow"
+                            style="border-radius: 10px;">
                             GUARDAR DADOS
                         </button>
-                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">CANCELAR</a>
                     </div>
                 </form>
             </div>
