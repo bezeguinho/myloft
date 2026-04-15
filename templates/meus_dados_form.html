@@ -2,63 +2,52 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0" style="border-radius: 15px;">
-            <div class="card-header bg-primary text-white py-3" style="border-radius: 15px 15px 0 0;">
-                <h4 class="mb-0 fw-bold"><i class="bi bi-person-vcard me-2"></i>OS MEUS DADOS</h4>
-            </div>
-            <div class="card-body p-4">
+    <div class="col-md-9">
+        <div class="card shadow-sm border-0" style="border-radius: 10px; background-color: #ffffff;">
+            <div class="card-body p-5">
                 <form method="POST" enctype="multipart/form-data">
-                    <div class="row g-4">
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-secondary">Nome do Columbófilo / Pombal</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-primary border-end-0"><i
-                                        class="bi bi-person-fill"></i></span>
-                                <input type="text" name="nome" class="form-control border-start-0 bg-light"
-                                    placeholder="Ex: Loft João Silva" required>
+                    <div class="row align-items-center">
+
+                        <div class="col-md-4 text-center border-end">
+                            <label class="form-label d-block fw-bold mb-3">Foto / Logotipo</label>
+                            <div class="mx-auto bg-light d-flex align-items-center justify-content-center mb-3 shadow-sm"
+                                style="width: 180px; height: 180px; border-radius: 10px; border: 2px dashed #0d6efd; cursor: pointer;">
+                                <i class="bi bi-person-bounding-box text-primary" style="font-size: 4rem;"></i>
                             </div>
+                            <input type="file" name="foto" class="form-control form-control-sm" accept="image/*">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-secondary">Localidade</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-primary border-end-0"><i
-                                        class="bi bi-geo-alt-fill"></i></span>
-                                <input type="text" name="localidade" class="form-control border-start-0 bg-light"
-                                    placeholder="Ex: Lisboa">
+
+                        <div class="col-md-8 ps-md-5">
+                            <div class="mb-3 row">
+                                <label class="col-sm-3 col-form-label fw-bold text-end">Nome:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="nome" class="form-control bg-light" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-secondary">Telefone / Telemóvel</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-primary border-end-0"><i
-                                        class="bi bi-telephone-fill"></i></span>
-                                <input type="text" name="telefone" class="form-control border-start-0 bg-light"
-                                    placeholder="Ex: 912 345 678">
+                            <div class="mb-3 row">
+                                <label class="col-sm-3 col-form-label fw-bold text-end">Localidade:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="localidade" class="form-control bg-light">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-secondary">Email de Contacto</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-primary border-end-0"><i
-                                        class="bi bi-envelope-at-fill"></i></span>
-                                <input type="email" name="email" class="form-control border-start-0 bg-light"
-                                    placeholder="Ex: joao@email.com">
+                            <div class="mb-3 row">
+                                <label class="col-sm-3 col-form-label fw-bold text-end">Email:</label>
+                                <div class="col-sm-9">
+                                    <input type="email" name="email" class="form-control bg-light">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-secondary">Foto de Perfil ou Logotipo</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-primary border-end-0"><i
-                                        class="bi bi-image"></i></span>
-                                <input type="file" name="foto" class="form-control border-start-0 bg-light"
-                                    accept="image/*">
+                            <div class="mb-3 row">
+                                <label class="col-sm-3 col-form-label fw-bold text-end">Telemóvel:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="telefone" class="form-control bg-light">
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5">
-                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow"
-                            style="border-radius: 10px;">
+
+                    <div class="mt-5 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm"
+                            style="border-radius: 8px;">
                             GUARDAR DADOS
                         </button>
                     </div>
