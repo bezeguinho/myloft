@@ -55,6 +55,7 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# DADOS SEGUROS - APENAS CREATE_ALL
 with app.app_context():
     db.create_all()
 
@@ -75,7 +76,6 @@ def index():
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    # Proteção caso a BD falhe a leitura
     try:
         pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     except:

@@ -30,7 +30,7 @@
                         </div>
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Cor:</label>
-                            <input type="text" name="cor" class="form-control bg-light" maxlength="30"
+                            <input type="text" name="cor" class="form-control bg-light" maxlength="40"
                                 style="width: 180px;">
                         </div>
                     </div>
@@ -64,33 +64,36 @@
                                 <option value="" selected disabled>Escolha...</option>
                                 <option value="Voador">Voadores</option>
                                 <option value="Reprodutor">Reprodutores</option>
-                                <option value="Cedido">Cedido</option>
+                                <option value="Cedido">Cedido a:</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-3" id="cedidoGroup" style="display: none;">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small text-uppercase text-danger">Cedido a:</label>
+                            <label class="form-label fw-bold small text-uppercase text-danger">A quem cedeu:</label>
                             <input type="text" name="cedido_a" class="form-control border-danger bg-light"
                                 style="width: 300px;">
                         </div>
                     </div>
 
                     <div class="row g-3 mt-2">
-                        <div class="col-auto d-flex align-items-end gap-4">
+                        <div class="col-auto d-flex align-items-center gap-4">
                             <div>
-                                <label class="form-label fw-bold small text-uppercase">Observações:</label>
+                                <label class="form-label fw-bold small text-uppercase">Descrição para o
+                                    pedigre...</label>
                                 <textarea name="obs" class="form-control bg-light"
-                                    style="width: 250px; height: 250px; resize: none;"></textarea>
+                                    style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.15;"
+                                    maxlength="350"></textarea>
                             </div>
-                            <div class="d-flex flex-column justify-content-end gap-3 pb-1" style="width: 200px;">
+                            <div class="d-flex flex-column justify-content-center gap-3 pt-4" style="width: 200px;">
                                 <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR POMBO</button>
                                 <a href="{{ url_for('lista_pombos') }}"
                                     class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
                             </div>
                         </div>
                     </div>
+
                 </form>
             </div>
         </div>
