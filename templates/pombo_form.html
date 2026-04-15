@@ -22,7 +22,7 @@
         <div class="card shadow border-0" style="border-radius: 10px;">
             <div class="card-body p-4 p-md-5">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
-                <form method="POST" id="pomboForm">
+                <form method="POST">
                     <div class="row g-3 mb-4">
                         <div class="col-auto">
                             <label class="form-label fw-bold small">Nº ANILHA:</label>
@@ -118,9 +118,9 @@
 </div>
 
 <script>
-    // Correção do erro de variável indefinida
+    // USAR JSON PARA EVITAR ERROS DE JINJA NO JS
     const todosPombos = [
-        {% if pombos_user is defined %}
+        {% if pombos_user is defined and pombos_user %}
     {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}

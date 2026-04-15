@@ -49,7 +49,7 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# LIMPEZA FORÇADA
+# --- AQUI ESTÁ A LINHA QUE LIMPA TUDO ---
 with app.app_context():
     db.drop_all()
     db.create_all()
@@ -62,12 +62,11 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    # Nome da variável: pombos_user
-    pombos_do_sistema = Pombo.query.filter_by(user_id=current_user.id).all()
+    # Busca os pombos do utilizador logado
+    pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     
     if request.method == 'POST':
         try:
-            is_oculto = True if request.form.get('oculto') == 'on' else False
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -79,7 +78,7 @@ def novo_pombo():
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
                 cedido_a=request.form.get('cedido_a'),
-                oculto=is_oculto,
+                oculto=True if request.form.get('oculto') == 'on' else False,
                 user_id=current_user.id
             )
             db.session.add(novo)
@@ -89,7 +88,7 @@ def novo_pombo():
             db.session.rollback()
             flash("Erro ao gravar.", "danger")
             
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_do_sistema)
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
 @login_required
