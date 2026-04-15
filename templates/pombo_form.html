@@ -100,7 +100,7 @@
 <script>
     const todosPombos = [
         {% for p in pombos_user %}
-    { anilha: "{{ p.anilha }}", ano: { { p.ano } }, sexo: "{{ p.sexo }}" },
+    { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
 ];
 
@@ -114,7 +114,6 @@
             todosPombos.forEach(p => {
                 if (p.ano <= anoSel) {
                     let opt = document.createElement('option');
-                    // Alterado para mostrar a anilha inteira (até 12 chars)
                     opt.value = p.anilha;
                     if (p.sexo === "Macho") dPai.appendChild(opt);
                     else if (p.sexo === "Fêmea") dMae.appendChild(opt);

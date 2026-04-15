@@ -55,9 +55,15 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# JÁ RETIREI O DROP_ALL. OS DADOS ESTÃO SEGUROS!
 with app.app_context():
     db.create_all()
+
+# --- ROTA SECRETA PARA ATUALIZAR A BASE DE DADOS NO VERCEL ---
+@app.route("/reset_bd")
+def reset_bd():
+    db.drop_all()
+    db.create_all()
+    return "<h3>Base de Dados limpa e atualizada com sucesso!</h3> <p>Volta à pagina inicial e faz um novo Registo.</p>"
 
 # --- ROTAS ---
 @app.route("/")
@@ -68,7 +74,13 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
+    
+    # Proteção caso a BD falhe a leitura
+    try:
+        pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
+    except:
+        db.session.rollback()
+        pombos_user = []
 
     if request.method == 'POST':
         try:
@@ -76,7 +88,7 @@ def novo_pombo():
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
-                ano=int(request.form.get('ano')),
+                ano=int(request.form.get('ano') or 0),
                 sexo=request.form.get('sexo'),
                 cor=request.form.get('cor'),
                 categoria=request.form.get('categoria'),
@@ -92,7 +104,7 @@ def novo_pombo():
             return redirect(url_for('lista_pombos'))
         except Exception as e:
             db.session.rollback()
-            flash("Erro: Verifique se a anilha já existe.", "danger")
+            flash("Erro ao gravar. Verifique se a anilha já existe ou se preencheu tudo corretamente.", "danger")
             
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
