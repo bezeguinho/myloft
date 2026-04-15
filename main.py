@@ -30,6 +30,10 @@ class Utilizador(db.Model):
     __tablename__ = 'utilizadores_perfil'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
+    localberry = db.Column(db.String(100))
+    telefone = db.Column(db.String(20))
+    email = db.Column(db.String(120))
+    foto = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 class Pombo(db.Model):
@@ -50,9 +54,12 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# --- ZONA DE RESET DA BASE DE DADOS ---
 with app.app_context():
-    db.create_all()
+    db.drop_all()   # Apaga a BD antiga viciada
+    db.create_all() # Cria a BD nova corrigida
 
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -64,6 +71,7 @@ def novo_pombo():
     pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     if request.method == 'POST':
         try:
+            status_pombo = "Cedido" if request.form.get('categoria') == "Cedido" else "Ativo"
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -82,7 +90,7 @@ def novo_pombo():
             return redirect(url_for('lista_pombos'))
         except Exception:
             db.session.rollback()
-            flash("Erro ao gravar pombo.", "danger")
+            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
@@ -109,6 +117,24 @@ def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
+@app.route("/pedigree/gerar", methods=['GET', 'POST'])
+@login_required
+def gerar_pedigree():
+    if request.method == 'POST':
+        anilha = request.form.get('numero')
+        pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
+        if pombo:
+            dono = Utilizador.query.filter_by(user_id=current_user.id).first()
+            return render_template("pedigree_view.html", pombo=pombo, dono=dono)
+        flash("Pombo não encontrado!", "warning")
+    return render_template("gerar_pedigree.html")
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -117,6 +143,17 @@ def login():
             login_user(user)
             return redirect(url_for('index'))
     return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        passw = request.form.get('password')
+        new_user = User(email=email, password_hash=generate_password_hash(passw))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
