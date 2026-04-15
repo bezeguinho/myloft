@@ -41,8 +41,8 @@ class Pombo(db.Model):
     nome = db.Column(db.String(100))
     sexo = db.Column(db.String(20))
     cor = db.Column(db.String(50))
-    categoria = db.Column(db.String(50)) # Reprodutor, Voador
-    status = db.Column(db.String(50))    # Ativo, Cedido
+    categoria = db.Column(db.String(50))
+    status = db.Column(db.String(50))
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -54,10 +54,29 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-# --- ROTAS DE LISTAGEM ---
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/novo_pombo", methods=['GET', 'POST'])
+@login_required
+def novo_pombo():
+    if request.method == 'POST':
+        novo = Pombo(
+            anilha=request.form.get('anilha'),
+            nome=request.form.get('nome'),
+            sexo=request.form.get('sexo'),
+            cor=request.form.get('cor'),
+            categoria=request.form.get('categoria'),
+            status="Ativo",
+            user_id=current_user.id
+        )
+        db.session.add(novo)
+        db.session.commit()
+        flash("Pombo inserido com sucesso!", "success")
+        return redirect(url_for('lista_pombos'))
+    return render_template("pombo_form.html")
 
 @app.route("/lista_pombos")
 @login_required
@@ -83,7 +102,6 @@ def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, status="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-# --- PEDIGREE ---
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
 @login_required
 def gerar_pedigree():
@@ -96,7 +114,12 @@ def gerar_pedigree():
         flash("Pombo não encontrado!", "warning")
     return render_template("gerar_pedigree.html")
 
-# --- LOGIN / LOGOUT ---
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -110,12 +133,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 if __name__ == "__main__":
     app.run(debug=True)

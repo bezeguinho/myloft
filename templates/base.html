@@ -24,26 +24,22 @@
       gap: 10px;
     }
 
-    .btn-executar,
-    .btn-primary {
+    .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
     }
 
-    .btn-executar:hover,
-    .btn-primary:hover {
+    .btn-executar:hover {
       background-color: var(--azul-myloft) !important;
       color: #000000 !important;
     }
 
-    .btn-retroceder,
-    .btn-warning {
+    .btn-retroceder {
       background-color: var(--amarelo-myloft) !important;
       color: #ffffff !important;
     }
 
-    .btn-retroceder:hover,
-    .btn-warning:hover {
+    .btn-retroceder:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
     }
@@ -80,6 +76,10 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#">GESTÃO DE POMBOS</a>
             <ul class="dropdown-menu border-0 shadow">
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
               <li><a class="dropdown-item" href="{{ url_for('reprodutores') }}">REPRODUTORES</a></li>
               <li><a class="dropdown-item" href="{{ url_for('voadores') }}">VOADORES</a></li>
