@@ -3,30 +3,30 @@
 <div class="container bg-white p-5 shadow" id="printableArea"
     style="min-height: 297mm; border: 1px solid #ddd; border-radius: 10px;">
     <div class="text-center mb-5 border-bottom pb-3">
-        <h1 class="fw-bold text-primary">PEDIGREE COLUMBÓFILO</h1>
-        <p class="text-muted">MYLOFT - Gestão Digital de Columbofilia</p>
+        <h1 class="fw-bold text-primary text-uppercase">Pedigree Columbófilo</h1>
+        <p class="text-muted fw-bold">MYLOFT - GESTÃO DIGITAL</p>
     </div>
 
     <div class="row mb-5">
         <div class="col-6">
-            <h4 class="fw-bold">POMBO: {{ pombo.anilha }}</h4>
-            <p><strong>Nome:</strong> {{ pombo.nome }}</p>
-            <p><strong>Sexo:</strong> {{ pombo.sexo }}</p>
+            <h4 class="fw-bold text-uppercase">Pombo: {{ pombo.anilha }}</h4>
+            <p><strong>NOME:</strong> {{ pombo.nome or '---' }}</p>
+            <p><strong>SEXO:</strong> {{ pombo.sexo }}</p>
         </div>
         <div class="col-6 text-end">
-            <h5 class="fw-bold">PROPRIETÁRIO</h5>
-            <p>{{ current_user.email }}</p>
+            <h5 class="fw-bold text-uppercase">Proprietário</h5>
+            <p>{{ dono.nome if dono else current_user.email }}</p>
         </div>
     </div>
 
     <div class="row g-4">
         <div class="col-md-6 border p-4" style="background-color: #f8f9fa; border-radius: 10px;">
             <h5 class="fw-bold text-primary">PAI</h5>
-            <p class="fs-5">{{ pombo.pai or 'Desconhecido' }}</p>
+            <p class="fs-5">{{ pombo.pai or 'DESCONHECIDO' }}</p>
         </div>
         <div class="col-md-6 border p-4" style="background-color: #f8f9fa; border-radius: 10px;">
             <h5 class="fw-bold text-danger">MÃE</h5>
-            <p class="fs-5">{{ pombo.mae or 'Desconhecido' }}</p>
+            <p class="fs-5">{{ pombo.mae or 'DESCONHECIDA' }}</p>
         </div>
     </div>
 </div>
