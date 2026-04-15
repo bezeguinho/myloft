@@ -24,31 +24,33 @@
       gap: 10px;
     }
 
-    .btn-executar {
+    /* EXECUÇÃO (AZUL) */
+    .btn-executar,
+    .btn-primary {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
     }
 
-    .btn-executar:hover {
+    .btn-executar:hover,
+    .btn-primary:hover {
       background-color: var(--azul-myloft) !important;
       color: #000000 !important;
     }
 
-    .btn-retroceder {
+    /* RETROCEDER (AMARELO) */
+    .btn-retroceder,
+    .btn-warning {
       background-color: var(--amarelo-myloft) !important;
       color: #ffffff !important;
     }
 
-    .btn-retroceder:hover {
+    .btn-retroceder:hover,
+    .btn-warning:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
     }
 
-    .nav-item.dropdown:hover .dropdown-menu {
-      display: block;
-      margin-top: 0;
-    }
-
+    /* MENUS */
     .navbar-nav .nav-link {
       color: #ffffff !important;
       border-radius: 8px !important;
@@ -58,6 +60,11 @@
     .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
+    }
+
+    .nav-item.dropdown:hover .dropdown-menu {
+      display: block;
+      margin-top: 0;
     }
 
     body {
@@ -77,9 +84,9 @@
             <a class="nav-link dropdown-toggle" href="#">GESTÃO DE POMBOS</a>
             <ul class="dropdown-menu border-0 shadow">
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_reprodutores') }}">REPRODUTORES</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_voadores') }}">VOADORES</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_cedidos') }}">CEDIDOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('reprodutores') }}">REPRODUTORES</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('voadores') }}">VOADORES</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('cedidos') }}">CEDIDOS</a></li>
             </ul>
           </li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
@@ -90,7 +97,9 @@
       {% endif %}
     </div>
   </nav>
-  <main class="container mt-4">{% block content %}{% endblock %}</main>
+  <main class="container mt-4">
+    {% block content %}{% endblock %}
+  </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

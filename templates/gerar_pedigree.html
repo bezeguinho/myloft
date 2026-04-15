@@ -3,12 +3,12 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow-sm border-0 p-5" style="border-radius: 10px;">
-            <h3 class="fw-bold text-primary mb-4 text-center text-uppercase">Gerar Pedigree</h3>
+            <h3 class="fw-bold text-primary mb-4 text-center">GERAR PEDIGREE</h3>
             <form action="{{ url_for('gerar_pedigree') }}" method="POST">
                 <div class="mb-4">
                     <label class="form-label fw-bold small text-muted text-uppercase">Número da Anilha:</label>
                     <input type="text" name="numero" class="form-control bg-light border-0" style="height: 50px;"
-                        placeholder="Ex: 1234567/23" required>
+                        placeholder="Ex: 123456/23" required>
                 </div>
                 <div class="d-grid gap-3">
                     <button type="submit" class="btn btn-executar btn-lg shadow">GERAR DOCUMENTO</button>
