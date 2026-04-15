@@ -45,7 +45,6 @@ class Pombo(db.Model):
     obs = db.Column(db.Text)
     cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
-    status = db.Column(db.String(50), default="Ativo")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 @login_manager.user_loader
@@ -57,4 +56,50 @@ with app.app_context():
 
 @app.route("/reset_bd")
 def reset_bd():
-    db.drop
+    db.drop_all()
+    db.create_all()
+    return "<h3>Base de Dados limpa!</h3>"
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/novo_pombo", methods=['GET', 'POST'])
+@login_required
+def novo_pombo():
+    anos_lista = list(range(datetime.now().year, 1990, -1))
+    # Garantimos que enviamos pombos_user para o HTML
+    pombos_lista_completa = Pombo.query.filter_by(user_id=current_user.id).all()
+    
+    if request.method == 'POST':
+        try:
+            novo = Pombo(
+                anilha=request.form.get('anilha'),
+                nome=request.form.get('nome'),
+                ano=int(request.form.get('ano') or 0),
+                sexo=request.form.get('sexo'),
+                cor=request.form.get('cor'),
+                categoria=request.form.get('categoria'),
+                pai=request.form.get('pai'),
+                mae=request.form.get('mae'),
+                obs=request.form.get('obs'),
+                cedido_a=request.form.get('cedido_a'),
+                oculto=True if request.form.get('oculto') == 'on' else False,
+                user_id=current_user.id
+            )
+            db.session.add(novo)
+            db.session.commit()
+            return redirect(url_for('lista_pombos'))
+        except Exception:
+            db.session.rollback()
+            flash("Erro ao gravar.", "danger")
+            
+    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_lista_completa)
+
+@app.route("/lista_pombos")
+@login_required
+def lista_pombos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
+
+# ... (outras rotas omitidas para brevidade, mas devem continuar no teu ficheiro)
