@@ -20,24 +20,35 @@
     /* BARRA DE NAVEGAÇÃO */
     .navbar {
       background-color: var(--azul-myloft) !important;
+      padding: 0.5rem 1rem;
     }
 
     .navbar-brand {
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
+      margin-right: 2rem;
     }
 
-    /* PADRÃO MYLOFT: MENUS E SUBMENUS */
+    /* CONFIGURAÇÃO DO HOVER AUTOMÁTICO (ABRIR SEM CLICAR) */
+    @media (min-width: 992px) {
+      .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        /* Evita que o menu feche ao mover o rato para baixo */
+      }
+    }
+
+    /* PADRÃO MYLOFT: LINKS DA BARRA */
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
       border-radius: 6px;
-      /* Cantos em raio */
-      padding: 8px 12px !important;
-      margin: 0 4px;
+      padding: 8px 15px !important;
+      margin: 0 5px;
       transition: all 0.2s ease-in-out;
+      display: inline-block;
     }
 
     /* HOVER PADRÃO: Botão Amarelo, Letra Preta, Cantos Redondos */
@@ -47,36 +58,35 @@
       color: #000000 !important;
     }
 
-    /* CAIXA DOS SUBMENUS (Azul com letras brancas) */
+    /* CAIXA DOS SUBMENUS (Azul) */
     .dropdown-menu {
       background-color: var(--azul-myloft) !important;
       border: none;
       border-radius: 8px;
-      padding: 8px;
-      /* Dá espaço ao redor dos botões */
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     /* ITENS DO SUBMENU */
     .dropdown-item {
       color: #ffffff !important;
-      /* Letras Brancas */
       font-weight: bold;
       border-radius: 6px;
-      /* Cantos em raio para coincidir com o hover */
+      padding: 8px 15px;
       margin-bottom: 2px;
       transition: all 0.2s ease-in-out;
     }
 
-    /* Divisória fina e clara para fundo azul */
     .dropdown-divider {
       border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    /* BOTÕES INFERIORES */
+    /* BOTÕES DO FORMULÁRIO */
     .btn-executar {
       background-color: var(--azul-myloft);
       color: white;
       font-weight: bold;
+      border-radius: 6px;
     }
 
     .btn-executar:hover {
@@ -88,6 +98,7 @@
       background-color: #ffc107;
       color: black;
       font-weight: bold;
+      border-radius: 6px;
     }
 
     .btn-retroceder:hover {
@@ -101,7 +112,8 @@
 
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
-      <a class="navbar-brand fs-4 me-4" href="{{ url_for('index') }}">MYLOFT</a>
+      <a class="navbar-brand fs-4" href="{{ url_for('index') }}">MYLOFT</a>
+
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -109,10 +121,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button">
               GESTÃO DE POMBOS
             </a>
-            <ul class="dropdown-menu shadow mt-2">
+            <ul class="dropdown-menu shadow">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
                 <hr class="dropdown-divider">
@@ -124,15 +136,23 @@
               <li><a class="dropdown-item" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a class="nav-link" href="#">PEDIGREE</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">OS MEUS DADOS</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a>
+          </li>
         </ul>
 
-        <ul class="navbar-nav">
+        <ul class="navbar-nav ms-auto">
           {% if current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}" style="background-color: rgba(255,255,255,0.1);">SAIR</a>
+          </li>
           {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a>
+          </li>
           {% endif %}
         </ul>
       </div>
