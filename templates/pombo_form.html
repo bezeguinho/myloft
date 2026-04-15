@@ -34,9 +34,11 @@
                             <select name="ano" id="pomboAno" class="form-select caixa-input" style="width: 110px;"
                                 required onchange="filtrarPais()">
                                 <option value="" selected disabled hidden>Escolha...</option>
+                                {% if anos_lista %}
                                 {% for ano in anos_lista %}
                                 <option value="{{ ano }}">{{ ano }}</option>
                                 {% endfor %}
+                                {% endif %}
                             </select>
                         </div>
                         <div class="col-auto">
@@ -118,9 +120,9 @@
 </div>
 
 <script>
-    // USAR JSON PARA EVITAR ERROS DE JINJA NO JS
+    // TÉCNICA DE SEGURANÇA: Se a variável falhar, o JS cria uma lista vazia em vez de dar erro
     const todosPombos = [
-        {% if pombos_user is defined and pombos_user %}
+        {% if pombos_user is defined %}
     {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
@@ -148,9 +150,8 @@
     function toggleCedido() {
         const sel = document.getElementById("categoriaSelect");
         const div = document.getElementById("cedidoGroup");
-        const input = document.getElementById("cedidoInput");
-        if (sel.value === "Cedido") { div.style.display = "block"; input.focus(); }
-        else { div.style.display = "none"; input.value = ""; }
+        if (sel.value === "Cedido") { div.style.display = "block"; document.getElementById("cedidoInput").focus(); }
+        else { div.style.display = "none"; }
     }
 
     function esconderCedido() {
