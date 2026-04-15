@@ -18,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -50,14 +49,14 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# CRIA AS TABELAS SÓ SE NÃO EXISTIREM
+# CRIA AS TABELAS SÓ SE NÃO EXISTIREM (SEGURO PARA O VERCEL)
 with app.app_context():
     try:
         db.create_all()
     except Exception as e:
         print("Aviso na base de dados:", e)
 
-# --- ROTA SECRETA PARA LIMPAR TUDO ---
+# ROTA SECRETA DE LIMPEZA
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
@@ -133,3 +132,43 @@ def cedidos():
 @login_required
 def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+# --- AQUI ESTÃO AS ROTAS QUE FALTAVAM E CAUSAVAM O ERRO 500 ---
+@app.route("/pedigree/gerar", methods=['GET', 'POST'])
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    return render_template("meus_dados_ver.html")
+# -------------------------------------------------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
