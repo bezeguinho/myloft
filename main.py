@@ -40,6 +40,7 @@ class Pombo(db.Model):
     anilha = db.Column(db.String(50), primary_key=True)
     nome = db.Column(db.String(100))
     sexo = db.Column(db.String(20))
+    cor = db.Column(db.String(50))
     categoria = db.Column(db.String(50)) # Reprodutor, Voador
     status = db.Column(db.String(50))    # Ativo, Cedido
     pai = db.Column(db.String(50))
@@ -53,7 +54,7 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-# --- ROTAS DE NAVEGAÇÃO ---
+# --- ROTAS DE LISTAGEM ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -95,7 +96,7 @@ def gerar_pedigree():
         flash("Pombo não encontrado!", "warning")
     return render_template("gerar_pedigree.html")
 
-# --- UTILIZADOR ---
+# --- LOGIN / LOGOUT ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
