@@ -51,19 +51,11 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Criar tabelas ao iniciar
+# --- FORÇA BRUTA: LIMPEZA TOTAL NO ARRANQUE ---
 with app.app_context():
-    db.create_all()
+    db.drop_all()   # APAGA TUDO
+    db.create_all() # CRIA TUDO NOVO E CORRETO
 
-# --- ROTA DE RESET CORRIGIDA ---
-@app.route("/reset_bd")
-def reset_bd():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Base de Dados limpa e sincronizada!</h3><p>Volte ao início e crie uma nova conta.</p>"
-
-# --- ROTAS PRINCIPAIS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -72,17 +64,15 @@ def index():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    
-    # Busca segura de pombos
+    # Envio explícito da variável para evitar o erro de 'undefined'
     try:
         pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     except:
         db.session.rollback()
         pombos_user = []
-    
+        
     if request.method == 'POST':
         try:
-            is_oculto = True if request.form.get('oculto') == 'on' else False
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -94,7 +84,7 @@ def novo_pombo():
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
                 cedido_a=request.form.get('cedido_a'),
-                oculto=is_oculto,
+                oculto=True if request.form.get('oculto') == 'on' else False,
                 user_id=current_user.id
             )
             db.session.add(novo)
@@ -102,7 +92,7 @@ def novo_pombo():
             return redirect(url_for('lista_pombos'))
         except Exception:
             db.session.rollback()
-            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
+            flash("Erro ao gravar.", "danger")
             
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
@@ -111,24 +101,6 @@ def novo_pombo():
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
-
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
-
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
 @app.route("/pombos_ocultos")
 @login_required
@@ -149,8 +121,7 @@ def login():
 def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
-        passw = request.form.get('password')
-        new_user = User(email=email, password_hash=generate_password_hash(passw))
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
