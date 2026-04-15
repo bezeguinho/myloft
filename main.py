@@ -28,6 +28,10 @@ class Utilizador(db.Model):
     __tablename__ = 'utilizadores_perfil'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
+    localidade = db.Column(db.String(100)) # Adicionado
+    email = db.Column(db.String(120))      # Adicionado
+    telefone = db.Column(db.String(20))    # Adicionado
+    foto = db.Column(db.String(255))       # Adicionado
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 class Pombo(db.Model):
@@ -98,7 +102,7 @@ def novo_pombo():
             return redirect(url_for('lista_pombos'))
         except Exception:
             db.session.rollback()
-            flash("Erro ao gravar. Verifique se a anilha já existe.", "danger")
+            flash("Erro ao gravar.", "danger")
             
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=meus_pombos)
 
@@ -132,26 +136,28 @@ def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar", methods=['GET', 'POST'])
+@app.route("/pedigree/gerar")
 @login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-# --- CORREÇÃO: Cria o perfil automaticamente se não existir, evitando Erro 500 ---
 @app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
     try:
         utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-        if not utilizador:
-            utilizador = Utilizador(nome="Nome não definido", user_id=current_user.id)
-            db.session.add(utilizador)
-            db.session.commit()
     except Exception:
         db.session.rollback()
         utilizador = None
     return render_template("meus_dados_ver.html", utilizador=utilizador)
-# -------------------------------------------------------------------------------
+
+# --- A ROTA QUE FALTAVA ---
+@app.route("/meus-dados/editar", methods=['GET', 'POST'])
+@login_required
+def editar_dados():
+    # Carrega a página editar_dados.html (se já a tiveres na pasta templates)
+    return render_template("editar_dados.html")
+# --------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
