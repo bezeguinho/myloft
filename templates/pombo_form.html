@@ -1,69 +1,87 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10">
+    <div class="col-md-11">
         <div class="card shadow border-0" style="border-radius: 10px; background-color: #ffffff;">
-            <div class="card-body p-5">
+            <div class="card-body p-4">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST">
-                    <div class="row g-4">
+                    <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Nº DA ANILHA</label>
-                            <input type="text" name="anilha" class="form-control bg-light" placeholder="Ex: 1234567"
-                                required>
+                            <label class="form-label fw-bold small text-uppercase">Nº da Anilha</label>
+                            <input type="text" name="anilha" class="form-control bg-light" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">NOME DO POMBO</label>
-                            <input type="text" name="nome" class="form-control bg-light" placeholder="Ex: Campeão">
+                            <label class="form-label fw-bold small text-uppercase">Nome do Pombo</label>
+                            <input type="text" name="nome" class="form-control bg-light">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">ANO</label>
-                            <input type="text" name="ano" class="form-control bg-light" placeholder="Ex: 2024">
+                            <label class="form-label fw-bold small text-uppercase">Ano</label>
+                            <input type="text" name="ano" class="form-control bg-light">
                         </div>
+
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">SEXO</label>
+                            <label class="form-label fw-bold small text-uppercase">Sexo</label>
                             <select name="sexo" class="form-select bg-light">
                                 <option value="Macho">Macho</option>
                                 <option value="Fêmea">Fêmea</option>
+                                <option value="Indefinido">Indefinido</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">COR</label>
-                            <input type="text" name="cor" class="form-control bg-light" placeholder="Ex: Azulado">
+                            <label class="form-label fw-bold small text-uppercase">Cor</label>
+                            <input type="text" name="cor" class="form-control bg-light">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">CATEGORIA</label>
-                            <select name="categoria" class="form-select bg-light">
+                            <label class="form-label fw-bold small text-uppercase">Categoria</label>
+                            <select name="categoria" id="categoriaSelect" class="form-select bg-light"
+                                onchange="toggleCedido()">
                                 <option value="Voador">Voador</option>
                                 <option value="Reprodutor">Reprodutor</option>
+                                <option value="Cedido">Cedido</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">ANILHA DO PAI</label>
-                            <input type="text" name="pai" class="form-control bg-light" placeholder="Nº Anilha do Pai">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">ANILHA DA MÃE</label>
-                            <input type="text" name="mae" class="form-control bg-light" placeholder="Nº Anilha da Mãe">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">OBSERVAÇÕES</label>
-                            <textarea name="obs" class="form-control bg-light" rows="3"
-                                placeholder="Notas adicionais..."></textarea>
-                        </div>
-                    </div>
 
-                    <div class="mt-5 d-flex justify-content-center gap-3">
-                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">
-                            GRAVAR POMBO
-                        </button>
-                        <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg px-5 shadow">
-                            <i class="bi bi-arrow-left"></i> VOLTAR
-                        </a>
+                        <div class="col-md-12" id="cedidoGroup" style="display: none;">
+                            <label class="form-label fw-bold small text-uppercase text-danger">Cedido a:</label>
+                            <input type="text" name="cedido_a" class="form-control border-danger bg-light">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase">Anilha do Pai</label>
+                            <input type="text" name="pai" class="form-control bg-light">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase">Anilha da Mãe</label>
+                            <input type="text" name="mae" class="form-control bg-light">
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small text-uppercase">Observações (Aparecerá no
+                                Pedigree)</label>
+                            <textarea name="obs" class="form-control bg-light" rows="4"
+                                style="resize: none;"></textarea>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column justify-content-end gap-2 pb-1">
+                            <button type="submit" class="btn btn-executar btn-lg w-100 shadow">
+                                GRAVAR POMBO
+                            </button>
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg w-100 shadow">
+                                <i class="bi bi-arrow-left"></i> VOLTAR
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCedido() {
+        var select = document.getElementById("categoriaSelect");
+        var group = document.getElementById("cedidoGroup");
+        group.style.display = (select.value === "Cedido") ? "block" : "none";
+    }
+</script>
 {% endblock %}

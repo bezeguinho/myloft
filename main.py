@@ -46,6 +46,7 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
+    cedido_a = db.Column(db.String(100))
     status = db.Column(db.String(50), default="Ativo")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -66,6 +67,7 @@ def index():
 def novo_pombo():
     if request.method == 'POST':
         try:
+            status_pombo = "Cedido" if request.form.get('categoria') == 'Cedido' else "Ativo"
             novo = Pombo(
                 anilha=request.form.get('anilha'),
                 nome=request.form.get('nome'),
@@ -76,16 +78,16 @@ def novo_pombo():
                 pai=request.form.get('pai'),
                 mae=request.form.get('mae'),
                 obs=request.form.get('obs'),
+                cedido_a=request.form.get('cedido_a'),
+                status=status_pombo,
                 user_id=current_user.id
             )
             db.session.add(novo)
             db.session.commit()
-            flash("Pombo registado com sucesso!", "success")
             return redirect(url_for('lista_pombos'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
-            flash("Erro ao gravar pombo. Verifique se a anilha já existe.", "danger")
-            return redirect(url_for('novo_pombo'))
+            flash("Erro: Verifique se a anilha já existe.", "danger")
     return render_template("pombo_form.html")
 
 @app.route("/lista_pombos")
@@ -109,7 +111,7 @@ def voadores():
 @app.route("/cedidos")
 @login_required
 def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, status="Cedido").all()
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido").all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
 @app.route("/pedigree/gerar", methods=['GET', 'POST'])
