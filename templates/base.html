@@ -17,6 +17,7 @@
       background-color: #f8f9fa;
     }
 
+    /* BARRA DE NAVEGAÇÃO */
     .navbar {
       background-color: var(--azul-myloft) !important;
     }
@@ -28,11 +29,30 @@
       text-transform: uppercase;
     }
 
+    /* Efeito Amarelo na barra principal */
     .nav-link:hover {
-      color: #d1e7dd !important;
+      color: #ffc107 !important;
     }
 
-    /* Cores dos teus botões */
+    /* SUBMENUS (Dropdown) */
+    .dropdown-menu {
+      border: none;
+      border-radius: 8px;
+    }
+
+    .dropdown-item {
+      color: var(--azul-myloft) !important;
+      /* Todos a Azul */
+      font-weight: bold;
+    }
+
+    /* Efeito Hover nos Submenus (Fundo Amarelo, Letra Preta) */
+    .dropdown-item:hover {
+      background-color: #ffc107 !important;
+      color: #000000 !important;
+    }
+
+    /* BOTÕES */
     .btn-executar {
       background-color: var(--azul-myloft);
       color: white;
@@ -72,9 +92,8 @@
             <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown">
               GESTÃO DE POMBOS
             </a>
-            <ul class="dropdown-menu shadow border-0 mt-2">
-              <li><a class="dropdown-item fw-bold text-primary" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a>
-              </li>
+            <ul class="dropdown-menu shadow mt-2">
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -82,15 +101,11 @@
               <li><a class="dropdown-item" href="{{ url_for('reprodutores') }}">REPRODUTORES</a></li>
               <li><a class="dropdown-item" href="{{ url_for('voadores') }}">VOADORES</a></li>
               <li><a class="dropdown-item" href="{{ url_for('cedidos') }}">CEDIDOS</a></li>
-              <li><a class="dropdown-item text-danger" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">PEDIGREE</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">OS MEUS DADOS</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="#">PEDIGREE</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">OS MEUS DADOS</a></li>
         </ul>
 
         <ul class="navbar-nav">

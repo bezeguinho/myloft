@@ -12,8 +12,13 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
+    /* Mantém o "Escolha..." cinzento, mas as opções reais a preto */
     select.caixa-input:invalid {
         color: #999999 !important;
+    }
+
+    select.caixa-input option {
+        color: #000000 !important;
     }
 </style>
 
@@ -53,7 +58,7 @@
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-4">
+                    <div class="row g-3 mb-4 align-items-start">
                         <div class="col-auto">
                             <label class="form-label fw-bold small">Nº PAI:</label>
                             <input type="text" name="pai" id="paiInput" class="form-control caixa-input" maxlength="12"
@@ -90,10 +95,14 @@
                                     style="width: 310px;" onblur="esconderCedido()">
                             </div>
                         </div>
-                        <div class="col-auto pt-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="oculto" id="checkOculto">
-                                <label class="form-check-label fw-bold small ms-1" for="checkOculto">OCULTAR</label>
+
+                        <div class="col-auto d-flex align-items-center h-100 pt-4">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input border-secondary me-2" type="checkbox" name="oculto"
+                                    id="checkOculto" style="margin-top: 0; transform: scale(1.2);">
+                                <label class="form-check-label fw-bold small text-uppercase" for="checkOculto">
+                                    Ocultar pombo
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -120,9 +129,8 @@
 </div>
 
 <script>
-    // TÉCNICA DE SEGURANÇA: Se a variável falhar, o JS cria uma lista vazia em vez de dar erro
     const todosPombos = [
-        {% if pombos_user is defined %}
+        {% if pombos_user is defined and pombos_user %}
     {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
@@ -150,8 +158,9 @@
     function toggleCedido() {
         const sel = document.getElementById("categoriaSelect");
         const div = document.getElementById("cedidoGroup");
-        if (sel.value === "Cedido") { div.style.display = "block"; document.getElementById("cedidoInput").focus(); }
-        else { div.style.display = "none"; }
+        const input = document.getElementById("cedidoInput");
+        if (sel.value === "Cedido") { div.style.display = "block"; input.focus(); }
+        else { div.style.display = "none"; input.value = ""; }
     }
 
     function esconderCedido() {
