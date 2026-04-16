@@ -8,6 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# Configuração da Base de Dados
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -18,6 +19,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -57,14 +59,15 @@ with app.app_context():
     try:
         db.create_all()
     except Exception as e:
-        print("Erro DB:", e)
+        print("Erro ao criar tabelas:", e)
 
+# --- ROTAS ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Sucesso!</h3><p>Base de dados limpa. Faz novo registo.</p>"
+    return "<h3>Base de Dados Reiniciada!</h3><p>Crie um novo registo agora.</p>"
 
 @app.route("/")
 def index():
@@ -82,6 +85,7 @@ def novo_pombo():
     
     if request.method == 'POST':
         anilha_input = request.form.get('anilha')
+        # Validação de anilha por utilizador
         pombo_existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
         if pombo_existente:
             flash("Pombo já existente no seu pombal!", "danger")
@@ -106,7 +110,7 @@ def novo_pombo():
                 return redirect(url_for('lista_pombos'))
             except:
                 db.session.rollback()
-                flash("Erro ao gravar.", "danger")
+                flash("Erro ao gravar pombo.", "danger")
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=meus_pombos)
 
 @app.route("/lista_pombos")
@@ -149,7 +153,7 @@ def gerar_pedigree():
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     if not utilizador:
-        utilizador = Utilizador(nome="Meu Pombal", user_id=current_user.id)
+        utilizador = Utilizador(nome="Pombal", user_id=current_user.id)
         db.session.add(utilizador)
         db.session.commit()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
@@ -157,7 +161,8 @@ def ver_dados():
 @app.route("/meus-dados/editar")
 @login_required
 def editar_dados():
-    return render_template("editar_dados.html")
+    # Rota placeholder para evitar Erro 500 ao clicar no botão
+    return "Página de Edição em Construção"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -166,11 +171,27 @@ def login():
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
             return redirect(url_for('index'))
+        flash("Email ou Password incorretos.", "danger")
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
+        if User.query.filter_by(email=email).first():
+            flash("Email já registado.", "danger")
+            return redirect(url_for('register'))
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
