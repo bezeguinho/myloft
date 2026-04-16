@@ -2,20 +2,16 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow-sm border-0 p-5" style="border-radius: 10px;">
-            <h3 class="fw-bold text-primary mb-4 text-center">GERAR PEDIGREE</h3>
-            <form action="{{ url_for('gerar_pedigree') }}" method="POST">
+        <div class="card shadow border-0 p-5 mt-5 text-center" style="border-radius: 10px;">
+            <h2 class="text-primary fw-bold mb-4">GERAR PEDIGREE</h2>
+            <form>
                 <div class="mb-4">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Número da Anilha:</label>
-                    <input type="text" name="numero" class="form-control bg-light border-0" style="height: 50px;"
-                        placeholder="Ex: 123456/23" required>
+                    <label class="form-label fw-bold text-muted small d-block text-start">NÚMERO DA ANILHA:</label>
+                    <input type="text" class="form-control" placeholder="Ex: 123456/23"
+                        style="padding: 15px; background: #f8f9fa;">
                 </div>
-                <div class="d-grid gap-3">
-                    <button type="submit" class="btn btn-executar btn-lg shadow">GERAR DOCUMENTO</button>
-                    <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg shadow">
-                        <i class="bi bi-arrow-left"></i> VOLTAR
-                    </a>
-                </div>
+                <button type="button" class="btn btn-executar btn-lg w-100 mb-3 p-3 shadow-sm">GERAR DOCUMENTO</button>
+                <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg w-100 p-3 shadow-sm">VOLTAR</a>
             </form>
         </div>
     </div>

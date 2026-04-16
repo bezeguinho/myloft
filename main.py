@@ -174,15 +174,3 @@ def register():
         email = request.form.get('email').lower()
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-if __name__ == "__main__":
-    app.run(debug=True)
