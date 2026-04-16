@@ -1,4 +1,5 @@
 import os
+import traceback # Ferramenta de Raio-X
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -8,18 +9,15 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- A CURA PARA O VERCEL (Ligação Blindada) ---
+# --- LIGAÇÃO DB COM PROTEÇÃO ---
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
-    # Garante que o Vercel usa a ligação segura
     if 'sslmode' not in db_url:
         db_url += '?sslmode=require'
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 else:
-    # Se falhar a net ou o Postgres, usa a ÚNICA pasta onde o Vercel deixa escrever: /tmp/
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/local.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -28,7 +26,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- OS TEUS MODELOS COMPLETOS ---
+# --- OS TEUS MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -86,10 +84,13 @@ def register():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Conta criada com sucesso! Por favor, faça login.", "success")
-        return redirect(url_for('login')) # Entra na página de login, não entra direto
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Conta criada com sucesso! Por favor, faça login.", "success")
+            return redirect(url_for('login'))
+        except Exception as e:
+            return f"Erro ao gravar na DB: {e}"
     return render_template('register.html')
 
 @app.route("/meus-dados/ver")
@@ -155,13 +156,20 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# --- A ROTA RAIO-X PARA APANHAR O ERRO ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
-    # Rota vital! Ao aceder a este link, o Vercel cria as tabelas de forma segura
-    with app.app_context():
+    try:
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados criada com sucesso!</h3><p>Volta ao site e cria a tua conta.</p>"
+        return "<h3>Base de Dados criada com sucesso!</h3><p>Volta ao site e cria a tua conta.</p>"
+    except Exception as e:
+        erro = traceback.format_exc()
+        return f"""
+        <h2>Apanhámos o Erro!</h2>
+        <p>A Base de Dados rejeitou a ligação. Envia-me um print deste quadro vermelho para resolvermos a fonte do problema:</p>
+        <pre style='background-color: #ffe6e6; color: #990000; padding: 15px; border: 1px solid #cc0000; border-radius: 5px; white-space: pre-wrap;'>{erro}</pre>
+        """
 
 if __name__ == "__main__":
     app.run(debug=True)
