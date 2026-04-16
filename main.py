@@ -140,13 +140,10 @@ def novo_pombo():
         db.session.add(novo)
         db.session.commit()
         
-        # AQUI ESTÁ A MAGIA: Dá o aviso de sucesso e mantém-te na página com a tag saved=1
         flash(f"Pombo {anilha_final} gravado com sucesso!", "success")
         return redirect(url_for('novo_pombo', saved='1'))
         
-    # --- SISTEMA INTELIGENTE (SÓ CALCULA SE ACABARES DE GRAVAR UM POMBO) ---
     proxima_anilha = ""
-    # Se na barra de endereço disser que vieste de uma gravação bem sucedida:
     if request.args.get('saved') == '1':
         ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
         if ultimo_pombo and ultimo_pombo.anilha:
@@ -160,36 +157,43 @@ def novo_pombo():
 
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
 
-@app.route("/lista_pombos") @login_required
+@app.route("/lista_pombos")
+@login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores") @login_required
+@app.route("/reprodutores")
+@login_required
 def reprodutores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
 
-@app.route("/voadores") @login_required
+@app.route("/voadores")
+@login_required
 def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route("/cedidos") @login_required
+@app.route("/cedidos")
+@login_required
 def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-@app.route("/pombos_ocultos") @login_required
+@app.route("/pombos_ocultos")
+@login_required
 def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar") @login_required
+@app.route("/pedigree/gerar")
+@login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/logout") @login_required
+@app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
