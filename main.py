@@ -8,6 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# Configuração da Base de Dados (Resiliente para Vercel)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -18,6 +19,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -54,15 +56,16 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-with app.app_context():
-    db.create_all()
-
+# --- ROTAS ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Base de Dados Reiniciada!</h3><p>Crie uma nova conta.</p>"
+    try:
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
+        return "<h3>Sucesso!</h3><p>Base de dados limpa e recriada. Faz o Registo agora.</p>"
+    except Exception as e:
+        return f"<h3>Erro ao limpar:</h3><p>{str(e)}</p>"
 
 @app.route("/")
 def index():
@@ -80,53 +83,33 @@ def novo_pombo():
             flash("Pombo existente", "danger")
             return redirect(url_for('novo_pombo'))
         
-        novo = Pombo(
-            anilha=anilha_in,
-            nome=request.form.get('nome'),
-            ano=int(request.form.get('ano') or 0),
-            sexo=request.form.get('sexo'),
-            cor=request.form.get('cor'),
-            categoria=request.form.get('categoria'),
-            pai=request.form.get('pai'),
-            mae=request.form.get('mae'),
-            obs=request.form.get('obs'),
-            oculto=True if request.form.get('oculto') == 'on' else False,
-            user_id=current_user.id
-        )
-        db.session.add(novo)
-        db.session.commit()
-        return redirect(url_for('lista_pombos'))
+        try:
+            novo = Pombo(
+                anilha=anilha_in,
+                nome=request.form.get('nome'),
+                ano=int(request.form.get('ano') or 0),
+                sexo=request.form.get('sexo'),
+                cor=request.form.get('cor'),
+                categoria=request.form.get('categoria'),
+                pai=request.form.get('pai'),
+                mae=request.form.get('mae'),
+                obs=request.form.get('obs'),
+                oculto=True if request.form.get('oculto') == 'on' else False,
+                user_id=current_user.id
+            )
+            db.session.add(novo)
+            db.session.commit()
+            return redirect(url_for('lista_pombos'))
+        except:
+            db.session.rollback()
+            flash("Erro ao gravar dados.", "danger")
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
 
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
-
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
-
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+    pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    return render_template("pombos.html", pombos=pombos, titulo="MEU POMBAL")
 
 @app.route("/pedigree/gerar")
 @login_required
@@ -159,16 +142,24 @@ def register():
         email = request.form.get('email').lower()
         password = request.form.get('password')
         confirm = request.form.get('confirm_password')
+
         if password != confirm:
             flash("As passwords não coincidem!", "danger")
             return redirect(url_for('register'))
+
         if User.query.filter_by(email=email).first():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(password))
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
+            
+        try:
+            new_user = User(email=email, password_hash=generate_password_hash(password))
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash("Erro ao criar conta. Tente limpar a base de dados.", "danger")
+            
     return render_template('register.html')
 
 @app.route('/logout')
@@ -177,4 +168,6 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
