@@ -12,62 +12,80 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
+    /* Força as opções de seleção a ficarem a preto */
+    select.caixa-input {
+        color: #000000 !important;
+    }
+
     select.caixa-input:invalid {
         color: #999999 !important;
+    }
+
+    select.caixa-input option {
+        color: #000000 !important;
     }
 </style>
 
 <div class="row justify-content-center">
     <div class="col-auto">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         <div class="card shadow border-0" style="border-radius: 10px;">
             <div class="card-body p-4 p-md-5">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST">
-                    <div class="row g-3 mb-4">
+                    <div class="row g-3 mb-4 text-uppercase fw-bold small">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">Nº ANILHA:</label>
+                            <label class="form-label">Nº ANILHA:</label>
                             <input type="text" name="anilha" class="form-control caixa-input" maxlength="12"
                                 style="width: 140px;" required>
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">ANO:</label>
+                            <label class="form-label">ANO:</label>
                             <select name="ano" id="pomboAno" class="form-select caixa-input" style="width: 110px;"
                                 required onchange="filtrarPais()">
                                 <option value="" selected disabled hidden>Escolha...</option>
-                                {% if anos_lista %}
                                 {% for ano in anos_lista %}
                                 <option value="{{ ano }}">{{ ano }}</option>
                                 {% endfor %}
-                                {% endif %}
                             </select>
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">NOME:</label>
+                            <label class="form-label">NOME:</label>
                             <input type="text" name="nome" class="form-control caixa-input" maxlength="40"
-                                style="width: 250px;">
+                                style="width: 350px;">
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">COR:</label>
+                            <label class="form-label">COR:</label>
                             <input type="text" name="cor" class="form-control caixa-input" maxlength="40"
                                 style="width: 310px;">
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-4 align-items-start">
+                    <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-start">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">Nº PAI:</label>
+                            <label class="form-label">Nº PAI:</label>
                             <input type="text" name="pai" id="paiInput" class="form-control caixa-input" maxlength="12"
                                 style="width: 140px;" list="listaPais">
                             <datalist id="listaPais"></datalist>
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">Nº MÃE:</label>
+                            <label class="form-label">Nº MÃE:</label>
                             <input type="text" name="mae" id="maeInput" class="form-control caixa-input" maxlength="12"
                                 style="width: 140px;" list="listaMaes">
                             <datalist id="listaMaes"></datalist>
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">SEXO:</label>
+                            <label class="form-label">SEXO:</label>
                             <select name="sexo" class="form-select caixa-input" style="width: 140px;" required>
                                 <option value="" selected disabled hidden>Escolha...</option>
                                 <option value="Macho">Macho</option>
@@ -76,7 +94,7 @@
                             </select>
                         </div>
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">CATEGORIA:</label>
+                            <label class="form-label">CATEGORIA:</label>
                             <select name="categoria" id="categoriaSelect" class="form-select caixa-input"
                                 style="width: 150px;" required onchange="toggleCedido()">
                                 <option value="" selected disabled hidden>Escolha...</option>
@@ -85,27 +103,25 @@
                                 <option value="Cedido">Cedido</option>
                             </select>
                             <div id="cedidoGroup" style="display: none; margin-top: 15px;">
-                                <label class="form-label fw-bold small">A QUEM CEDEU:</label>
+                                <label class="form-label">A QUEM CEDEU:</label>
                                 <input type="text" name="cedido_a" id="cedidoInput" class="form-control caixa-input"
                                     style="width: 310px;" onblur="esconderCedido()">
                             </div>
                         </div>
 
-                        <div class="col-auto d-flex align-items-center h-100 pt-4">
+                        <div class="col-auto pt-4">
                             <div class="form-check d-flex align-items-center">
                                 <input class="form-check-input border-secondary me-2" type="checkbox" name="oculto"
-                                    id="checkOculto" style="margin-top: 0; transform: scale(1.2);">
-                                <label class="form-check-label fw-bold small text-uppercase" for="checkOculto">
-                                    Ocultar pombo
-                                </label>
+                                    id="checkOculto" style="transform: scale(1.2);">
+                                <label class="form-check-label" for="checkOculto">OCULTAR POMBO</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-auto d-flex align-items-center gap-4">
+                        <div class="col-auto d-flex align-items-center gap-4 fw-bold small">
                             <div>
-                                <label class="form-label fw-bold small">Descrição para o pedigree...</label>
+                                <label class="form-label">Descrição para o pedigree...</label>
                                 <textarea name="obs" class="form-control caixa-input"
                                     style="width: 250px; height: 250px; resize: none; overflow: hidden; line-height: 1.25;"
                                     maxlength="230" oninput="limitarAltura(this)"></textarea>
@@ -125,7 +141,7 @@
 
 <script>
     const todosPombos = [
-        {% if pombos_user is defined and pombos_user %}
+        {% if pombos_user %}
     {% for p in pombos_user %}
     { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
     {% endfor %}
@@ -153,9 +169,8 @@
     function toggleCedido() {
         const sel = document.getElementById("categoriaSelect");
         const div = document.getElementById("cedidoGroup");
-        const input = document.getElementById("cedidoInput");
-        if (sel.value === "Cedido") { div.style.display = "block"; input.focus(); }
-        else { div.style.display = "none"; input.value = ""; }
+        if (sel.value === "Cedido") { div.style.display = "block"; document.getElementById("cedidoInput").focus(); }
+        else { div.style.display = "none"; }
     }
 
     function esconderCedido() {
