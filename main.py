@@ -50,7 +50,7 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
-    cedido_a = db.Column(db.String(100)) # <-- PREPARADO PARA RECEBER O CEDIDO
+    cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -75,6 +75,8 @@ def login():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    # Garante que qualquer login anterior é limpo ao tentar criar conta nova
+    logout_user() 
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
@@ -83,19 +85,9 @@ def register():
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada com sucesso! Faça login.", "success")
+        flash("Conta criada com sucesso! Faça login para entrar.", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
@@ -107,8 +99,7 @@ def novo_pombo():
             ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), categoria=request.form.get('categoria'),
             pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'), 
-            cedido_a=request.form.get('cedido_a'), # <-- GUARDA O NOME DA PESSOA
+            obs=request.form.get('obs'), cedido_a=request.form.get('cedido_a'),
             user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
@@ -117,43 +108,12 @@ def novo_pombo():
         return redirect(url_for('lista_pombos'))
     return render_template("pombo_form.html", anos_lista=anos_lista)
 
-@app.route("/lista_pombos")
-@login_required
+@app.route("/lista_pombos") @login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
-
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
-
-@app.route("/pedigree/gerar")
-@login_required
-def gerar_pedigree():
-    return render_template("gerar_pedigree.html")
-
-@app.route("/logout")
-@login_required
+@app.route("/logout") @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -163,7 +123,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados criada com sucesso!</h3><p>Volte à página inicial.</p>"
+    return "Base de dados reiniciada."
 
 if __name__ == "__main__":
     app.run(debug=True)
