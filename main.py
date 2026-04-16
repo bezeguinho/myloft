@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração de Base de Dados Robusta (Vercel + SSL)
+# Configuração de Base de Dados (Vercel Postgres exige SSL)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS (Tudo num só ficheiro para evitar erros de importação no Vercel) ---
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +55,7 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Cria tabelas se não existirem
+# Tenta criar tabelas no arranque
 with app.app_context():
     db.create_all()
 
@@ -72,7 +72,7 @@ def login():
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
             return redirect(url_for('index'))
-        flash("Email ou Password incorretos.", "danger")
+        flash("Dados incorretos.", "danger")
     return render_template('login.html')
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -80,12 +80,12 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
-            flash("Este email já está registado.", "danger")
+            flash("Email já registado.", "danger")
             return redirect(url_for('register'))
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada com sucesso! Por favor, faça login.", "success")
+        flash("Conta criada! Faça login.", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -146,8 +146,7 @@ def pombos_ocultos():
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/logout")
-@login_required
+@app.route("/logout") @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -157,7 +156,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados reiniciada."
+    return "Base de dados limpa."
 
 if __name__ == "__main__":
     app.run(debug=True)

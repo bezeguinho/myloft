@@ -5,34 +5,31 @@
         <div class="card shadow border-0 p-5" style="border-radius: 15px;">
             <div class="row align-items-center">
                 <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
-                    <div class="bg-secondary d-flex align-items-center justify-content-center mx-auto shadow-sm"
+                    <div class="bg-secondary d-flex align-items-center justify-content-center mx-auto shadow"
                         style="width: 220px; height: 220px; border-radius: 10px; cursor: pointer;">
-                        <i class="bi bi-camera-fill text-white display-2"></i>
+                        <i class="bi bi-person-bounding-box text-white" style="font-size: 80px;"></i>
                     </div>
                     <p class="small text-muted mt-3 text-uppercase fw-bold">Alterar Foto</p>
                 </div>
                 <div class="col-12 col-md-8 ps-md-5">
-                    <h2 class="text-primary fw-bold text-uppercase mb-4">Perfil do Columbófilo</h2>
+                    <h2 class="text-primary fw-bold text-uppercase mb-4">Os Meus Dados</h2>
                     <div class="row g-4 text-uppercase fw-bold small">
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
-                            <span class="text-muted">NOME:</span>
-                            <span class="text-dark">{{ utilizador.nome }}</span>
+                            <span class="text-muted">NOME DO COLUMBÓFILO:</span>
+                            <span class="text-dark fs-5">{{ utilizador.nome }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted">LOCALIDADE:</span>
-                            <span class="text-dark">{{ utilizador.localidade or '---' }}</span>
+                            <span class="text-dark fs-5">{{ utilizador.localidade or '---' }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted">EMAIL:</span>
-                            <span class="text-dark">{{ current_user.email }}</span>
+                            <span class="text-dark fs-5">{{ current_user.email }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted">TELEFONE:</span>
-                            <span class="text-dark">{{ utilizador.telefone or '---' }}</span>
+                            <span class="text-dark fs-5">{{ utilizador.telefone or '---' }}</span>
                         </div>
-                    </div>
-                    <div class="mt-5 text-end">
-                        <button class="btn btn-executar px-4 shadow-sm">EDITAR PERFIL</button>
                     </div>
                 </div>
             </div>
