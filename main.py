@@ -1,4 +1,5 @@
 import os
+import re # Ferramenta nova para ler o número da anilha!
 import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -64,9 +65,8 @@ def handle_exception(e):
     return f"""
     <div style="font-family: sans-serif; text-align: center; padding: 50px; background-color: #f8f9fa; height: 100vh;">
         <h1 style="color: #dc3545;">Temos de Atualizar a Base de Dados</h1>
-        <p style="font-size: 18px;">Como adicionámos a opção "Cedido a", a base de dados precisa de ser reiniciada para aceitar esta nova gaveta.</p>
         <br>
-        <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
             CLICAR AQUI PARA ATUALIZAR E RESOLVER
         </a>
         <p style="margin-top: 40px; color: #6c757d; font-size: 12px;">Detalhe técnico do erro: {str(e)}</p>
@@ -119,20 +119,46 @@ def ver_dados():
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
+    
+    # --- SISTEMA INTELIGENTE DA PRÓXIMA ANILHA ---
+    proxima_anilha = ""
+    ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
+    
+    if ultimo_pombo and ultimo_pombo.anilha:
+        # Tenta encontrar números no final da anilha
+        match = re.search(r'(\d+)$', ultimo_pombo.anilha)
+        if match:
+            numero_novo = int(match.group(1)) + 1
+            tamanho = len(match.group(1))
+            proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
+        else:
+            proxima_anilha = ultimo_pombo.anilha + "-1"
+
     if request.method == 'POST':
+        # Se o utilizador carregou no Enter e deixou o campo em branco, usamos a sugerida
+        anilha_final = request.form.get('anilha')
+        if not anilha_final:
+            anilha_final = request.form.get('anilha_sugerida')
+            
         novo = Pombo(
-            anilha=request.form.get('anilha'), nome=request.form.get('nome'),
-            ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
-            cor=request.form.get('cor'), categoria=request.form.get('categoria'),
-            pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'), cedido_a=request.form.get('cedido_a'),
+            anilha=anilha_final, 
+            nome=request.form.get('nome'),
+            ano=int(request.form.get('ano') or 0), 
+            sexo=request.form.get('sexo'),
+            cor=request.form.get('cor'), 
+            categoria=request.form.get('categoria'),
+            pai=request.form.get('pai'), 
+            mae=request.form.get('mae'),
+            obs=request.form.get('obs'), 
+            cedido_a=request.form.get('cedido_a'),
             user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
         db.session.add(novo)
         db.session.commit()
         return redirect(url_for('lista_pombos'))
-    return render_template("pombo_form.html", anos_lista=anos_lista)
+        
+    return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
 
 @app.route("/lista_pombos")
 @login_required
