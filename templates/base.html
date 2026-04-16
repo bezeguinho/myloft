@@ -29,6 +29,14 @@
       font-size: 1.6rem;
     }
 
+    /* HOVER NOS MENUS */
+    @media (min-width: 992px) {
+      .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+      }
+    }
+
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
@@ -39,9 +47,26 @@
       transition: 0.2s;
     }
 
-    .nav-link:hover {
+    .nav-link:hover,
+    .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
+    }
+
+    .dropdown-menu {
+      background-color: var(--azul-myloft) !important;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .dropdown-item {
+      color: #ffffff !important;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 8px 15px;
+      text-transform: uppercase;
     }
 
     .btn-executar {
@@ -82,10 +107,22 @@
         <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto text-uppercase fw-bold">
+        <ul class="navbar-nav ms-auto text-uppercase fw-bold align-items-center">
           {% if current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('lista_pombos') }}">MEU POMBAL</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos">GESTÃO DE POMBOS</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
+              <li>
+                <hr class="dropdown-divider border-white">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('reprodutores') }}">REPRODUTORES</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('voadores') }}">VOADORES</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('cedidos') }}">CEDIDOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
+            </ul>
+          </li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
@@ -95,6 +132,13 @@
     </div>
   </nav>
   <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+      {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}{% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

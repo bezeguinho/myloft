@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -8,6 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# --- LIGAÇÃO DB COM PROTEÇÃO VERCEL ---
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith('postgres://'):
@@ -24,6 +26,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# --- MODELOS (Inclui o novo campo "cedido_a") ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -50,7 +53,7 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
-    cedido_a = db.Column(db.String(100))
+    cedido_a = db.Column(db.String(100)) # A GAVETA NOVA
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -58,6 +61,23 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# --- O NOSSO AIRBAG (Impede o Erro 500 de aparecer) ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Se houver erro, mostra um ecrã amigável com um botão para limpar a DB
+    return f"""
+    <div style="font-family: sans-serif; text-align: center; padding: 50px; background-color: #f8f9fa; height: 100vh;">
+        <h1 style="color: #dc3545;">Temos de Atualizar a Base de Dados</h1>
+        <p style="font-size: 18px;">Como adicionámos a opção "Cedido a", a base de dados precisa de ser reiniciada para aceitar esta nova gaveta.</p>
+        <br>
+        <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            CLICAR AQUI PARA ATUALIZAR E RESOLVER
+        </a>
+        <p style="margin-top: 40px; color: #6c757d; font-size: 12px;">Detalhe técnico do erro: {str(e)}</p>
+    </div>
+    """, 500
+
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -75,8 +95,8 @@ def login():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    # Garante que qualquer login anterior é limpo ao tentar criar conta nova
-    logout_user() 
+    if current_user.is_authenticated:
+        logout_user() # Garante que estás desligado ao criar conta
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
@@ -85,9 +105,19 @@ def register():
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada com sucesso! Faça login para entrar.", "success")
+        flash("Conta criada com sucesso! Por favor, faça login.", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
@@ -113,6 +143,30 @@ def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
+@app.route("/reprodutores") @login_required
+def reprodutores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+
+@app.route("/voadores") @login_required
+def voadores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+
+@app.route("/cedidos") @login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos") @login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+@app.route("/pedigree/gerar") @login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
 @app.route("/logout") @login_required
 def logout():
     logout_user()
@@ -123,7 +177,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados reiniciada."
+    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site e fazer Login</a></p>"
 
 if __name__ == "__main__":
     app.run(debug=True)
