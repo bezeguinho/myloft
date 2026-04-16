@@ -1,16 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    .caixa-input {
-        border: 1px solid #777777 !important;
-        background-color: #fdfdfd !important;
-        color: #000000 !important;
-    }
-
-    .caixa-input:focus {
-        border-color: var(--azul-myloft) !important;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-    }
+    .caixa-input { border: 1px solid #777777 !important; background-color: #fdfdfd !important; color: #000000 !important; }
+    .caixa-input:focus { border-color: var(--azul-myloft) !important; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; }
 </style>
 <div class="row justify-content-center">
     <div class="col-auto">
@@ -21,8 +13,7 @@
                     <div class="row g-3 mb-4 text-uppercase fw-bold small">
                         <div class="col-auto">
                             <label class="form-label">Nº ANILHA:</label>
-                            <input type="text" name="anilha" class="form-control caixa-input" style="width: 140px;"
-                                required autofocus>
+                            <input type="text" name="anilha" class="form-control caixa-input" style="width: 140px;" required autofocus>
                         </div>
                         <div class="col-auto">
                             <label class="form-label">ANO:</label>
@@ -42,6 +33,7 @@
                             <input type="text" name="cor" class="form-control caixa-input" style="width: 310px;">
                         </div>
                     </div>
+                    
                     <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-center">
                         <div class="col-auto">
                             <label class="form-label">Nº PAI:</label>
@@ -51,41 +43,47 @@
                             <label class="form-label">Nº MÃE:</label>
                             <input type="text" name="mae" class="form-control caixa-input" style="width: 140px;">
                         </div>
+                        
                         <div class="col-auto">
                             <label class="form-label">SEXO:</label>
                             <select name="sexo" class="form-select caixa-input" style="width: 140px;" required>
                                 <option value="" selected disabled hidden>Escolha..</option>
                                 <option value="Macho">Macho</option>
                                 <option value="Fêmea">Fêmea</option>
-                            </select>
+                                <option value="Indefinido">Indefinido</option> </select>
                         </div>
+                        
                         <div class="col-auto">
                             <label class="form-label">CATEGORIA:</label>
-                            <select name="categoria" class="form-select caixa-input" style="width: 150px;" required>
+                            <select name="categoria" id="categoriaSelect" class="form-select caixa-input" style="width: 150px;" required onchange="verificarCategoria()">
                                 <option value="" selected disabled hidden>Escolha..</option>
                                 <option value="Voador">Voadores</option>
                                 <option value="Reprodutor">Reprodutores</option>
                                 <option value="Cedido">Cedido</option>
                             </select>
                         </div>
+
+                        <div class="col-auto" id="caixaCedidoA" style="display: none;">
+                            <label class="form-label text-danger">CEDIDO A:</label>
+                            <input type="text" name="cedido_a" id="inputCedidoA" class="form-control caixa-input border-danger" style="width: 250px;" placeholder="Nome da pessoa...">
+                        </div>
+                        
                         <div class="col-auto pt-4">
                             <div class="d-flex align-items-center bg-light p-2 rounded border shadow-sm">
                                 <label class="form-check-label me-3" for="checkOculto">OCULTAR POMBO?</label>
-                                <input class="form-check-input border-secondary" type="checkbox" name="oculto"
-                                    id="checkOculto" style="transform: scale(1.3);">
+                                <input class="form-check-input border-secondary" type="checkbox" name="oculto" id="checkOculto" style="transform: scale(1.3);">
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row g-3">
                         <div class="col-auto">
                             <label class="form-label fw-bold small">DESCRIÇÃO PARA O PEDIGREE...</label>
-                            <textarea name="obs" class="form-control caixa-input"
-                                style="width: 250px; height: 250px; resize: none;"></textarea>
+                            <textarea name="obs" class="form-control caixa-input" style="width: 250px; height: 250px; resize: none;"></textarea>
                         </div>
                         <div class="col-auto d-flex flex-column justify-content-end gap-3" style="width: 200px;">
                             <button type="submit" class="btn btn-executar btn-lg shadow w-100">GRAVAR</button>
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-retroceder btn-lg shadow w-100">VOLTAR</a>
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg shadow w-100">VOLTAR</a>
                         </div>
                     </div>
                 </form>
@@ -93,4 +91,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function verificarCategoria() {
+        var dropdown = document.getElementById("categoriaSelect");
+        var caixa = document.getElementById("caixaCedidoA");
+        var input = document.getElementById("inputCedidoA");
+
+        if (dropdown.value === "Cedido") {
+            caixa.style.display = "block"; // Mostra a caixa
+            input.focus(); // Coloca o cursor a piscar lá dentro
+        } else {
+            caixa.style.display = "none"; // Esconde a caixa
+            input.value = ""; // Apaga o texto se mudares de ideias
+        }
+    }
+</script>
 {% endblock %}

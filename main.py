@@ -8,7 +8,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- LIGAÇÃO DB COM PROTEÇÃO ---
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith('postgres://'):
@@ -25,7 +24,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +50,7 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
+    cedido_a = db.Column(db.String(100)) # <-- PREPARADO PARA RECEBER O CEDIDO
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -59,7 +58,6 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -109,7 +107,9 @@ def novo_pombo():
             ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), categoria=request.form.get('categoria'),
             pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'), user_id=current_user.id,
+            obs=request.form.get('obs'), 
+            cedido_a=request.form.get('cedido_a'), # <-- GUARDA O NOME DA PESSOA
+            user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
         db.session.add(novo)
@@ -163,7 +163,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados criada!</h3><p>Volte à página inicial.</p>"
+    return "<h3>Base de Dados criada com sucesso!</h3><p>Volte à página inicial.</p>"
 
 if __name__ == "__main__":
     app.run(debug=True)
