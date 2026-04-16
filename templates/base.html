@@ -5,9 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MYLOFT</title>
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
     :root {
       --azul-myloft: #0d6efd;
@@ -29,7 +27,6 @@
       margin-right: 2rem;
     }
 
-    /* HOVER AUTOMÁTICO */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -37,7 +34,6 @@
       }
     }
 
-    /* PADRÃO MYLOFT */
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
@@ -49,7 +45,6 @@
       display: inline-block;
     }
 
-    /* HOVER: Fundo amarelo, letra preta */
     .nav-link:hover,
     .dropdown-item:hover {
       background-color: #ffc107 !important;
@@ -104,21 +99,16 @@
 </head>
 
 <body>
-
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
       <a class="navbar-brand fs-4" href="{{ url_for('index') }}">MYLOFT</a>
-
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button">
-              GESTÃO DE POMBOS
-            </a>
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button">GESTÃO DE POMBOS</a>
             <ul class="dropdown-menu shadow">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
@@ -131,30 +121,18 @@
               <li><a class="dropdown-item" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
           {% if current_user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
           {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">ENTRAR</a></li>
           {% endif %}
         </ul>
       </div>
     </div>
   </nav>
-
-  <div class="container">
-    {% block content %}{% endblock %}
-  </div>
-
+  <div class="container">{% block content %}{% endblock %}</div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

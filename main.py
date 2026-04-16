@@ -8,7 +8,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração da Base de Dados (Postgres ou SQLite)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -19,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,14 +53,12 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Criação das tabelas
 with app.app_context():
     try:
         db.create_all()
     except Exception as e:
         print("Erro DB:", e)
 
-# --- ROTAS ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
@@ -86,7 +82,6 @@ def novo_pombo():
     
     if request.method == 'POST':
         anilha_input = request.form.get('anilha')
-        # VALIDAÇÃO: Existe esta anilha para ESTE utilizador?
         pombo_existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
         
         if pombo_existente:
@@ -136,4 +131,24 @@ def voadores():
 @app.route("/cedidos")
 @login_required
 def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido",
+    # LINHA 139 CORRIGIDA AQUI:
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos")
+@login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+@app.route("/pedigree/gerar")
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    # Se não existir perfil, cria um básico para evitar Erro 500
+    if

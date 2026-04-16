@@ -12,7 +12,6 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
-    /* Força as opções de seleção a ficarem a preto */
     select.caixa-input {
         color: #000000 !important;
     }
@@ -25,20 +24,17 @@
         color: #000000 !important;
     }
 </style>
-
 <div class="row justify-content-center">
     <div class="col-auto">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
         <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
         {% endif %}
         {% endwith %}
-
         <div class="card shadow border-0" style="border-radius: 10px;">
             <div class="card-body p-4 p-md-5">
                 <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
@@ -62,7 +58,7 @@
                         <div class="col-auto">
                             <label class="form-label">NOME:</label>
                             <input type="text" name="nome" class="form-control caixa-input" maxlength="40"
-                                style="width: 350px;">
+                                style="width: 380px;">
                         </div>
                         <div class="col-auto">
                             <label class="form-label">COR:</label>
@@ -70,7 +66,6 @@
                                 style="width: 310px;">
                         </div>
                     </div>
-
                     <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-start">
                         <div class="col-auto">
                             <label class="form-label">Nº PAI:</label>
@@ -108,7 +103,6 @@
                                     style="width: 310px;" onblur="esconderCedido()">
                             </div>
                         </div>
-
                         <div class="col-auto pt-4">
                             <div class="form-check d-flex align-items-center">
                                 <input class="form-check-input border-secondary me-2" type="checkbox" name="oculto"
@@ -117,7 +111,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row g-3">
                         <div class="col-auto d-flex align-items-center gap-4 fw-bold small">
                             <div>
@@ -138,26 +131,16 @@
         </div>
     </div>
 </div>
-
 <script>
-    const todosPombos = [
-        {% if pombos_user %}
-    {% for p in pombos_user %}
-    { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" },
-    {% endfor %}
-    {% endif %}
-];
-
+    const todosPombos = [{% if pombos_user %} {% for p in pombos_user %} { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" }, {% endfor %} {% endif %} ];
     function filtrarPais() {
         const anoSel = parseInt(document.getElementById('pomboAno').value);
-        const dPai = document.getElementById('listaPais');
-        const dMae = document.getElementById('listaMaes');
+        const dPai = document.getElementById('listaPais'); const dMae = document.getElementById('listaMaes');
         dPai.innerHTML = ""; dMae.innerHTML = "";
         if (!isNaN(anoSel)) {
             todosPombos.forEach(p => {
                 if (p.ano <= anoSel) {
-                    let opt = document.createElement('option');
-                    opt.value = p.anilha;
+                    let opt = document.createElement('option'); opt.value = p.anilha;
                     if (p.sexo === "Macho") dPai.appendChild(opt);
                     else if (p.sexo === "Fêmea") dMae.appendChild(opt);
                     else { dPai.appendChild(opt.cloneNode(true)); dMae.appendChild(opt.cloneNode(true)); }
@@ -165,19 +148,16 @@
             });
         }
     }
-
     function toggleCedido() {
         const sel = document.getElementById("categoriaSelect");
         const div = document.getElementById("cedidoGroup");
         if (sel.value === "Cedido") { div.style.display = "block"; document.getElementById("cedidoInput").focus(); }
         else { div.style.display = "none"; }
     }
-
     function esconderCedido() {
         const input = document.getElementById("cedidoInput");
         if (input.value.trim() === "") { document.getElementById("cedidoGroup").style.display = "none"; document.getElementById("categoriaSelect").value = ""; }
     }
-
     let textoAnterior = "";
     function limitarAltura(textarea) {
         if (textarea.scrollHeight > textarea.clientHeight) { textarea.value = textoAnterior; }
