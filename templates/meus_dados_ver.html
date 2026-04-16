@@ -7,13 +7,13 @@
                 <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
                     <div class="bg-secondary d-flex align-items-center justify-content-center mx-auto shadow"
                         style="width: 220px; height: 220px; border-radius: 10px; cursor: pointer;">
-                        <i class="bi bi-person-fill text-white" style="font-size: 80px;"></i>
+                        <i class="bi bi-person-bounding-box text-white" style="font-size: 80px;"></i>
                     </div>
                     <button class="btn btn-sm btn-outline-primary mt-3 text-uppercase fw-bold">Alterar Foto</button>
                 </div>
 
                 <div class="col-12 col-md-8 ps-md-5">
-                    <h2 class="text-primary fw-bold text-uppercase mb-4">Perfil do Columbófilo</h2>
+                    <h2 class="text-primary fw-bold text-uppercase mb-4">Os Meus Dados</h2>
                     <div class="row g-4 text-uppercase fw-bold">
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted small">NOME:</span>
@@ -21,19 +21,19 @@
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted small">LOCALIDADE:</span>
-                            <span class="text-dark">{{ utilizador.localidade or '---' }}</span>
+                            <span class="text-dark fs-5">{{ utilizador.localidade or 'Não Definida' }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted small">EMAIL:</span>
-                            <span class="text-dark">{{ current_user.email }}</span>
+                            <span class="text-dark fs-5">{{ current_user.email }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
                             <span class="text-muted small">TELEFONE:</span>
-                            <span class="text-dark">{{ utilizador.telefone or '---' }}</span>
+                            <span class="text-dark fs-5">{{ utilizador.telefone or 'Não Definido' }}</span>
                         </div>
                     </div>
-                    <div class="mt-4 text-end">
-                        <button class="btn btn-executar px-4 shadow-sm">EDITAR DADOS</button>
+                    <div class="mt-5 text-end">
+                        <button class="btn btn-executar px-4 py-2 shadow-sm">EDITAR PERFIL</button>
                     </div>
                 </div>
             </div>

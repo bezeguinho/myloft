@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+<div class="row justify-content-center align-items-center" style="min-height: 65vh;">
   <div class="col-12 text-center">
     <h1 class="display-1 fw-bold text-primary mb-3">MYLOFT</h1>
-    <h2 class="text-muted fw-light">Gestão da tua colónia</h2>
+    <h2 class="text-muted fw-light mb-5">Gestão da tua colónia</h2>
 
     {% if not current_user.is_authenticated %}
-    <div class="d-flex justify-content-center gap-4 mt-5">
-      <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 shadow">ENTRAR</a>
-      <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 shadow">CRIAR CONTA</a>
+    <div class="d-flex justify-content-center gap-4">
+      <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">ENTRAR</a>
+      <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 py-3 shadow">CRIAR CONTA</a>
     </div>
     {% endif %}
   </div>
