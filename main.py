@@ -64,7 +64,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Sucesso!</h3><p>Base de dados limpa.</p>"
+    return "<h3>Sucesso!</h3><p>Base de dados limpa. Faz novo registo.</p>"
 
 @app.route("/")
 def index():
@@ -83,7 +83,6 @@ def novo_pombo():
     if request.method == 'POST':
         anilha_input = request.form.get('anilha')
         pombo_existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
-        
         if pombo_existente:
             flash("Pombo já existente no seu pombal!", "danger")
         else:
@@ -105,7 +104,7 @@ def novo_pombo():
                 db.session.add(novo)
                 db.session.commit()
                 return redirect(url_for('lista_pombos'))
-            except Exception:
+            except:
                 db.session.rollback()
                 flash("Erro ao gravar.", "danger")
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=meus_pombos)
@@ -131,7 +130,6 @@ def voadores():
 @app.route("/cedidos")
 @login_required
 def cedidos():
-    # LINHA 139 CORRIGIDA AQUI:
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
@@ -150,5 +148,41 @@ def gerar_pedigree():
 @login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    # Se não existir perfil, cria um básico para evitar Erro 500
-    if
+    if not utilizador:
+        utilizador = Utilizador(nome="Meu Pombal", user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
+@app.route("/meus-dados/editar")
+@login_required
+def editar_dados():
+    return render_template("editar_dados.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
