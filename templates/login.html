@@ -1,41 +1,26 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+    <div class="col-12 col-md-5 col-lg-4">
         <div class="card shadow border-0" style="border-radius: 10px;">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold text-primary">ENTRAR</h2>
-                    <p class="text-muted">Aceda à sua conta MYLOFT</p>
-                </div>
-
+            <div class="card-body p-4 p-md-5">
+                <h2 class="fw-bold text-primary mb-4 text-center text-uppercase">Entrar</h2>
                 <form method="POST">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Email</label>
-                        <input type="email" name="email" class="form-control bg-light" placeholder="seu@email.com"
-                            required>
+                        <label class="form-label fw-bold small text-muted">EMAIL</label>
+                        <input type="email" name="email" class="form-control p-3" style="background: #f8f9fa;" required>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control bg-light" required>
+                        <label class="form-label fw-bold small text-muted">PASSWORD</label>
+                        <input type="password" name="password" class="form-control p-3" style="background: #f8f9fa;"
+                            required>
                     </div>
-
-                    <div class="d-grid gap-3">
-                        <button type="submit" class="btn btn-executar btn-lg w-100 shadow">
-                            ENTRAR
-                        </button>
-
-                        <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg w-100 shadow">
-                            <i class="bi bi-arrow-left"></i> VOLTAR
-                        </a>
+                    <button type="submit" class="btn btn-executar w-100 p-3 mb-3 shadow">ENTRAR NA CONTA</button>
+                    <div class="text-center small">
+                        <span class="text-muted">Ainda não tem conta?</span>
+                        <a href="{{ url_for('register') }}" class="fw-bold text-primary">Registe-se aqui</a>
                     </div>
                 </form>
-
-                <div class="mt-4 text-center">
-                    <p class="mb-0">Não tem conta? <a href="{{ url_for('register') }}"
-                            class="text-primary fw-bold text-decoration-none">Registe-se aqui</a></p>
-                </div>
             </div>
         </div>
     </div>

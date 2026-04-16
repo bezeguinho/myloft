@@ -8,7 +8,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração da Base de Dados
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -19,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +36,8 @@ class Utilizador(db.Model):
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
-    anilha = db.Column(db.String(50), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) # Nova Chave Primária
+    anilha = db.Column(db.String(50), nullable=False)
     nome = db.Column(db.String(100))
     ano = db.Column(db.Integer, nullable=False)
     sexo = db.Column(db.String(20), nullable=False)
@@ -59,15 +58,14 @@ with app.app_context():
     try:
         db.create_all()
     except Exception as e:
-        print("Erro ao criar tabelas:", e)
+        print("Erro DB:", e)
 
-# --- ROTAS ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados Reiniciada!</h3><p>Crie um novo registo agora.</p>"
+    return "<h3>Base de Dados Reiniciada!</h3><p>Crie um novo registo.</p>"
 
 @app.route("/")
 def index():
@@ -85,32 +83,35 @@ def novo_pombo():
     
     if request.method == 'POST':
         anilha_input = request.form.get('anilha')
-        # Validação de anilha por utilizador
-        pombo_existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
-        if pombo_existente:
-            flash("Pombo já existente no seu pombal!", "danger")
-        else:
-            try:
-                novo = Pombo(
-                    anilha=anilha_input,
-                    nome=request.form.get('nome'),
-                    ano=int(request.form.get('ano') or 0),
-                    sexo=request.form.get('sexo'),
-                    cor=request.form.get('cor'),
-                    categoria=request.form.get('categoria'),
-                    pai=request.form.get('pai'),
-                    mae=request.form.get('mae'),
-                    obs=request.form.get('obs'),
-                    cedido_a=request.form.get('cedido_a'),
-                    oculto=True if request.form.get('oculto') == 'on' else False,
-                    user_id=current_user.id
-                )
-                db.session.add(novo)
-                db.session.commit()
-                return redirect(url_for('lista_pombos'))
-            except:
-                db.session.rollback()
-                flash("Erro ao gravar pombo.", "danger")
+        # LÓGICA PROFISSIONAL: Bloqueia apenas se a anilha já existir PARA ESTE USER
+        existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
+        
+        if existente:
+            flash("Pombo existente", "danger")
+            return redirect(url_for('novo_pombo'))
+        
+        try:
+            novo = Pombo(
+                anilha=anilha_input,
+                nome=request.form.get('nome'),
+                ano=int(request.form.get('ano') or 0),
+                sexo=request.form.get('sexo'),
+                cor=request.form.get('cor'),
+                categoria=request.form.get('categoria'),
+                pai=request.form.get('pai'),
+                mae=request.form.get('mae'),
+                obs=request.form.get('obs'),
+                cedido_a=request.form.get('cedido_a'),
+                oculto=True if request.form.get('oculto') == 'on' else False,
+                user_id=current_user.id
+            )
+            db.session.add(novo)
+            db.session.commit()
+            return redirect(url_for('lista_pombos'))
+        except:
+            db.session.rollback()
+            flash("Erro ao gravar dados.", "danger")
+            
     return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=meus_pombos)
 
 @app.route("/lista_pombos")
@@ -161,7 +162,6 @@ def ver_dados():
 @app.route("/meus-dados/editar")
 @login_required
 def editar_dados():
-    # Rota placeholder para evitar Erro 500 ao clicar no botão
     return "Página de Edição em Construção"
 
 @app.route('/login', methods=['GET', 'POST'])
