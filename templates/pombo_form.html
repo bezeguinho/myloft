@@ -15,11 +15,8 @@
     select.caixa-input {
         color: #000000 !important;
     }
-
-    select.caixa-input option {
-        color: #000000 !important;
-    }
 </style>
+
 <div class="row justify-content-center">
     <div class="col-auto">
         <div class="card shadow border-0" style="border-radius: 10px;">
@@ -35,7 +32,7 @@
                         <div class="col-auto">
                             <label class="form-label">ANO:</label>
                             <select name="ano" class="form-select caixa-input" style="width: 110px;" required>
-                                <option value="" selected disabled hidden>Escolha...</option>
+                                <option value="" selected disabled hidden>Escolha..</option>
                                 {% for ano in anos_lista %}
                                 <option value="{{ ano }}">{{ ano }}</option>
                                 {% endfor %}
@@ -43,12 +40,41 @@
                         </div>
                         <div class="col-auto">
                             <label class="form-label">NOME:</label>
-                            <input type="text" name="nome" class="form-control caixa-input" style="width: 380px;">
+                            <input type="text" name="nome" class="form-control caixa-input" style="width: 350px;">
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">COR:</label>
+                            <input type="text" name="cor" class="form-control caixa-input" style="width: 310px;">
                         </div>
                     </div>
 
                     <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-center">
                         <div class="col-auto">
+                            <label class="form-label">Nº PAI:</label>
+                            <input type="text" name="pai" class="form-control caixa-input" style="width: 140px;">
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">Nº MÃE:</label>
+                            <input type="text" name="mae" class="form-control caixa-input" style="width: 140px;">
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">SEXO:</label>
+                            <select name="sexo" class="form-select caixa-input" style="width: 140px;" required>
+                                <option value="" selected disabled hidden>Escolha..</option>
+                                <option value="Macho">Macho</option>
+                                <option value="Fêmea">Fêmea</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">CATEGORIA:</label>
+                            <select name="categoria" class="form-select caixa-input" style="width: 150px;" required>
+                                <option value="" selected disabled hidden>Escolha..</option>
+                                <option value="Voador">Voadores</option>
+                                <option value="Reprodutor">Reprodutores</option>
+                                <option value="Cedido">Cedido</option>
+                            </select>
+                        </div>
+                        <div class="col-auto pt-4">
                             <div class="d-flex align-items-center bg-light p-2 rounded border">
                                 <label class="form-check-label me-3" for="checkOculto">OCULTAR POMBO?</label>
                                 <input class="form-check-input border-secondary" type="checkbox" name="oculto"
@@ -57,9 +83,16 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn btn-executar shadow">GRAVAR</button>
-                        <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow">VOLTAR</a>
+                    <div class="row g-3">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold small">DESCRIÇÃO PARA O PEDIGREE...</label>
+                            <textarea name="obs" class="form-control caixa-input"
+                                style="width: 250px; height: 250px; resize: none;"></textarea>
+                        </div>
+                        <div class="col-auto d-flex flex-column justify-content-end gap-3" style="width: 200px;">
+                            <button type="submit" class="btn btn-executar shadow w-100">GRAVAR</button>
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow w-100">VOLTAR</a>
+                        </div>
                     </div>
                 </form>
             </div>

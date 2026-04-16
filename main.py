@@ -59,7 +59,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Sucesso!</h3><p>Base de dados limpa.</p>"
+    return "<h3>Base de Dados Limpa!</h3><p>Cria uma nova conta.</p>"
 
 @app.route("/")
 def index():
@@ -75,13 +75,15 @@ def novo_pombo():
         if Pombo.query.filter_by(anilha=anilha_in, user_id=current_user.id).first():
             flash("Pombo existente", "danger")
             return redirect(url_for('novo_pombo'))
+        
         novo = Pombo(
             anilha=anilha_in, nome=request.form.get('nome'),
             ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), categoria=request.form.get('categoria'),
             pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'), user_id=current_user.id,
-            oculto=True if request.form.get('oculto') == 'on' else False
+            obs=request.form.get('obs'), cedido_a=request.form.get('cedido_a'),
+            oculto=True if request.form.get('oculto') == 'on' else False,
+            user_id=current_user.id
         )
         db.session.add(novo)
         db.session.commit()
