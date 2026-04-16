@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração de Base de Dados (Vercel Postgres exige SSL)
+# Configuração de Base de Dados Segura
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -55,9 +55,7 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Tenta criar tabelas no arranque
-with app.app_context():
-    db.create_all()
+# AQUI ESTAVA O ERRO! Removi o db.create_all() automático que fazia o Vercel crashar.
 
 # --- ROTAS ---
 @app.route("/")
@@ -153,10 +151,11 @@ def logout():
 
 @app.route("/limpar_tudo")
 def limpar_tudo():
+    # AGORA SIM! As tabelas só são criadas quando acedes a este link manualmente!
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados limpa."
+    return "<h3>Base de dados reiniciada com sucesso! As tabelas foram criadas.</h3><p><a href='/'>Voltar ao início</a></p>"
 
 if __name__ == "__main__":
     app.run(debug=True)
