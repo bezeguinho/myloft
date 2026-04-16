@@ -140,13 +140,13 @@ def novo_pombo():
         db.session.add(novo)
         db.session.commit()
         
-        # AVISO DE SUCESSO E MANTÉM NA PÁGINA COM O PARÂMETRO 'saved=1'
+        # AQUI ESTÁ A MAGIA: Dá o aviso de sucesso e mantém-te na página com a tag saved=1
         flash(f"Pombo {anilha_final} gravado com sucesso!", "success")
         return redirect(url_for('novo_pombo', saved='1'))
         
     # --- SISTEMA INTELIGENTE (SÓ CALCULA SE ACABARES DE GRAVAR UM POMBO) ---
     proxima_anilha = ""
-    # O request.args.get('saved') verifica se a página foi carregada após uma gravação
+    # Se na barra de endereço disser que vieste de uma gravação bem sucedida:
     if request.args.get('saved') == '1':
         ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
         if ultimo_pombo and ultimo_pombo.anilha:
@@ -175,4 +175,31 @@ def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route
+@app.route("/cedidos") @login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos") @login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+@app.route("/pedigree/gerar") @login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/logout") @login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route("/limpar_tudo")
+def limpar_tudo():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
+
+if __name__ == "__main__":
+    app.run(debug=True)
