@@ -18,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -37,7 +36,7 @@ class Utilizador(db.Model):
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) 
     anilha = db.Column(db.String(50), nullable=False)
     nome = db.Column(db.String(100))
     ano = db.Column(db.Integer, nullable=False)
@@ -63,7 +62,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados Reiniciada!</h3><p>Crie um novo registo.</p>"
+    return "<h3>Base de Dados Reiniciada!</h3><p>Crie uma nova conta.</p>"
 
 @app.route("/")
 def index():
@@ -76,21 +75,22 @@ def novo_pombo():
     pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     
     if request.method == 'POST':
-        anilha = request.form.get('anilha')
-        if Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first():
+        anilha_in = request.form.get('anilha')
+        if Pombo.query.filter_by(anilha=anilha_in, user_id=current_user.id).first():
             flash("Pombo existente", "danger")
             return redirect(url_for('novo_pombo'))
         
         novo = Pombo(
-            anilha=anilha,
+            anilha=anilha_in,
             nome=request.form.get('nome'),
-            ano=int(request.form.get('ano')),
+            ano=int(request.form.get('ano') or 0),
             sexo=request.form.get('sexo'),
             cor=request.form.get('cor'),
             categoria=request.form.get('categoria'),
             pai=request.form.get('pai'),
             mae=request.form.get('mae'),
             obs=request.form.get('obs'),
+            oculto=True if request.form.get('oculto') == 'on' else False,
             user_id=current_user.id
         )
         db.session.add(novo)
@@ -101,8 +101,32 @@ def novo_pombo():
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id).all()
-    return render_template("pombos.html", pombos=pombos, titulo="MEU POMBAL")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
+
+@app.route("/reprodutores")
+@login_required
+def reprodutores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+
+@app.route("/voadores")
+@login_required
+def voadores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+
+@app.route("/cedidos")
+@login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos")
+@login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
 @app.route("/pedigree/gerar")
 @login_required
@@ -113,6 +137,10 @@ def gerar_pedigree():
 @login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(nome="Pombal", user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -131,26 +159,15 @@ def register():
         email = request.form.get('email').lower()
         password = request.form.get('password')
         confirm = request.form.get('confirm_password')
-
-        # VALIDAÇÃO DE CONFIRMAÇÃO
         if password != confirm:
             flash("As passwords não coincidem!", "danger")
             return redirect(url_for('register'))
-
         if User.query.filter_by(email=email).first():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
-            
         new_user = User(email=email, password_hash=generate_password_hash(password))
         db.session.add(new_user)
         db.session.commit()
-        
-        # Cria perfil automático
-        perfil = Utilizador(nome="Pombal Exemplo", user_id=new_user.id)
-        db.session.add(perfil)
-        db.session.commit()
-        
-        flash("Conta criada com sucesso!", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
 

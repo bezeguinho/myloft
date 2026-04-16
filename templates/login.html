@@ -14,7 +14,7 @@
                         <label class="form-label fw-bold small text-muted">PASSWORD</label>
                         <div class="input-group">
                             <input type="password" name="password" id="password"
-                                class="form-control p-3 form-control-password" style="background: #f8f9fa;" required>
+                                class="form-control p-3 border-right-none" style="background: #f8f9fa;" required>
                             <span class="input-group-text" onclick="togglePassword('password', 'eyeIcon')">
                                 <i class="bi bi-eye-slash" id="eyeIcon"></i>
                             </span>
@@ -22,28 +22,12 @@
                     </div>
                     <button type="submit" class="btn btn-executar w-100 p-3 mb-3 shadow">ENTRAR NA CONTA</button>
                     <div class="text-center small">
-                        <span class="text-muted">Ainda não tem conta?</span>
-                        <a href="{{ url_for('register') }}" class="fw-bold text-primary">Registe-se aqui</a>
+                        <span class="text-muted">Não tem conta?</span> <a href="{{ url_for('register') }}"
+                            class="fw-bold text-primary">Registe-se</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    function togglePassword(inputId, iconId) {
-        const passwordInput = document.getElementById(inputId);
-        const eyeIcon = document.getElementById(iconId);
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            eyeIcon.classList.remove("bi-eye-slash");
-            eyeIcon.classList.add("bi-eye");
-        } else {
-            passwordInput.type = "password";
-            eyeIcon.classList.remove("bi-eye");
-            eyeIcon.classList.add("bi-eye-slash");
-        }
-    }
-</script>
 {% endblock %}
