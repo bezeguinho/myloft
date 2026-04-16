@@ -18,7 +18,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -57,13 +56,6 @@ def load_user(user_id):
 
 with app.app_context():
     db.create_all()
-
-@app.route("/limpar_tudo")
-def limpar_tudo():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Base de Dados Limpa!</h3>"
 
 @app.route("/")
 def index():
@@ -113,15 +105,11 @@ def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar") @login_required
-def gerar_pedigree():
-    return render_template("gerar_pedigree.html")
-
 @app.route("/meus-dados/ver") @login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     if not utilizador:
-        utilizador = Utilizador(nome="Nome do Columbófilo", user_id=current_user.id)
+        utilizador = Utilizador(nome="Utilizador Novo", user_id=current_user.id)
         db.session.add(utilizador)
         db.session.commit()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
@@ -134,7 +122,7 @@ def login():
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
             return redirect(url_for('index'))
-        flash("Email ou Password incorretos.", "danger")
+        flash("Dados incorretos.", "danger")
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -142,19 +130,27 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
-            flash("Email já registado.", "danger")
+            flash("Email já existe.", "danger")
             return redirect(url_for('register'))
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada com sucesso! Faça login.", "success")
+        flash("Conta criada! Por favor, faça login.", "success")
         return redirect(url_for('login')) # NÃO ENTRA DIRETO
     return render_template('register.html')
 
-@app.route('/logout') @login_required
+@app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route("/pedigree/gerar") @login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/limpar_tudo")
+def limpar_tudo():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+    return "<h3>Base de Dados Limpa!</h3>"
