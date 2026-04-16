@@ -36,7 +36,7 @@ class Utilizador(db.Model):
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
-    id = db.Column(db.Integer, primary_key=True) # Nova Chave Primária
+    id = db.Column(db.Integer, primary_key=True) 
     anilha = db.Column(db.String(50), nullable=False)
     nome = db.Column(db.String(100))
     ano = db.Column(db.Integer, nullable=False)
@@ -83,7 +83,7 @@ def novo_pombo():
     
     if request.method == 'POST':
         anilha_input = request.form.get('anilha')
-        # LÓGICA PROFISSIONAL: Bloqueia apenas se a anilha já existir PARA ESTE USER
+        # BLOQUEIO: Apenas se este utilizador já tiver esta anilha
         existente = Pombo.query.filter_by(anilha=anilha_input, user_id=current_user.id).first()
         
         if existente:

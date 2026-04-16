@@ -1,19 +1,13 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
-  {% if current_user.is_authenticated %}
-  <div class="text-center">
-    <h1 class="frase-central">GESTÃO DE COLÓNIAS</h1>
-  </div>
-  {% else %}
-  <div class="text-center">
-    <h2 class="fw-bold text-primary mb-5" style="font-size: 2.5rem;">Bem-vindo ao MYLOFT</h2>
-    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="col-12 col-md-8 text-center">
+    <h1 class="display-4 fw-bold text-primary mb-5">Bem-vindo ao MYLOFT</h1>
+
+    <div class="d-flex flex-column flex-md-row justify-content-center gap-4">
       <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">ENTRAR</a>
-      <a href="{{ url_for('register') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">CRIAR CONTA</a>
+      <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 py-3 shadow">CRIAR CONTA</a>
     </div>
   </div>
-  {% endif %}
 </div>
 {% endblock %}

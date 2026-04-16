@@ -11,131 +11,28 @@
         border-color: var(--azul-myloft) !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
-
-    select.caixa-input {
-        color: #000000 !important;
-    }
-
-    select.caixa-input:invalid {
-        color: #999999 !important;
-    }
-
-    select.caixa-input option {
-        color: #000000 !important;
-    }
 </style>
 
 <div class="row justify-content-center">
     <div class="col-12 col-lg-auto">
         <div class="card shadow border-0" style="border-radius: 10px;">
             <div class="card-body p-4 p-md-5">
-                <h2 class="fw-bold text-primary mb-4 text-uppercase text-center text-md-start">Inserir Novo Pombo</h2>
+                <h2 class="fw-bold text-primary mb-4 text-uppercase">Inserir Novo Pombo</h2>
                 <form method="POST">
                     <div class="row g-3 mb-4 text-uppercase fw-bold small">
                         <div class="col-12 col-md-auto">
                             <label class="form-label">Nº ANILHA:</label>
-                            <input type="text" name="anilha" class="form-control caixa-input" maxlength="12"
+                            <input type="text" name="anilha" class="form-control caixa-input"
                                 style="width: 100%; min-width: 140px;" required autofocus>
                         </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">ANO:</label>
-                            <select name="ano" id="pomboAno" class="form-select caixa-input"
-                                style="width: 100%; min-width: 110px;" required onchange="filtrarPais()">
-                                <option value="" selected disabled hidden>Escolha...</option>
-                                {% for ano in anos_lista %}
-                                <option value="{{ ano }}">{{ ano }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">NOME:</label>
-                            <input type="text" name="nome" class="form-control caixa-input" maxlength="40"
-                                style="width: 100%; min-width: 380px;">
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">COR:</label>
-                            <input type="text" name="cor" class="form-control caixa-input" maxlength="40"
-                                style="width: 100%; min-width: 310px;">
-                        </div>
                     </div>
-
-                    <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-start">
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">Nº PAI:</label>
-                            <input type="text" name="pai" id="paiInput" class="form-control caixa-input" maxlength="12"
-                                style="width: 100%; min-width: 140px;" list="listaPais">
-                            <datalist id="listaPais"></datalist>
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">Nº MÃE:</label>
-                            <input type="text" name="mae" id="maeInput" class="form-control caixa-input" maxlength="12"
-                                style="width: 100%; min-width: 140px;" list="listaMaes">
-                            <datalist id="listaMaes"></datalist>
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">SEXO:</label>
-                            <select name="sexo" class="form-select caixa-input" style="width: 100%; min-width: 140px;"
-                                required>
-                                <option value="" selected disabled hidden>Escolha...</option>
-                                <option value="Macho">Macho</option>
-                                <option value="Fêmea">Fêmea</option>
-                                <option value="Indefinido">Indefinido</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">CATEGORIA:</label>
-                            <select name="categoria" id="categoriaSelect" class="form-select caixa-input"
-                                style="width: 100%; min-width: 150px;" required onchange="toggleCedido()">
-                                <option value="" selected disabled hidden>Escolha...</option>
-                                <option value="Voador">Voadores</option>
-                                <option value="Reprodutor">Reprodutores</option>
-                                <option value="Cedido">Cedido</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-12 d-flex flex-column flex-md-row align-items-center gap-4 fw-bold small">
-                            <div class="w-100">
-                                <label class="form-label text-capitalize">Descrição para o pedigree...</label>
-                                <textarea name="obs" class="form-control caixa-input w-100"
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                            <div class="d-flex flex-column gap-3 w-100" style="max-width: 300px;">
-                                <button type="submit" class="btn btn-executar btn-lg shadow w-100">GRAVAR</button>
-                                <a href="{{ url_for('lista_pombos') }}"
-                                    class="btn btn-retroceder btn-lg shadow w-100">VOLTAR</a>
-                            </div>
-                        </div>
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-executar btn-lg px-5 shadow">GRAVAR</button>
+                        <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg px-5 shadow">VOLTAR</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    // Mantemos a lógica de filtros de pais que já funcionava bem
-    const todosPombos = [{% if pombos_user %} {% for p in pombos_user %} { anilha: "{{ p.anilha }}", ano: { { p.ano or 0 } }, sexo: "{{ p.sexo }}" }, {% endfor %} {% endif %} ];
-    function filtrarPais() {
-        const anoSel = parseInt(document.getElementById('pomboAno').value);
-        const dPai = document.getElementById('listaPais'); const dMae = document.getElementById('listaMaes');
-        dPai.innerHTML = ""; dMae.innerHTML = "";
-        if (!isNaN(anoSel)) {
-            todosPombos.forEach(p => {
-                if (p.ano <= anoSel) {
-                    let opt = document.createElement('option'); opt.value = p.anilha;
-                    if (p.sexo === "Macho") dPai.appendChild(opt);
-                    else if (p.sexo === "Fêmea") dMae.appendChild(opt);
-                    else { dPai.appendChild(opt.cloneNode(true)); dMae.appendChild(opt.cloneNode(true)); }
-                }
-            });
-        }
-    }
-    function toggleCedido() {
-        const sel = document.getElementById("categoriaSelect");
-        const div = document.getElementById("cedidoGroup");
-        if (sel && sel.value === "Cedido") { div.style.display = "block"; }
-    }
-</script>
 {% endblock %}
