@@ -35,11 +35,11 @@
                         </div>
                         <div class="col-auto">
                             <label class="form-label">NOME:</label>
-                            <input type="text" name="nome" class="form-control caixa-input" style="width: 350px;">
+                            <input type="text" name="nome" class="form-control caixa-input" style="width: 250px;">
                         </div>
                         <div class="col-auto">
                             <label class="form-label">COR:</label>
-                            <input type="text" name="cor" class="form-control caixa-input" style="width: 310px;">
+                            <input type="text" name="cor" class="form-control caixa-input" style="width: 250px;">
                         </div>
                     </div>
 
@@ -74,7 +74,7 @@
                             <div id="caixaCedidoA" style="display: none; margin-top: 15px;">
                                 <label class="form-label fw-bold" style="color: #000;">CEDIDO A:</label>
                                 <input type="text" name="cedido_a" id="inputCedidoA" class="form-control caixa-input"
-                                    style="width: 250px;" placeholder="Nome da pessoa...">
+                                    style="width: 250px;">
                             </div>
                         </div>
 
@@ -89,12 +89,12 @@
 
                     <div class="row g-3">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small">DESCRIÇÃO PARA O PEDIGREE...</label>
+                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
                             <textarea name="obs" class="form-control caixa-input"
                                 style="width: 250px; height: 250px; resize: none; overflow: hidden;"
                                 maxlength="400"></textarea>
                         </div>
-                        <div class="col-auto d-flex flex-column justify-content-end gap-3" style="width: 200px;">
+                        <div class="col-auto d-flex flex-column justify-content-start gap-3 pt-4" style="width: 200px;">
                             <button type="submit" class="btn btn-executar btn-lg shadow w-100">GRAVAR</button>
                             <a href="{{ url_for('lista_pombos') }}"
                                 class="btn btn-retroceder btn-lg shadow w-100">VOLTAR</a>
@@ -114,10 +114,8 @@
 
         if (dropdown.value === "Cedido") {
             caixa.style.display = "block";
-            // Força o cursor a ir diretamente para a caixa
             setTimeout(function () { input.focus(); }, 10);
         } else {
-            // Se escolher outra opção (Voador/Reprodutor), desaparece IMEDIATAMENTE e limpa
             caixa.style.display = "none";
             input.value = "";
         }
