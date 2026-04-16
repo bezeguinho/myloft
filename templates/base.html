@@ -29,7 +29,7 @@
       font-size: 1.6rem;
     }
 
-    /* HOVER NOS MENUS */
+    /* HOVER NO DESKTOP */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -110,7 +110,8 @@
         <ul class="navbar-nav me-auto ms-4 text-uppercase fw-bold align-items-center">
           {% if current_user.is_authenticated %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="menuPombos">GESTÃO DE POMBOS</a>
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">GESTÃO DE POMBOS</a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
