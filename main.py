@@ -128,6 +128,7 @@ def gerar_pedigree():
 @app.route("/meus-dados/ver")
 @login_required
 def ver_dados():
+    # Proteção contra Erro 500: Se não existir, cria.
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     if not utilizador:
         utilizador = Utilizador(nome="Pombal", user_id=current_user.id)

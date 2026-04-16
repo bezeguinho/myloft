@@ -2,12 +2,16 @@
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
   <div class="col-12 col-md-8 text-center">
-    <h1 class="display-4 fw-bold text-primary mb-5">Bem-vindo ao MYLOFT</h1>
+    <h1 class="display-3 fw-bold text-primary mb-4">Bem-vindo ao MYLOFT</h1>
 
-    <div class="d-flex flex-column flex-md-row justify-content-center gap-4">
+    {% if current_user.is_authenticated %}
+    <h3 class="text-muted">Olá! Já pode gerir os seus pombos através do menu superior.</h3>
+    {% else %}
+    <div class="d-flex flex-column flex-md-row justify-content-center gap-4 mt-5">
       <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">ENTRAR</a>
       <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 py-3 shadow">CRIAR CONTA</a>
     </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
