@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração da Base de Dados com SSL obrigatório para Vercel
+# Configuração de Base de Dados Robusta (Vercel + SSL)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -50,12 +50,16 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
+    cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+with app.app_context():
+    db.create_all()
 
 # --- ROTAS ---
 @app.route("/")
@@ -83,8 +87,8 @@ def register():
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada! Faça login.", "success")
-        return redirect(url_for('login'))
+        flash("Conta criada! Por favor, faça login.", "success")
+        return redirect(url_for('login')) # Racional: Manda para o Login
     return render_template('register.html')
 
 @app.route("/meus-dados/ver")
@@ -92,7 +96,7 @@ def register():
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     if not utilizador:
-        utilizador = Utilizador(nome="Nome do Columbófilo", user_id=current_user.id)
+        utilizador = Utilizador(nome="Utilizador Novo", user_id=current_user.id)
         db.session.add(utilizador)
         db.session.commit()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
@@ -144,7 +148,7 @@ def pombos_ocultos():
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/logout")
+@app.route("/logout") @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -154,9 +158,4 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados limpa com sucesso!"
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    return "Base de dados reiniciada."

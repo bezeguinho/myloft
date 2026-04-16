@@ -26,7 +26,7 @@
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
     }
 
     @media (min-width: 992px) {
@@ -40,6 +40,8 @@
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
+      margin: 0 5px;
+      border-radius: 6px;
       padding: 8px 15px !important;
       transition: 0.2s;
     }
@@ -48,7 +50,6 @@
     .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
-      border-radius: 6px;
     }
 
     .dropdown-menu {
@@ -56,17 +57,17 @@
       border: none;
       border-radius: 8px;
       padding: 10px;
-      shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .dropdown-item {
       color: #ffffff !important;
       font-weight: bold;
+      border-radius: 6px;
       padding: 8px 15px;
       text-transform: uppercase;
     }
 
-    /* BOTÕES: BRANCO -> PRETO NO HOVER */
     .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
@@ -101,8 +102,11 @@
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
       <a class="navbar-brand" href="{{ url_for('index') }}">MYLOFT</a>
+      <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
+        <ul class="navbar-nav ms-auto text-uppercase fw-bold">
           {% if current_user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="menuPombos">GESTÃO DE POMBOS</a>
@@ -126,7 +130,9 @@
       </div>
     </div>
   </nav>
-  <div class="container">{% block content %}{% endblock %}</div>
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
