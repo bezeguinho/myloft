@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração de Base de Dados Robusta (Vercel + SSL)
+# Configuração de Base de Dados Robusta para Vercel
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS ---
+# --- MODELOS (Estrutura Completa) ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -50,7 +50,6 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
-    cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -58,8 +57,12 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-with app.app_context():
-    db.create_all()
+# Tenta criar tabelas sem crashar o app
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as e:
+    print(f"Erro ao iniciar DB: {e}")
 
 # --- ROTAS ---
 @app.route("/")
@@ -74,7 +77,7 @@ def login():
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
             return redirect(url_for('index'))
-        flash("Dados incorretos.", "danger")
+        flash("Email ou Password incorretos.", "danger")
     return render_template('login.html')
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -87,19 +90,9 @@ def register():
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada! Por favor, faça login.", "success")
-        return redirect(url_for('login')) # Racional: Manda para o Login
+        flash("Conta criada! Faça login agora.", "success")
+        return redirect(url_for('login'))
     return render_template('register.html')
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(nome="Utilizador Novo", user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
@@ -118,6 +111,16 @@ def novo_pombo():
         db.session.commit()
         return redirect(url_for('lista_pombos'))
     return render_template("pombo_form.html", anos_lista=anos_lista)
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(nome="Nome Columbófilo", user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/lista_pombos") @login_required
 def lista_pombos():
@@ -158,4 +161,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados reiniciada."
+    return "Base de dados limpa."
+
+if __name__ == "__main__":
+    app.run(debug=True)
