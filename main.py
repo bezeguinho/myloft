@@ -1,5 +1,5 @@
 import os
-import re # Ferramenta nova para ler o número da anilha!
+import re
 import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -63,13 +63,11 @@ def load_user(user_id):
 @app.errorhandler(Exception)
 def handle_exception(e):
     return f"""
-    <div style="font-family: sans-serif; text-align: center; padding: 50px; background-color: #f8f9fa; height: 100vh;">
+    <div style="font-family: sans-serif; text-align: center; padding: 50px;">
         <h1 style="color: #dc3545;">Temos de Atualizar a Base de Dados</h1>
-        <br>
         <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-            CLICAR AQUI PARA ATUALIZAR E RESOLVER
+            CLICAR AQUI PARA ATUALIZAR
         </a>
-        <p style="margin-top: 40px; color: #6c757d; font-size: 12px;">Detalhe técnico do erro: {str(e)}</p>
     </div>
     """, 500
 
@@ -120,22 +118,7 @@ def ver_dados():
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    # --- SISTEMA INTELIGENTE DA PRÓXIMA ANILHA ---
-    proxima_anilha = ""
-    ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
-    
-    if ultimo_pombo and ultimo_pombo.anilha:
-        # Tenta encontrar números no final da anilha
-        match = re.search(r'(\d+)$', ultimo_pombo.anilha)
-        if match:
-            numero_novo = int(match.group(1)) + 1
-            tamanho = len(match.group(1))
-            proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
-        else:
-            proxima_anilha = ultimo_pombo.anilha + "-1"
-
     if request.method == 'POST':
-        # Se o utilizador carregou no Enter e deixou o campo em branco, usamos a sugerida
         anilha_final = request.form.get('anilha')
         if not anilha_final:
             anilha_final = request.form.get('anilha_sugerida')
@@ -156,57 +139,40 @@ def novo_pombo():
         )
         db.session.add(novo)
         db.session.commit()
-        return redirect(url_for('lista_pombos'))
         
+        # AVISO DE SUCESSO E MANTÉM NA PÁGINA COM O PARÂMETRO 'saved=1'
+        flash(f"Pombo {anilha_final} gravado com sucesso!", "success")
+        return redirect(url_for('novo_pombo', saved='1'))
+        
+    # --- SISTEMA INTELIGENTE (SÓ CALCULA SE ACABARES DE GRAVAR UM POMBO) ---
+    proxima_anilha = ""
+    # O request.args.get('saved') verifica se a página foi carregada após uma gravação
+    if request.args.get('saved') == '1':
+        ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
+        if ultimo_pombo and ultimo_pombo.anilha:
+            match = re.search(r'(\d+)$', ultimo_pombo.anilha)
+            if match:
+                numero_novo = int(match.group(1)) + 1
+                tamanho = len(match.group(1))
+                proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
+            else:
+                proxima_anilha = ultimo_pombo.anilha + "-1"
+
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
 
-@app.route("/lista_pombos")
-@login_required
+@app.route("/lista_pombos") @login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores")
-@login_required
+@app.route("/reprodutores") @login_required
 def reprodutores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
 
-@app.route("/voadores")
-@login_required
+@app.route("/voadores") @login_required
 def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
-
-@app.route("/pedigree/gerar")
-@login_required
-def gerar_pedigree():
-    return render_template("gerar_pedigree.html")
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-@app.route("/limpar_tudo")
-def limpar_tudo():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site e fazer Login</a></p>"
-
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route

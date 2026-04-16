@@ -1,33 +1,53 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-12 col-md-5 col-lg-4">
-        <div class="card shadow border-0" style="border-radius: 10px;">
-            <div class="card-body p-4 p-md-5">
-                <h2 class="fw-bold text-primary mb-4 text-center text-uppercase">Entrar</h2>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-muted">EMAIL</label>
-                        <input type="email" name="email" class="form-control p-3" style="background: #f8f9fa;" required>
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow border-0 p-4" style="border-radius: 12px;">
+            <h2 class="text-center text-primary fw-bold mb-4 text-uppercase">Entrar</h2>
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-uppercase">Email</label>
+                    <input type="email" name="email" class="form-control" style="border: 1px solid #777;" required
+                        autofocus>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-uppercase">Password</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="loginPassword" class="form-control"
+                            style="border: 1px solid #777; border-right: none;" required>
+                        <button class="btn btn-outline-secondary" type="button"
+                            style="border: 1px solid #777; border-left: none; background: white;"
+                            onclick="togglePassword('loginPassword', 'eyeIconLogin')">
+                            <i class="bi bi-eye-slash text-dark" id="eyeIconLogin"></i>
+                        </button>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small text-muted">PASSWORD</label>
-                        <div class="input-group">
-                            <input type="password" name="password" id="password"
-                                class="form-control p-3 border-right-none" style="background: #f8f9fa;" required>
-                            <span class="input-group-text" onclick="togglePassword('password', 'eyeIcon')">
-                                <i class="bi bi-eye-slash" id="eyeIcon"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-executar w-100 p-3 mb-3 shadow">ENTRAR NA CONTA</button>
-                    <div class="text-center small">
-                        <span class="text-muted">Não tem conta?</span> <a href="{{ url_for('register') }}"
-                            class="fw-bold text-primary">Registe-se</a>
-                    </div>
-                </form>
+                </div>
+
+                <button type="submit" class="btn btn-executar w-100 btn-lg shadow text-uppercase">Entrar no
+                    MyLoft</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="{{ url_for('register') }}" class="text-muted text-decoration-none small fw-bold">Ainda não tens
+                    conta? Criar agora.</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function togglePassword(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("bi-eye-slash", "bi-eye");
+        } else {
+            input.type = "password";
+            icon.classList.replace("bi-eye", "bi-eye-slash");
+        }
+    }
+</script>
 {% endblock %}
