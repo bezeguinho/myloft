@@ -18,7 +18,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS (Estrutura Segura) ---
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,14 +55,13 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROTAS DE GESTÃO (RESTAURADAS) ---
-
+# --- ROTAS ---
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Sucesso!</h3><p>Base de dados limpa. Podes criar conta.</p>"
+    return "<h3>Sucesso!</h3><p>Base de dados limpa.</p>"
 
 @app.route("/")
 def index():
@@ -83,10 +82,7 @@ def novo_pombo():
             ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), categoria=request.form.get('categoria'),
             pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'), 
-            cedido_a=request.form.get('cedido_a'),
-            oculto=True if request.form.get('oculto') == 'on' else False,
-            user_id=current_user.id
+            obs=request.form.get('obs'), user_id=current_user.id
         )
         db.session.add(novo)
         db.session.commit()
@@ -140,6 +136,10 @@ def ver_dados():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Se já estiver logado, não mostra o login, vai direto para o início
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
@@ -150,6 +150,8 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         email = request.form.get('email').lower()
         password = request.form.get('password')
@@ -167,6 +169,7 @@ def register():
     return render_template('register.html')
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))

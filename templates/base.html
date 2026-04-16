@@ -10,6 +10,7 @@
   <style>
     :root {
       --azul-myloft: #0d6efd;
+      --amarelo-myloft: #ffc107;
     }
 
     body {
@@ -42,13 +43,12 @@
       border-radius: 6px;
       padding: 8px 15px !important;
       margin: 0 5px;
-      transition: all 0.2s ease-in-out;
-      display: inline-block;
+      transition: all 0.2s;
     }
 
     .nav-link:hover,
     .dropdown-item:hover {
-      background-color: #ffc107 !important;
+      background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
     }
 
@@ -57,7 +57,6 @@
       border: none;
       border-radius: 8px;
       padding: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .dropdown-item {
@@ -65,39 +64,43 @@
       font-weight: bold;
       border-radius: 6px;
       padding: 8px 15px;
-      margin-bottom: 2px;
-      transition: all 0.2s ease-in-out;
     }
 
+    /* PADRÃO DE BOTÕES - SOLICITADO */
     .btn-executar {
       background-color: var(--azul-myloft) !important;
-      color: white !important;
+      color: #ffffff !important;
       font-weight: bold;
-      border-radius: 6px;
       border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
       transition: 0.2s;
     }
 
     .btn-executar:hover {
-      background-color: #ffc107 !important;
+      background-color: var(--azul-myloft) !important;
       color: #000000 !important;
+      /* Muda para preto no hover */
     }
 
     .btn-retroceder {
-      background-color: #ffc107 !important;
-      color: black !important;
+      background-color: var(--amarelo-myloft) !important;
+      color: #ffffff !important;
+      /* Branco inicial */
       font-weight: bold;
-      border-radius: 6px;
       border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
       transition: 0.2s;
     }
 
     .btn-retroceder:hover {
-      background-color: #e0a800 !important;
-      color: black !important;
+      background-color: var(--amarelo-myloft) !important;
+      color: #000000 !important;
+      /* Muda para preto no hover */
     }
 
-    /* Estilos do Olho da Password */
+    /* Olho Password */
     .input-group-text {
       cursor: pointer;
       background: white;
@@ -114,16 +117,14 @@
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
       <a class="navbar-brand fs-4" href="{{ url_for('index') }}">MYLOFT</a>
-
       <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           {% if current_user.is_authenticated %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button">GESTÃO DE POMBOS</a>
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos">GESTÃO DE POMBOS</a>
             <ul class="dropdown-menu shadow">
               <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
               <li>
@@ -147,7 +148,6 @@
       </div>
     </div>
   </nav>
-
   <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}{% for category, message in messages %}
@@ -158,19 +158,13 @@
     {% endwith %}
     {% block content %}{% endblock %}
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     function togglePassword(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.replace("bi-eye-slash", "bi-eye");
-      } else {
-        input.type = "password";
-        icon.classList.replace("bi-eye", "bi-eye-slash");
-      }
+      if (input.type === "password") { input.type = "text"; icon.classList.replace("bi-eye-slash", "bi-eye"); }
+      else { input.type = "password"; icon.classList.replace("bi-eye", "bi-eye-slash"); }
     }
   </script>
 </body>
