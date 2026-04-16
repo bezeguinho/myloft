@@ -8,9 +8,12 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# Configuração da Base de Dados com SSL obrigatório para Vercel
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
+    if 'sslmode' not in uri:
+        uri += '?sslmode=require'
 app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -18,6 +21,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +50,6 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
-    cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -54,18 +57,50 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-with app.app_context():
-    db.create_all()
-
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated: return redirect(url_for('index'))
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form.get('email').lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get('password')):
+            login_user(user)
+            return redirect(url_for('index'))
+        flash("Dados incorretos.", "danger")
+    return render_template('login.html')
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email').lower()
+        if User.query.filter_by(email=email).first():
+            flash("Email já registado.", "danger")
+            return redirect(url_for('register'))
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+        db.session.add(new_user)
+        db.session.commit()
+        flash("Conta criada! Faça login.", "success")
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(nome="Nome do Columbófilo", user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    pombos_user = Pombo.query.filter_by(user_id=current_user.id).all()
     if request.method == 'POST':
         novo = Pombo(
             anilha=request.form.get('anilha'), nome=request.form.get('nome'),
@@ -78,7 +113,7 @@ def novo_pombo():
         db.session.add(novo)
         db.session.commit()
         return redirect(url_for('lista_pombos'))
-    return render_template("pombo_form.html", anos_lista=anos_lista, pombos_user=pombos_user)
+    return render_template("pombo_form.html", anos_lista=anos_lista)
 
 @app.route("/lista_pombos") @login_required
 def lista_pombos():
@@ -105,52 +140,23 @@ def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/meus-dados/ver") @login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(nome="Utilizador Novo", user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated: return redirect(url_for('index'))
-    if request.method == 'POST':
-        user = User.query.filter_by(email=request.form.get('email').lower()).first()
-        if user and check_password_hash(user.password_hash, request.form.get('password')):
-            login_user(user)
-            return redirect(url_for('index'))
-        flash("Dados incorretos.", "danger")
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form.get('email').lower()
-        if User.query.filter_by(email=email).first():
-            flash("Email já existe.", "danger")
-            return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Conta criada! Por favor, faça login.", "success")
-        return redirect(url_for('login')) # NÃO ENTRA DIRETO
-    return render_template('register.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
 @app.route("/pedigree/gerar") @login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route("/limpar_tudo")
 def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados Limpa!</h3>"
+    return "Base de dados limpa com sucesso!"
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
