@@ -9,7 +9,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# --- LIGAÇÃO DB COM PROTEÇÃO VERCEL ---
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith('postgres://'):
@@ -26,7 +25,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS (Inclui o novo campo "cedido_a") ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -53,7 +51,7 @@ class Pombo(db.Model):
     pai = db.Column(db.String(50))
     mae = db.Column(db.String(50))
     obs = db.Column(db.Text)
-    cedido_a = db.Column(db.String(100)) # A GAVETA NOVA
+    cedido_a = db.Column(db.String(100))
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -61,10 +59,8 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- O NOSSO AIRBAG (Impede o Erro 500 de aparecer) ---
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Se houver erro, mostra um ecrã amigável com um botão para limpar a DB
     return f"""
     <div style="font-family: sans-serif; text-align: center; padding: 50px; background-color: #f8f9fa; height: 100vh;">
         <h1 style="color: #dc3545;">Temos de Atualizar a Base de Dados</h1>
@@ -77,14 +73,14 @@ def handle_exception(e):
     </div>
     """, 500
 
-# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated: return redirect(url_for('index'))
+    if current_user.is_authenticated: 
+        return redirect(url_for('index'))
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
@@ -96,7 +92,7 @@ def login():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        logout_user() # Garante que estás desligado ao criar conta
+        logout_user() 
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
@@ -138,36 +134,43 @@ def novo_pombo():
         return redirect(url_for('lista_pombos'))
     return render_template("pombo_form.html", anos_lista=anos_lista)
 
-@app.route("/lista_pombos") @login_required
+@app.route("/lista_pombos")
+@login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores") @login_required
+@app.route("/reprodutores")
+@login_required
 def reprodutores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
 
-@app.route("/voadores") @login_required
+@app.route("/voadores")
+@login_required
 def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route("/cedidos") @login_required
+@app.route("/cedidos")
+@login_required
 def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-@app.route("/pombos_ocultos") @login_required
+@app.route("/pombos_ocultos")
+@login_required
 def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar") @login_required
+@app.route("/pedigree/gerar")
+@login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/logout") @login_required
+@app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
