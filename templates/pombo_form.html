@@ -43,7 +43,7 @@
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-center">
+                    <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-start">
                         <div class="col-auto">
                             <label class="form-label">Nº PAI:</label>
                             <input type="text" name="pai" class="form-control caixa-input" style="width: 140px;">
@@ -70,7 +70,14 @@
                                 <option value="Reprodutor">Reprodutores</option>
                                 <option value="Cedido">Cedido</option>
                             </select>
+
+                            <div id="caixaCedidoA" style="display: none; margin-top: 15px;">
+                                <label class="form-label fw-bold" style="color: #000;">CEDIDO A:</label>
+                                <input type="text" name="cedido_a" id="inputCedidoA" class="form-control caixa-input"
+                                    style="width: 250px;" placeholder="Nome da pessoa...">
+                            </div>
                         </div>
+
                         <div class="col-auto pt-4">
                             <div class="d-flex align-items-center bg-light p-2 rounded border shadow-sm">
                                 <label class="form-check-label me-3" for="checkOculto">OCULTAR POMBO?</label>
@@ -80,20 +87,12 @@
                         </div>
                     </div>
 
-                    <div class="row mb-4" id="caixaCedidoA" style="display: none;">
-                        <div class="col-12">
-                            <label class="form-label text-danger fw-bold text-uppercase">Cedido a:</label>
-                            <input type="text" name="cedido_a" id="inputCedidoA"
-                                class="form-control caixa-input border-danger" style="width: 400px;"
-                                placeholder="Digite o nome do novo proprietário...">
-                        </div>
-                    </div>
-
                     <div class="row g-3">
                         <div class="col-auto">
                             <label class="form-label fw-bold small">DESCRIÇÃO PARA O PEDIGREE...</label>
                             <textarea name="obs" class="form-control caixa-input"
-                                style="width: 400px; height: 150px; resize: none;"></textarea>
+                                style="width: 250px; height: 250px; resize: none; overflow: hidden;"
+                                maxlength="400"></textarea>
                         </div>
                         <div class="col-auto d-flex flex-column justify-content-end gap-3" style="width: 200px;">
                             <button type="submit" class="btn btn-executar btn-lg shadow w-100">GRAVAR</button>
@@ -115,9 +114,10 @@
 
         if (dropdown.value === "Cedido") {
             caixa.style.display = "block";
-            // Timeout curto garante que o cursor foca logo após a animação de aparecer
+            // Força o cursor a ir diretamente para a caixa
             setTimeout(function () { input.focus(); }, 10);
         } else {
+            // Se escolher outra opção (Voador/Reprodutor), desaparece IMEDIATAMENTE e limpa
             caixa.style.display = "none";
             input.value = "";
         }
