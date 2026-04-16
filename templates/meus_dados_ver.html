@@ -1,45 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm border-0" style="border-radius: 10px;">
-            <div class="card-body p-5">
-                <div class="row align-items-center">
-                    <div class="col-md-7 pe-md-5 border-end">
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">NOME:</label>
-                            <p class="fs-5 fw-bold text-primary">{{ utilizador.nome if utilizador else '---' }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">LOCALIDADE:</label>
-                            <p class="fs-5">{{ (utilizador.localidade if utilizador else '') or '---' }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">EMAIL:</label>
-                            <p class="fs-5">{{ (utilizador.email if utilizador else '') or '---' }}</p>
-                        </div>
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small d-block">TELEMÓVEL:</label>
-                            <p class="fs-5">{{ (utilizador.telefone if utilizador else '') or '---' }}</p>
-                        </div>
+    <div class="col-12 col-md-8">
+        <div class="card shadow border-0 p-4 p-md-5" style="border-radius: 15px;">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-4 text-center mb-4 mb-md-0">
+                    <div class="bg-secondary d-flex align-items-center justify-content-center mx-auto shadow-sm"
+                        style="width: 200px; height: 200px; border-radius: 10px; cursor: pointer;">
+                        <i class="bi bi-camera-fill text-white display-4"></i>
                     </div>
-                    <div class="col-md-5 text-center">
-                        <div class="mx-auto shadow-sm"
-                            style="width: 220px; height: 220px; border-radius: 10px; border: 3px solid var(--azul-myloft); overflow: hidden;">
-                            {% if utilizador and utilizador.foto %}
-                            <img src="{{ url_for('static', filename=utilizador.foto) }}"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                            {% else %}
-                            <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                                <i class="bi bi-person-fill text-secondary" style="font-size: 6rem;"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <p class="small text-muted mt-2 text-uppercase fw-bold">Alterar Foto</p>
                 </div>
-                <div class="mt-5 d-flex justify-content-center gap-3">
-                    <a href="{{ url_for('editar_dados') }}" class="btn btn-executar btn-lg px-5 shadow">EDITAR DADOS</a>
-                    <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg px-5 shadow">VOLTAR</a>
+                <div class="col-12 col-md-8">
+                    <h2 class="text-primary fw-bold text-uppercase mb-4">{{ utilizador.nome }}</h2>
+                    <div class="row g-3 text-uppercase fw-bold small">
+                        <div class="col-12 border-bottom pb-2">
+                            <span class="text-muted">Localidade:</span> <span class="ms-2">{{ utilizador.localidade or
+                                'Não definido' }}</span>
+                        </div>
+                        <div class="col-12 border-bottom pb-2">
+                            <span class="text-muted">Email:</span> <span class="ms-2">{{ current_user.email }}</span>
+                        </div>
+                        <div class="col-12 border-bottom pb-2">
+                            <span class="text-muted">Telefone:</span> <span class="ms-2">{{ utilizador.telefone or 'Não
+                                definido' }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

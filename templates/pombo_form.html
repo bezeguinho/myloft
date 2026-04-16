@@ -11,10 +11,6 @@
         border-color: var(--azul-myloft) !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
-
-    select.caixa-input {
-        color: #000000 !important;
-    }
 </style>
 
 <div class="row justify-content-center">
@@ -90,9 +86,8 @@
                                 style="width: 250px; height: 250px; resize: none;"></textarea>
                         </div>
                         <div class="col-auto d-flex flex-column justify-content-end gap-3" style="width: 200px;">
-                            <button type="submit" class="btn btn-executar btn-lg w-100 shadow">GRAVAR</button>
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-retroceder btn-lg w-100 shadow">VOLTAR</a>
+                            <button type="submit" class="btn btn-executar btn-lg shadow">GRAVAR</button>
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg shadow">VOLTAR</a>
                         </div>
                     </div>
                 </form>
