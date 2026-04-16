@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
-# Configuração de Base de Dados Robusta para Vercel
+# Configuração de Base de Dados Robusta (Vercel + SSL)
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS (Estrutura Completa) ---
+# --- MODELOS (Tudo num só ficheiro para evitar erros de importação no Vercel) ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -31,11 +31,9 @@ class User(UserMixin, db.Model):
 class Utilizador(db.Model):
     __tablename__ = 'utilizadores_perfil'
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100))
-    localidade = db.Column(db.String(100))
-    email = db.Column(db.String(120))
-    telefone = db.Column(db.String(20))
-    foto = db.Column(db.String(255))
+    nome = db.Column(db.String(100), default="Nome do Columbófilo")
+    localidade = db.Column(db.String(100), default="")
+    telefone = db.Column(db.String(20), default="")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 class Pombo(db.Model):
@@ -57,12 +55,9 @@ class Pombo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Tenta criar tabelas sem crashar o app
-try:
-    with app.app_context():
-        db.create_all()
-except Exception as e:
-    print(f"Erro ao iniciar DB: {e}")
+# Cria tabelas se não existirem
+with app.app_context():
+    db.create_all()
 
 # --- ROTAS ---
 @app.route("/")
@@ -85,14 +80,24 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         if User.query.filter_by(email=email).first():
-            flash("Email já registado.", "danger")
+            flash("Este email já está registado.", "danger")
             return redirect(url_for('register'))
         new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
-        flash("Conta criada! Faça login agora.", "success")
+        flash("Conta criada com sucesso! Por favor, faça login.", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
@@ -111,16 +116,6 @@ def novo_pombo():
         db.session.commit()
         return redirect(url_for('lista_pombos'))
     return render_template("pombo_form.html", anos_lista=anos_lista)
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(nome="Nome Columbófilo", user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route("/lista_pombos") @login_required
 def lista_pombos():
@@ -151,7 +146,8 @@ def pombos_ocultos():
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/logout") @login_required
+@app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -161,7 +157,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "Base de dados limpa."
+    return "Base de dados reiniciada."
 
 if __name__ == "__main__":
     app.run(debug=True)
