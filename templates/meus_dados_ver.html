@@ -1,30 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-12 col-md-8">
+    <div class="col-12 col-lg-9">
         <div class="card shadow border-0 p-4 p-md-5" style="border-radius: 15px;">
             <div class="row align-items-center">
-                <div class="col-12 col-md-4 text-center mb-4 mb-md-0">
+                <div class="col-12 col-md-4 text-center mb-4 mb-md-0 border-end">
                     <div class="bg-secondary d-flex align-items-center justify-content-center mx-auto shadow-sm"
                         style="width: 200px; height: 200px; border-radius: 10px; cursor: pointer;">
                         <i class="bi bi-camera-fill text-white display-4"></i>
                     </div>
-                    <p class="small text-muted mt-2 text-uppercase fw-bold">Alterar Foto</p>
+                    <p class="small text-muted mt-3 text-uppercase fw-bold">Alterar Foto</p>
                 </div>
-                <div class="col-12 col-md-8">
-                    <h2 class="text-primary fw-bold text-uppercase mb-4">{{ utilizador.nome }}</h2>
-                    <div class="row g-3 text-uppercase fw-bold small">
+
+                <div class="col-12 col-md-8 ps-md-5">
+                    <h2 class="text-primary fw-bold text-uppercase mb-4">Os Meus Dados</h2>
+                    <div class="row g-4 text-uppercase fw-bold small">
                         <div class="col-12 border-bottom pb-2">
-                            <span class="text-muted">Localidade:</span> <span class="ms-2">{{ utilizador.localidade or
-                                'Não definido' }}</span>
+                            <span class="text-muted" style="width: 120px; display: inline-block;">NOME:</span>
+                            <span class="ms-2 text-dark fs-5">{{ utilizador.nome }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2">
-                            <span class="text-muted">Email:</span> <span class="ms-2">{{ current_user.email }}</span>
+                            <span class="text-muted" style="width: 120px; display: inline-block;">LOCALIDADE:</span>
+                            <span class="ms-2 text-dark fs-5">{{ utilizador.localidade or '---' }}</span>
                         </div>
                         <div class="col-12 border-bottom pb-2">
-                            <span class="text-muted">Telefone:</span> <span class="ms-2">{{ utilizador.telefone or 'Não
-                                definido' }}</span>
+                            <span class="text-muted" style="width: 120px; display: inline-block;">EMAIL:</span>
+                            <span class="ms-2 text-dark fs-5">{{ current_user.email }}</span>
                         </div>
+                        <div class="col-12 border-bottom pb-2">
+                            <span class="text-muted" style="width: 120px; display: inline-block;">TELEFONE:</span>
+                            <span class="ms-2 text-dark fs-5">{{ utilizador.telefone or '---' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button class="btn btn-executar px-4 py-2 shadow-sm">EDITAR PERFIL</button>
                     </div>
                 </div>
             </div>

@@ -8,6 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# Configuração da Base de Dados
 uri = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
 if uri and uri.startswith('postgres://'):
     uri = uri.replace('postgres://', 'postgresql://', 1)
@@ -18,6 +19,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -53,6 +55,18 @@ class Pombo(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# Criar tabelas automaticamente no Vercel
+with app.app_context():
+    db.create_all()
+
+# --- ROTAS ---
+@app.route("/limpar_tudo")
+def limpar_tudo():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+    return "<h3>Base de Dados Reiniciada!</h3><p>Crie uma nova conta.</p>"
 
 @app.route("/")
 def index():
@@ -116,15 +130,14 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         flash("Conta criada! Por favor, faça login.", "success")
-        return redirect(url_for('login')) # NÃO ENTRA DIRETO
+        return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

@@ -2,13 +2,17 @@
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
   <div class="col-12 text-center">
-    <h1 class="display-2 fw-bold text-primary mb-3">MYLOFT</h1>
+    <h1 class="display-2 fw-bold text-primary mb-3 text-uppercase">MyLoft</h1>
     <h2 class="text-muted fw-light">Gestão da tua colónia</h2>
 
     {% if not current_user.is_authenticated %}
     <div class="d-flex justify-content-center gap-4 mt-5">
       <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 shadow">ENTRAR</a>
       <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 shadow">CRIAR CONTA</a>
+    </div>
+    {% else %}
+    <div class="mt-5 p-4 bg-white shadow-sm rounded-pill d-inline-block px-5 border">
+      <p class="mb-0 fw-bold text-primary text-uppercase">Bem-vindo! Utiliza o menu superior para começar.</p>
     </div>
     {% endif %}
   </div>
