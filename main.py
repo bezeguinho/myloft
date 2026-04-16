@@ -36,7 +36,7 @@ class Utilizador(db.Model):
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
-    id = db.Column(db.Integer, primary_key=True) 
+    id = db.Column(db.Integer, primary_key=True)
     anilha = db.Column(db.String(50), nullable=False)
     nome = db.Column(db.String(100))
     ano = db.Column(db.Integer, nullable=False)
@@ -59,7 +59,7 @@ def limpar_tudo():
     with app.app_context():
         db.drop_all()
         db.create_all()
-    return "<h3>Base de Dados Limpa!</h3><p>Cria uma nova conta.</p>"
+    return "<h3>Sucesso!</h3><p>Base de dados limpa.</p>"
 
 @app.route("/")
 def index():
@@ -75,15 +75,13 @@ def novo_pombo():
         if Pombo.query.filter_by(anilha=anilha_in, user_id=current_user.id).first():
             flash("Pombo existente", "danger")
             return redirect(url_for('novo_pombo'))
-        
         novo = Pombo(
             anilha=anilha_in, nome=request.form.get('nome'),
             ano=int(request.form.get('ano') or 0), sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), categoria=request.form.get('categoria'),
             pai=request.form.get('pai'), mae=request.form.get('mae'),
-            obs=request.form.get('obs'),
-            oculto=True if request.form.get('oculto') == 'on' else False,
-            user_id=current_user.id
+            obs=request.form.get('obs'), user_id=current_user.id,
+            oculto=True if request.form.get('oculto') == 'on' else False
         )
         db.session.add(novo)
         db.session.commit()
@@ -156,4 +154,24 @@ def register():
         password = request.form.get('password')
         confirm = request.form.get('confirm_password')
         if password != confirm:
-            flash("As passwords não coincidem!", "
+            flash("As passwords não coincidem!", "danger")
+            return redirect(url_for('register'))
+        if User.query.filter_by(email=email).first():
+            flash("Email já registado.", "danger")
+            return redirect(url_for('register'))
+        new_user = User(email=email, password_hash=generate_password_hash(password))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
