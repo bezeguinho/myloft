@@ -96,41 +96,44 @@ def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores") @login_required
+@app.route("/reprodutores")
+@login_required
 def reprodutores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
 
-@app.route("/voadores") @login_required
+@app.route("/voadores")
+@login_required
 def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route("/cedidos") @login_required
+@app.route("/cedidos")
+@login_required
 def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-@app.route("/pombos_ocultos") @login_required
+@app.route("/pombos_ocultos")
+@login_required
 def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar") @login_required
+@app.route("/pedigree/gerar")
+@login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/meus-dados/ver") @login_required
+@app.route("/meus-dados/ver")
+@login_required
 def ver_dados():
-    try:
-        utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-        if not utilizador:
-            utilizador = Utilizador(nome="Pombal", user_id=current_user.id)
-            db.session.add(utilizador)
-            db.session.commit()
-        return render_template("meus_dados_ver.html", utilizador=utilizador)
-    except:
-        return redirect(url_for('limpar_tudo'))
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(nome="Pombal", user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -140,36 +143,3 @@ def login():
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
             login_user(user)
-            return redirect(url_for('index'))
-        flash("Email ou Password incorretos.", "danger")
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    if request.method == 'POST':
-        email = request.form.get('email').lower()
-        password = request.form.get('password')
-        confirm = request.form.get('confirm_password')
-        if password != confirm:
-            flash("As passwords não coincidem!", "danger")
-            return redirect(url_for('register'))
-        if User.query.filter_by(email=email).first():
-            flash("Email já registado.", "danger")
-            return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(password))
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
-@app.route('/logout') @login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
