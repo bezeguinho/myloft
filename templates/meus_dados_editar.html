@@ -15,13 +15,13 @@
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Localidade:</label>
-                                <div class="col-sm-9"><input type="text" name="localberry" class="form-control bg-light"
-                                        value="{{ utilizador.localberry }}"></div>
+                                <div class="col-sm-9"><input type="text" name="localidade" class="form-control bg-light"
+                                        value="{{ utilizador.localidade or '' }}"></div>
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Email:</label>
                                 <div class="col-sm-9"><input type="email" name="email" class="form-control bg-light"
-                                        value="{{ utilizador.email }}"></div>
+                                        value="{{ utilizador.email or current_user.email }}"></div>
                             </div>
                             <div class="mb-4 row">
                                 <label class="col-sm-3 col-form-label fw-bold">Telemóvel:</label>
