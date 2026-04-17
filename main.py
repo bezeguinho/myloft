@@ -14,6 +14,7 @@ IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is n
 
 # --- CONFIGURAÇÃO DA BASE DE DADOS ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+print(f"[DEBUG] Inicializando aplicação... Vercel: {IS_VERCEL}")
 
 if not db_url:
     if IS_VERCEL:
@@ -28,8 +29,10 @@ elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
     db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
 if 'sslmode' not in db_url and 'sqlite' not in db_url:
-    db_url += '?sslmode=require'
+    separator = '&' if '?' in db_url else '?'
+    db_url += f"{separator}sslmode=require"
 
+print(f"[DEBUG] SQLAlchemy URI configurado para host: {db_url.split('@')[-1] if '@' in db_url else 'local'}")
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # --- FIM DA CONFIGURAÇÃO DA BASE DE DADOS ---
@@ -131,6 +134,10 @@ def handle_exception(e):
     return render_template("erro_db.html", erro=str(e)), 500
 
 # --- ROTAS DE ACESSO ---
+@app.route("/ping")
+def ping():
+    return "pong - app is alive"
+
 @app.route("/")
 def index():
     return render_template("index.html")
