@@ -40,9 +40,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configuração de SSL para pg8000 via ssl_context (a forma definitiva)
 if "postgresql+pg8000" in db_url:
+    # Criamos um contexto que ignora a validação de certificados (necessário para Neon/Supabase no Vercel)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
-            "ssl_context": ssl.create_default_context()
+            "ssl_context": ctx
         }
     }
 else:
