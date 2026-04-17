@@ -17,7 +17,6 @@ IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is n
 
 # --- CONFIGURAÇÃO DA BASE DE DADOS ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
-print(f"[DEBUG] Inicializando aplicação... Vercel: {IS_VERCEL}")
 
 if not db_url:
     db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
@@ -40,7 +39,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configuração de SSL para pg8000 via ssl_context (a forma definitiva)
 if "postgresql+pg8000" in db_url:
-    # Criamos um contexto que ignora a validação de certificados (necessário para Neon/Supabase no Vercel)
+    # Contexto que ignora validação de certificados (essencial para Neon/Supabase no Vercel)
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -52,10 +51,6 @@ if "postgresql+pg8000" in db_url:
     }
 else:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
-
-print(f"[DEBUG] SQLAlchemy URI (final): {db_url.split('@')[-1] if '@' in db_url else 'local'}")
-print(f"[DEBUG] Engine Options: {app.config.get('SQLALCHEMY_ENGINE_OPTIONS')}")
-
 # --- FIM DA CONFIGURAÇÃO DA BASE DE DADOS ---
 
 # Configuração de Uploads - No Vercel só podemos escrever em /tmp
@@ -156,19 +151,15 @@ def handle_exception(e):
     if isinstance(e, HTTPException):
         return e
         
-    # Print apenas de erros reais para os logs do Vercel
-    print(f"!!! CRASH REAL DETETADO: {type(e).__name__}: {str(e)}")
+    # Log técnico para o Vercel
+    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
     
-    return f"""
-    <div style='font-family: sans-serif; padding: 20px; border: 5px solid red;'>
-        <h2>Ocorreu um Erro Crítico no MyLoft</h2>
-        <p><b>Tipo de Erro:</b> {type(e).__name__}</p>
-        <p><b>Detalhes:</b> {str(e)}</p>
-        <hr>
-        <p><a href='/ping'>Testar ligação Técnica (/ping)</a></p>
-        <p><a href='/'>Voltar ao Início</a></p>
-    </div>
-    """, 500
+    # Tenta renderizar o template elegante. 
+    # Se falhar (ex: erro de BD na base.html), usa um fail-safe em texto.
+    try:
+        return render_template("erro_db.html", erro=str(e)), 500
+    except Exception:
+        return f"<h1>Erro de Sistema</h1><p>Não foi possível carregar o template de erro. Detalhes: {str(e)}</p>", 500
 
 # --- ROTAS DE ACESSO ---
 @app.route("/ping")
