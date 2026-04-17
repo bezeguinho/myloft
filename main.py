@@ -1,5 +1,6 @@
 import os
 import re
+import ssl
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -35,11 +36,11 @@ if "sslmode" in db_url:
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração de SSL para pg8000 via connect_args (a forma correta)
+# Configuração de SSL para pg8000 via ssl_context (a forma definitiva)
 if "postgresql+pg8000" in db_url:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
-            "ssl": True
+            "ssl_context": ssl.create_default_context()
         }
     }
 else:
