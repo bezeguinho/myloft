@@ -1,51 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="col-12 col-md-8 col-lg-6">
-        <div class="card shadow-lg border-0" style="border-radius: 15px;">
-            <div class="card-body p-5 text-center">
-                <div class="mb-4">
-                    <i class="bi bi-exclamation-octagon-fill text-danger" style="font-size: 4rem;"></i>
-                </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 text-center p-4" style="border-radius: 20px;">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <i class="bi bi-wallet2 text-primary" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="fw-bold text-uppercase">Pagamento Pendente</h2>
+                    <p class="text-muted fs-5">A sua conta MyLoft encontra-se inativa. Para aceder ao sistema, efetue o
+                        pagamento da subscrição.</p>
 
-                <h2 class="fw-bold text-dark text-uppercase mb-3">Acesso Suspenso</h2>
-                <p class="text-muted mb-4">A sua subscrição MYLOFT expirou ou o pagamento ainda não foi processado.</p>
-
-                <div class="bg-light p-4 rounded-3 border mb-4">
-                    <h5 class="fw-bold text-primary mb-3 text-uppercase small">Formas de Pagamento</h5>
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="fw-bold"><i class="bi bi-phone-fill me-2"></i>MBWAY:</span>
-                        <span class="badge bg-white text-dark border p-2 fs-6">912 345 678</span>
+                    <div class="bg-light p-4 rounded-4 my-4 border shadow-sm">
+                        <h6 class="fw-bold text-uppercase text-secondary small mb-3">Pagar via MBWAY</h6>
+                        <div class="fs-2 fw-bold text-primary">912 345 678</div>
+                        <div class="fw-bold text-dark mt-2">Valor: 20,00€</div>
                     </div>
 
-                    <hr>
-
-                    <div class="text-start">
-                        <div class="small fw-bold text-muted text-uppercase mb-2">Referência Multibanco:</div>
-                        <div class="d-flex justify-content-between mb-1">
+                    <div class="bg-light p-4 rounded-4 mb-4 border text-start shadow-sm">
+                        <h6 class="fw-bold text-uppercase text-secondary small mb-3 text-center">Referência Multibanco
+                        </h6>
+                        <div class="d-flex justify-content-between mb-2">
                             <span>Entidade:</span> <span class="fw-bold">12345</span>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span>Referência:</span> <span class="fw-bold">999 000 111</span>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Valor:</span> <span class="fw-bold">XX,00€</span>
-                        </div>
                     </div>
-                </div>
 
-                <p class="small text-muted">Após o pagamento, o Administrador ativará a sua conta num prazo máximo de
-                    24h.</p>
+                    <a href="https://wa.me/351912345678?text=Ola!+Efectuei+o+pagamento+da+subscricao+MyLoft"
+                        class="btn btn-success btn-lg w-100 fw-bold shadow-sm py-3 text-uppercase">
+                        <i class="bi bi-whatsapp me-2"></i> Enviar Comprovativo
+                    </a>
 
-                <a href="https://wa.me/351912345678?text=Envio+comprovativo+de+pagamento+MyLoft"
-                    class="btn btn-success w-100 btn-lg shadow-sm fw-bold">
-                    <i class="bi bi-whatsapp me-2"></i>Enviar Comprovativo
-                </a>
-
-                <div class="mt-4">
-                    <a href="{{ url_for('logout') }}" class="text-decoration-none text-secondary fw-bold small">Tentar
-                        com outra conta</a>
+                    <div class="mt-4">
+                        <a href="{{ url_for('logout') }}" class="text-muted small fw-bold text-decoration-none">Sair e
+                            tentar outro email</a>
+                    </div>
                 </div>
             </div>
         </div>

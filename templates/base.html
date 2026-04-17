@@ -78,10 +78,6 @@
       padding: 10px 20px;
     }
 
-    .btn-executar:hover {
-      color: #000000 !important;
-    }
-
     .btn-retroceder {
       background-color: var(--amarelo-myloft) !important;
       color: #ffffff !important;
@@ -90,10 +86,6 @@
       border: none;
       transition: 0.3s;
       padding: 10px 20px;
-    }
-
-    .btn-retroceder:hover {
-      color: #000000 !important;
     }
   </style>
 </head>
@@ -125,12 +117,10 @@
           </li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
-
           {% if current_user.is_admin %}
           <li class="nav-item ms-lg-3"><a class="nav-link bg-warning text-dark shadow-sm"
               href="{{ url_for('admin_dashboard') }}"><i class="bi bi-shield-lock-fill me-1"></i> ADMIN</a></li>
           {% endif %}
-
           <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
           {% endif %}
         </ul>
