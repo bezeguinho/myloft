@@ -5,14 +5,14 @@
         <div class="card shadow border-0 p-4" style="border-radius: 12px;">
             <h2 class="text-center text-primary fw-bold mb-4 text-uppercase">Criar Conta</h2>
 
-            <form method="POST">
+            <form method="POST" onsubmit="return validarPasswords()">
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-uppercase">Email</label>
                     <input type="email" name="email" class="form-control" style="border: 1px solid #777;" required
                         autofocus>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="form-label fw-bold small text-uppercase">Password</label>
                     <div class="input-group">
                         <input type="password" name="password" id="regPassword" class="form-control"
@@ -23,6 +23,14 @@
                             <i class="bi bi-eye-slash text-dark" id="eyeIconReg"></i>
                         </button>
                     </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-uppercase">Repetir Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" style="border: 1px solid #777;"
+                        required>
+                    <div id="erroPassword" class="text-danger small fw-bold mt-1" style="display: none;">As passwords
+                        não coincidem!</div>
                 </div>
 
                 <button type="submit" class="btn btn-executar w-100 btn-lg shadow text-uppercase">Registar
@@ -48,6 +56,18 @@
             input.type = "password";
             icon.classList.replace("bi-eye", "bi-eye-slash");
         }
+    }
+
+    function validarPasswords() {
+        var p1 = document.getElementById("regPassword").value;
+        var p2 = document.getElementById("confirmPassword").value;
+        var erro = document.getElementById("erroPassword");
+
+        if (p1 !== p2) {
+            erro.style.display = "block";
+            return false;
+        }
+        return true;
     }
 </script>
 {% endblock %}
