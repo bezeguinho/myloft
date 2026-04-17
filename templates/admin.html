@@ -1,51 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-lg-9">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary text-uppercase m-0">Painel de Administrador</h2>
+            <h2 class="fw-bold text-primary text-uppercase m-0">Gestão de Utilizadores</h2>
             <span class="badge bg-primary fs-6">{{ users|length }} Contas</span>
         </div>
 
         <div class="row g-3">
             {% for u in users %}
             <div class="col-12">
-                <div class="card shadow-sm border-0 {% if not u.conta_ativa %}bg-light{% endif %}">
-                    <div
-                        class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="card shadow-sm border-0 {% if not u.conta_ativa %}bg-light text-muted{% endif %}">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-5 mb-3 mb-md-0">
+                                <h5 class="fw-bold mb-1 text-uppercase">
+                                    <i class="bi bi-person-circle me-2"></i>{{ u.email }}
+                                </h5>
+                                <div class="small fw-bold">
+                                    ID: #{{ u.id }} |
+                                    {% if u.is_admin %}
+                                    <span class="text-primary"><i class="bi bi-shield-check"></i> ADMINISTRADOR</span>
+                                    {% else %}
+                                    <span class="text-secondary"><i class="bi bi-person"></i> UTILIZADOR COMUM</span>
+                                    {% endif %}
+                                </div>
+                            </div>
 
-                        <div>
-                            <h5 class="fw-bold mb-1 text-uppercase">
-                                <i class="bi bi-person-circle text-secondary me-2"></i>{{ u.email }}
-                            </h5>
-                            <div class="small text-muted fw-bold">
-                                ID Cliente: #{{ u.id }}
-                                {% if u.is_admin %}<span class="badge bg-dark ms-2">ADMINISTRADOR</span>{% endif %}
+                            <div class="col-12 col-md-7">
+                                <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+
+                                    {% if u.id != current_user.id %}
+                                    <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
+                                        class="btn btn-sm {% if u.conta_ativa %}btn-outline-danger{% else %}btn-success{% endif %} fw-bold px-3">
+                                        {% if u.conta_ativa %}Bloquear Acesso{% else %}Ativar (Pago){% endif %}
+                                    </a>
+
+                                    <a href="{{ url_for('toggle_admin_role', user_id=u.id) }}"
+                                        class="btn btn-sm btn-dark fw-bold px-3">
+                                        {% if u.is_admin %}Retirar Admin{% else %}Tornar Admin{% endif %}
+                                    </a>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark">A tua conta (Protegida)</span>
+                                    {% endif %}
+
+                                </div>
                             </div>
                         </div>
-
-                        {% if not u.is_admin %}
-                        <div>
-                            {% if u.conta_ativa %}
-                            <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
-                                class="btn btn-outline-danger w-100 fw-bold shadow-sm">
-                                <i class="bi bi-lock-fill me-1"></i> Bloquear (Falta Pagamento)
-                            </a>
-                            {% else %}
-                            <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
-                                class="btn btn-success w-100 fw-bold shadow-sm">
-                                <i class="bi bi-unlock-fill me-1"></i> Ativar Conta (Pago)
-                            </a>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-
     </div>
 </div>
 {% endblock %}
