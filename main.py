@@ -12,43 +12,40 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 
-# --- INÍCIO DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
+# --- CONFIGURAÇÃO DA BASE DE DADOS ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+print(f"[DEBUG] Inicializando aplicação... Vercel: {IS_VERCEL}")
 
 if not db_url:
-    if IS_VERCEL:
-        db_url = 'sqlite:////tmp/local.db'
-    else:
-        db_url = 'sqlite:///local.db'
-else:
-    # 1. Removemos a parte problemática que o pg8000 não percebe
-    if "?sslmode" in db_url:
-        db_url = db_url.split("?sslmode")[0]
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 
-    # 2. Forçamos o uso do driver pg8000 compatível com Vercel
-    if db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql+pg8000://', 1)
-    elif db_url.startswith('postgresql://') and not db_url.startswith('postgresql+pg8000://'):
-        db_url = db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {} 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# --- FIM DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
-
-# Corrige prefixos e garante uso do driver pg8000 compatível com Vercel
+# Normalização para drivers compatíveis com Vercel
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
 elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
     db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-if 'sslmode' not in db_url and 'sqlite' not in db_url:
-    separator = '&' if '?' in db_url else '?'
-    db_url += f"{separator}sslmode=require"
+# Removemos sslmode da query string para evitar TypeError no pg8000
+if "sslmode" in db_url:
+    if "?" in db_url:
+        base, query = db_url.split("?", 1)
+        params = [p for p in query.split("&") if not p.startswith("sslmode")]
+        db_url = base + ("?" + "&".join(params) if params else "")
 
-print(f"[DEBUG] SQLAlchemy URI configurado para host: {db_url.split('@')[-1] if '@' in db_url else 'local'}")
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configuração de SSL para pg8000 via connect_args (a forma correta)
+if "postgresql+pg8000" in db_url:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {
+            "ssl": True
+        }
+    }
+else:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
+
+print(f"[DEBUG] DB URI configurada para: {db_url.split('@')[-1] if '@' in db_url else 'local'}")
 # --- FIM DA CONFIGURAÇÃO DA BASE DE DADOS ---
 
 # Configuração de Uploads - No Vercel só podemos escrever em /tmp
