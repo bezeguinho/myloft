@@ -12,25 +12,23 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 
-# Configuração da Base de Dados
-db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
-if db_url:
-    # Assegurar que usa o driver pg8000 compatível com Neon/Supabase em Vercel
-    if db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql+pg8000://', 1)
-    elif db_url.startswith('postgresql://'):
-        db_url = db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
-        
-    if 'sslmode' not in db_url:
-        db_url += '?sslmode=require'
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-else:
-    if IS_VERCEL:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/local.db'
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
+# --- INÍCIO DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
+if not db_url:
+    if IS_VERCEL:
+        db_url = 'sqlite:////tmp/local.db'
+    else:
+        db_url = 'sqlite:///local.db'
+
+# Corrige automaticamente o prefixo para o SQLAlchemy moderno
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {} 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- FIM DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
 
 # Configuração de Uploads - No Vercel só podemos escrever em /tmp
 if IS_VERCEL:
@@ -226,167 +224,3 @@ def novo_pombo():
             return redirect(url_for('novo_pombo'))
 
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
-
-@app.route("/lista_pombos")
-@login_required
-def lista_pombos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
-
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
-
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
-
-@app.route("/estatisticas")
-@login_required
-def estatisticas():
-    stats = get_colony_stats(current_user.id)
-    return render_template("estatisticas.html", stats=stats)
-
-@app.route("/pedigree/gerar")
-@login_required
-def gerar_pedigree():
-    # Passamos os pombos para o seletor no frontend
-    pombos = Pombo.query.filter_by(user_id=current_user.id).all()
-    return render_template("gerar_pedigree.html", pombos=pombos)
-
-@app.route("/pedigree/view", methods=['POST'])
-@login_required
-def view_pedigree():
-    anilha = request.form.get('anilha')
-    if not anilha:
-        flash('Por favor, indique a anilha do pombo.', 'warning')
-        return redirect(url_for('gerar_pedigree'))
-        
-    tree = get_pombo_tree(anilha, current_user.id)
-    if not tree or tree.get('nome') == 'Não Registado':
-        flash('Pombo não encontrado.', 'danger')
-        return redirect(url_for('gerar_pedigree'))
-        
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    return render_template("pedigree_view.html", tree=tree, utilizador=utilizador)
-
-@app.route("/meus-dados/ver")
-@login_required
-def ver_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-    return render_template("meus_dados_ver.html", utilizador=utilizador)
-
-@app.route("/meus-dados/editar", methods=['GET', 'POST'])
-@login_required
-def editar_dados():
-    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    if not utilizador:
-        utilizador = Utilizador(user_id=current_user.id)
-        db.session.add(utilizador)
-        db.session.commit()
-
-    if request.method == 'POST':
-        utilizador.nome = request.form.get('nome')
-        utilizador.localidade = request.form.get('localidade') # Mapeado para o campo correto
-        utilizador.telefone = request.form.get('telefone')
-        utilizador.email = request.form.get('email')
-        
-        foto = request.files.get('foto')
-        if foto and foto.filename:
-            filename = secure_filename(f"perfil_{current_user.id}_{foto.filename}")
-            filepath = os.path.join(app.static_folder, 'uploads', filename)
-            foto.save(filepath)
-            utilizador.foto = 'uploads/' + filename
-
-        try:
-            db.session.commit()
-            flash('Perfil atualizado com sucesso!', 'success')
-            return redirect(url_for('ver_dados'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
-
-    return render_template("meus_dados_editar.html", utilizador=utilizador)
-
-from flask import send_from_directory
-
-@app.route('/static/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-# --- ÁREA ADMINISTRATIVA ---
-@app.route("/admin/dashboard")
-@login_required
-def admin_dashboard():
-    if not current_user.is_admin:
-        flash("Acesso restrito.", "danger")
-        return redirect(url_for('index'))
-    users = User.query.all()
-    return render_template("admin.html", users=users)
-
-@app.route("/admin/toggle_conta/<int:user_id>")
-@login_required
-def toggle_conta(user_id):
-    if not current_user.is_admin:
-        return redirect(url_for('index'))
-    user_alvo = User.query.get(user_id)
-    if user_alvo and user_alvo.id != current_user.id:
-        user_alvo.conta_ativa = not user_alvo.conta_ativa
-        db.session.commit()
-        flash(f"Estado da conta de {user_alvo.email} alterado.", "success")
-    return redirect(url_for('admin_dashboard'))
-
-@app.route("/admin/toggle_admin/<int:user_id>")
-@login_required
-def toggle_admin_role(user_id):
-    if not current_user.is_admin:
-        return redirect(url_for('index'))
-    user_alvo = User.query.get(user_id)
-    if user_alvo and user_alvo.id != current_user.id:
-        user_alvo.is_admin = not user_alvo.is_admin
-        db.session.commit()
-        flash(f"Cargo de {user_alvo.email} alterado com sucesso.", "success")
-    return redirect(url_for('admin_dashboard'))
-
-@app.route("/ganhar_poderes_secretos")
-@login_required
-def ganhar_poderes_secretos():
-    current_user.is_admin = True
-    db.session.commit()
-    return "<h3>BOOOM! Agora és o Dono Disto Tudo!</h3><p><a href='/admin/dashboard'>Entrar no Painel Secreto</a></p>"
-
-@app.route("/limpar_tudo")
-def limpar_tudo():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
-
-if __name__ == "__main__":
-    app.run(debug=True)
