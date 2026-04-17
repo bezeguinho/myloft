@@ -10,23 +10,40 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
+
 # Configuração da Base de Dados
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
+    # Assegurar que usa o driver pg8000 compatível com Neon/Supabase em Vercel
     if db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+        db_url = db_url.replace('postgres://', 'postgresql+pg8000://', 1)
+    elif db_url.startswith('postgresql://'):
+        db_url = db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+        
     if 'sslmode' not in db_url:
         db_url += '?sslmode=require'
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/local.db'
+    if IS_VERCEL:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/local.db'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração de Uploads
-UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = 'uploads' # Relativo a static
+# Configuração de Uploads - No Vercel só podemos escrever em /tmp
+if IS_VERCEL:
+    UPLOAD_FOLDER = '/tmp/uploads'
+else:
+    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+
+try:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except Exception:
+    pass
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -310,6 +327,12 @@ def editar_dados():
             flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
 
     return render_template("meus_dados_editar.html", utilizador=utilizador)
+
+from flask import send_from_directory
+
+@app.route('/static/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route("/logout")
 @login_required
