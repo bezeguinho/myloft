@@ -1,5 +1,4 @@
-from app import app, db
-from models import Pombo
+from main import app, db
 
 with app.app_context():
     db.drop_all()
