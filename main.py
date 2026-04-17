@@ -3,8 +3,10 @@ import re
 import ssl
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
@@ -145,16 +147,20 @@ def load_user(user_id):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Print para os logs do Vercel
-    print(f"!!! CRASH DETEK: {type(e).__name__}: {str(e)}")
-    # Retorno simples sem depender de templates/base.html
+    # Se for um erro HTTP normal (como 404), deixa o Flask lidar normalmente
+    if isinstance(e, HTTPException):
+        return e
+        
+    # Print apenas de erros reais para os logs do Vercel
+    print(f"!!! CRASH REAL DETETADO: {type(e).__name__}: {str(e)}")
+    
     return f"""
     <div style='font-family: sans-serif; padding: 20px; border: 5px solid red;'>
-        <h2>Ocorreu um Erro no MyLoft</h2>
-        <p><b>Tipo:</b> {type(e).__name__}</p>
-        <p><b>Mensagem:</b> {str(e)}</p>
+        <h2>Ocorreu um Erro Crítico no MyLoft</h2>
+        <p><b>Tipo de Erro:</b> {type(e).__name__}</p>
+        <p><b>Detalhes:</b> {str(e)}</p>
         <hr>
-        <p><a href='/ping'>Testar ligação ao servidor (/ping)</a></p>
+        <p><a href='/ping'>Testar ligação Técnica (/ping)</a></p>
         <p><a href='/'>Voltar ao Início</a></p>
     </div>
     """, 500
@@ -162,7 +168,12 @@ def handle_exception(e):
 # --- ROTAS DE ACESSO ---
 @app.route("/ping")
 def ping():
-    return "pong - app is alive"
+    try:
+        # Tenta uma consulta mínima à base de dados
+        db.session.execute(text("SELECT 1"))
+        return "Ping: OK | Base de Dados: CONECTADA (pg8000 + SSL Context)"
+    except Exception as e:
+        return f"Ping: OK | Base de Dados: ERRO ({str(e)})", 500
 
 @app.route("/")
 def index():
