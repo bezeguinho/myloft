@@ -12,15 +12,29 @@ app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS ---
+# --- INÍCIO DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
-print(f"[DEBUG] Inicializando aplicação... Vercel: {IS_VERCEL}")
 
 if not db_url:
     if IS_VERCEL:
         db_url = 'sqlite:////tmp/local.db'
     else:
         db_url = 'sqlite:///local.db'
+else:
+    # 1. Removemos a parte problemática que o pg8000 não percebe
+    if "?sslmode" in db_url:
+        db_url = db_url.split("?sslmode")[0]
+
+    # 2. Forçamos o uso do driver pg8000 compatível com Vercel
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql+pg8000://', 1)
+    elif db_url.startswith('postgresql://') and not db_url.startswith('postgresql+pg8000://'):
+        db_url = db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {} 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- FIM DA NOVA CONFIGURAÇÃO DA BASE DE DADOS ---
 
 # Corrige prefixos e garante uso do driver pg8000 compatível com Vercel
 if db_url.startswith("postgres://"):
