@@ -29,7 +29,6 @@
       font-size: 1.6rem;
     }
 
-    /* HOVER NO DESKTOP */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -126,6 +125,12 @@
           </li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
+
+          {% if current_user.is_admin %}
+          <li class="nav-item ms-lg-3"><a class="nav-link bg-warning text-dark shadow-sm"
+              href="{{ url_for('admin_dashboard') }}"><i class="bi bi-shield-lock-fill me-1"></i> ADMIN</a></li>
+          {% endif %}
+
           <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
           {% endif %}
         </ul>
