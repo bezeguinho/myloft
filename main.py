@@ -46,7 +46,9 @@ if "postgresql+pg8000" in db_url:
 else:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 
-print(f"[DEBUG] DB URI configurada para: {db_url.split('@')[-1] if '@' in db_url else 'local'}")
+print(f"[DEBUG] SQLAlchemy URI (final): {db_url.split('@')[-1] if '@' in db_url else 'local'}")
+print(f"[DEBUG] Engine Options: {app.config.get('SQLALCHEMY_ENGINE_OPTIONS')}")
+
 # --- FIM DA CONFIGURAÇÃO DA BASE DE DADOS ---
 
 # Configuração de Uploads - No Vercel só podemos escrever em /tmp
@@ -143,7 +145,19 @@ def load_user(user_id):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    return render_template("erro_db.html", erro=str(e)), 500
+    # Print para os logs do Vercel
+    print(f"!!! CRASH DETEK: {type(e).__name__}: {str(e)}")
+    # Retorno simples sem depender de templates/base.html
+    return f"""
+    <div style='font-family: sans-serif; padding: 20px; border: 5px solid red;'>
+        <h2>Ocorreu um Erro no MyLoft</h2>
+        <p><b>Tipo:</b> {type(e).__name__}</p>
+        <p><b>Mensagem:</b> {str(e)}</p>
+        <hr>
+        <p><a href='/ping'>Testar ligação ao servidor (/ping)</a></p>
+        <p><a href='/'>Voltar ao Início</a></p>
+    </div>
+    """, 500
 
 # --- ROTAS DE ACESSO ---
 @app.route("/ping")
