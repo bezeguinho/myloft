@@ -9,6 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
 
+# Configuração da Base de Dados
 db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
 if db_url:
     if db_url.startswith('postgres://'):
@@ -25,7 +26,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS DE BASE DE DADOS ---
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -64,17 +65,9 @@ def load_user(user_id):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    return f"""
-    <div style="font-family: sans-serif; text-align: center; padding: 50px;">
-        <h1 style="color: #dc3545;">Temos de Atualizar a Base de Dados</h1>
-        <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-            CLICAR AQUI PARA ATUALIZAR
-        </a>
-        <p style="margin-top:20px; color:#666;">{str(e)}</p>
-    </div>
-    """, 500
+    return render_template("erro_db.html", erro=str(e)), 500
 
-# --- ROTAS DE AUTENTICAÇÃO ---
+# --- ROTAS DE ACESSO ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -144,4 +137,110 @@ def novo_pombo():
             if match:
                 numero_novo = int(match.group(1)) + 1
                 tamanho = len(match.group(1))
-                proxima_anilha = ultimo_pombo.anilha[:match.start()]
+                proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
+            else:
+                proxima_anilha = ultimo_pombo.anilha + "-1"
+
+    return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
+
+@app.route("/lista_pombos")
+@login_required
+def lista_pombos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
+
+@app.route("/reprodutores")
+@login_required
+def reprodutores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+
+@app.route("/voadores")
+@login_required
+def voadores():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+
+@app.route("/cedidos")
+@login_required
+def cedidos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+
+@app.route("/pombos_ocultos")
+@login_required
+def pombos_ocultos():
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+
+@app.route("/pedigree/gerar")
+@login_required
+def gerar_pedigree():
+    return render_template("gerar_pedigree.html")
+
+@app.route("/meus-dados/ver")
+@login_required
+def ver_dados():
+    utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
+    if not utilizador:
+        utilizador = Utilizador(user_id=current_user.id)
+        db.session.add(utilizador)
+        db.session.commit()
+    return render_template("meus_dados_ver.html", utilizador=utilizador)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# --- ÁREA ADMINISTRATIVA ---
+@app.route("/admin/dashboard")
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash("Acesso restrito.", "danger")
+        return redirect(url_for('index'))
+    users = User.query.all()
+    return render_template("admin.html", users=users)
+
+@app.route("/admin/toggle_conta/<int:user_id>")
+@login_required
+def toggle_conta(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+    user_alvo = User.query.get(user_id)
+    if user_alvo and user_alvo.id != current_user.id:
+        user_alvo.conta_ativa = not user_alvo.conta_ativa
+        db.session.commit()
+        flash(f"Estado da conta de {user_alvo.email} alterado.", "success")
+    return redirect(url_for('admin_dashboard'))
+
+@app.route("/admin/toggle_admin/<int:user_id>")
+@login_required
+def toggle_admin_role(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+    user_alvo = User.query.get(user_id)
+    if user_alvo and user_alvo.id != current_user.id:
+        user_alvo.is_admin = not user_alvo.is_admin
+        db.session.commit()
+        flash(f"Cargo de {user_alvo.email} alterado com sucesso.", "success")
+    return redirect(url_for('admin_dashboard'))
+
+@app.route("/ganhar_poderes_secretos")
+@login_required
+def ganhar_poderes_secretos():
+    current_user.is_admin = True
+    db.session.commit()
+    return "<h3>BOOOM! Agora és o Dono Disto Tudo!</h3><p><a href='/admin/dashboard'>Entrar no Painel Secreto</a></p>"
+
+@app.route("/limpar_tudo")
+def limpar_tudo():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
+
+if __name__ == "__main__":
+    app.run(debug=True)
