@@ -26,16 +26,13 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS (Atualizados com Administração) ---
+# --- MODELOS ---
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    # NOVAS GAVETAS DO ADMIN:
     is_admin = db.Column(db.Boolean, default=False)
-    # default=True significa que a conta entra livre (podes depois bloquear no painel).
-    # Se quiseres que TODOS fiquem bloqueados à nascença até pagarem, mudas o True para False.
     conta_ativa = db.Column(db.Boolean, default=True) 
 
 class Utilizador(db.Model):
@@ -74,10 +71,11 @@ def handle_exception(e):
         <a href="/limpar_tudo" style="background-color: #0d6efd; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
             CLICAR AQUI PARA ATUALIZAR
         </a>
+        <p style="margin-top:20px; color:#666;">{str(e)}</p>
     </div>
     """, 500
 
-# --- ROTAS PRINCIPAIS ---
+# --- ROTAS ---
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -89,12 +87,9 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
-            
-            # --- O SEGURANÇA DA PORTA (Verifica Pagamentos) ---
             if not user.conta_ativa:
-                flash("Acesso Negado: A sua conta encontra-se suspensa ou a aguardar verificação de pagamento. Contacte a Administração.", "danger")
+                flash("Acesso Negado: A sua conta aguarda verificação de pagamento.", "danger")
                 return redirect(url_for('login'))
-                
             login_user(user)
             return redirect(url_for('index'))
         flash("Email ou Password incorretos.", "danger")
@@ -116,7 +111,6 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-# --- ROTAS DE GESTÃO DE POMBOS (Intocáveis e Perfeitas) ---
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
@@ -153,36 +147,43 @@ def novo_pombo():
 
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
 
-@app.route("/lista_pombos") @login_required
+@app.route("/lista_pombos")
+@login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
 
-@app.route("/reprodutores") @login_required
+@app.route("/reprodutores")
+@login_required
 def reprodutores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
 
-@app.route("/voadores") @login_required
+@app.route("/voadores")
+@login_required
 def voadores():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
 
-@app.route("/cedidos") @login_required
+@app.route("/cedidos")
+@login_required
 def cedidos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
     return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
 
-@app.route("/pombos_ocultos") @login_required
+@app.route("/pombos_ocultos")
+@login_required
 def pombos_ocultos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
     return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
 
-@app.route("/pedigree/gerar") @login_required
+@app.route("/pedigree/gerar")
+@login_required
 def gerar_pedigree():
     return render_template("gerar_pedigree.html")
 
-@app.route("/meus-dados/ver") @login_required
+@app.route("/meus-dados/ver")
+@login_required
 def ver_dados():
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
     if not utilizador:
@@ -191,24 +192,18 @@ def ver_dados():
         db.session.commit()
     return render_template("meus_dados_ver.html", utilizador=utilizador)
 
-@app.route("/logout") @login_required
+@app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# ==========================================
-# ROTAS EXCLUSIVAS DO ADMINISTRADOR
-# ==========================================
-
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():
-    # Segurança de ferro: Se não for admin, leva um chuto para a página inicial
     if not current_user.is_admin:
-        flash("Acesso restrito. Não tem permissões de Administrador.", "danger")
+        flash("Acesso restrito.", "danger")
         return redirect(url_for('index'))
-    
-    # Procura todos os utilizadores no sistema
     users = User.query.all()
     return render_template("admin.html", users=users)
 
@@ -217,26 +212,19 @@ def admin_dashboard():
 def toggle_conta(user_id):
     if not current_user.is_admin:
         return redirect(url_for('index'))
-        
     user_alvo = User.query.get(user_id)
-    # Não podes bloquear a tua própria conta por acidente
     if user_alvo and user_alvo.id != current_user.id:
         user_alvo.conta_ativa = not user_alvo.conta_ativa
         db.session.commit()
-        status = "ATIVADA" if user_alvo.conta_ativa else "BLOQUEADA"
-        flash(f"A conta de {user_alvo.email} foi {status}.", "success")
-        
+        flash(f"Estado da conta de {user_alvo.email} alterado.", "success")
     return redirect(url_for('admin_dashboard'))
 
-# --- A ROTA SECRETA PARA TE DAR PODERES (O "Easter Egg") ---
 @app.route("/ganhar_poderes_secretos")
 @login_required
 def ganhar_poderes_secretos():
     current_user.is_admin = True
     db.session.commit()
     return "<h3>BOOOM! Agora és o Dono Disto Tudo!</h3><p><a href='/admin/dashboard'>Entrar no Painel Secreto</a></p>"
-
-# ==========================================
 
 @app.route("/limpar_tudo")
 def limpar_tudo():
