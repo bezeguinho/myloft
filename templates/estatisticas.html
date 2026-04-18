@@ -1,57 +1,95 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row align-items-center mb-4">
-    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-        <h2 class="fw-bold mb-0 text-dark"><i class="bi bi-grid-3x3-gap me-2"></i>ESTATÍSTICAS DO POMBAL</h2>
-        <a href="{{ request.referrer or url_for('lista_pombos') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Voltar
-        </a>
-    </div>
+<style>
+    /* Estilos personalizados iguais aos de pombos.html */
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: #333 !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-voltar:hover { background-color: #e6b800 !important; }
+
+    .card-stats {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .table-stats thead {
+        background-color: #f8f9fa;
+    }
+
+    .table-stats th {
+        font-weight: 700;
+        color: #000;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .text-femea { color: #ff69b4 !important; }
+    .text-macho { color: #007bff !important; }
+    .text-indef { color: #6c757d !important; }
+</style>
+
+<!-- Topo: Título e Botão Voltar -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-dark m-0">TABELA GERAL</h1>
+    <a href="{{ url_for('lista_pombos') }}" class="btn btn-voltar shadow-sm">
+        <i class="bi bi-arrow-left me-2"></i> Voltar
+    </a>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+<div class="card card-stats overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-                <tr class="text-uppercase small text-muted">
+        <table class="table table-hover align-middle mb-0 table-stats">
+            <thead>
+                <tr>
                     <th class="ps-4 py-3">Categoria</th>
                     <th class="text-center">Total</th>
-                    <th class="text-center text-danger"><i class="bi bi-gender-female"></i> Fêmeas</th>
-                    <th class="text-center text-primary"><i class="bi bi-gender-male"></i> Machos</th>
-                    <th class="text-center text-secondary">Indef.</th>
+                    <th class="text-center">Idade (Voadores)</th>
+                    <th class="text-center"><i class="bi bi-gender-female text-femea me-1"></i> Fêmeas</th>
+                    <th class="text-center"><i class="bi bi-gender-male text-macho me-1"></i> Machos</th>
+                    <th class="text-center"><i class="bi bi-question-circle text-indef me-1"></i> Indefinido</th>
                 </tr>
             </thead>
             <tbody>
-                <tr class="table-dark fw-bold">
-                    <td class="ps-4 py-3">TOTAL GERAL</td>
-                    <td class="text-center"><span class="badge bg-light text-dark rounded-pill fs-6">{{ stats.total
-                            }}</span></td>
-                    <td class="text-center">{{ stats.total_f }}</td>
-                    <td class="text-center">{{ stats.total_m }}</td>
-                    <td class="text-center">{{ stats.total_i }}</td>
-                </tr>
-
-                {% set categorias = [
-                {'nome': 'Voadores', 'icon': 'bi-send', 'total': stats.voadores, 'f': stats.voadores_f, 'm':
-                stats.voadores_m, 'i': stats.voadores_i},
-                {'nome': 'Reprodutores', 'icon': 'bi-house-heart', 'total': stats.reprodutores, 'f':
-                stats.reprodutores_f, 'm': stats.reprodutores_m, 'i': stats.reprodutores_i},
-                {'nome': 'Cedidos', 'icon': 'bi-person-up', 'total': stats.cedidos, 'f': stats.cedidos_f, 'm':
-                stats.cedidos_m, 'i': stats.cedidos_i}
+                {% set categorias_lista = [
+                    {'id': 'voadores', 'nome': 'Voadores', 'total': stats.voadores, 'f': stats.voadores_f, 'm': stats.voadores_m, 'i': stats.voadores_i, 
+                     'idade': 'A: ' ~ stats.voadores_adultos ~ ' | Y: ' ~ stats.voadores_yearlings ~ ' | B: ' ~ stats.voadores_borrachos},
+                    {'id': 'reprodutores', 'nome': 'Reprodutores', 'total': stats.reprodutores, 'f': stats.reprodutores_f, 'm': stats.reprodutores_m, 'i': stats.reprodutores_i},
+                    {'id': 'cedidos', 'nome': 'Cedidos', 'total': stats.cedidos, 'f': stats.cedidos_f, 'm': stats.cedidos_m, 'i': stats.cedidos_i}
                 ] %}
 
-                {% for cat in categorias %}
-                <tr class="bg-white">
-                    <td class="ps-4 py-3">
-                        <i class="{{ cat.icon }} text-muted me-2"></i>{{ cat.nome }}
+                {% for cat in categorias_lista %}
+                <tr>
+                    <td class="ps-4 py-3 fw-bold text-dark">{{ cat.nome }}</td>
+                    <td class="text-center fw-bold">{{ cat.total }}</td>
+                    <td class="text-center small text-muted">
+                        {{ cat.idade if cat.id == 'voadores' else '---' }}
                     </td>
-                    <td class="text-center fw-bold text-dark">{{ cat.total }}</td>
-                    <td class="text-center text-danger fw-medium">{{ cat.f }}</td>
-                    <td class="text-center text-primary fw-medium">{{ cat.m }}</td>
-                    <td class="text-center text-secondary fw-medium">{{ cat.i }}</td>
+                    <td class="text-center fw-bold text-femea">{{ cat.f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ cat.m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ cat.i }}</td>
                 </tr>
                 {% endfor %}
+
+                <!-- Linha Total Geral (Agora no fim) -->
+                <tr class="table-light fw-bold border-top border-dark border-2">
+                    <td class="ps-4 py-3">TOTAL GERAL</td>
+                    <td class="text-center text-primary fs-5">{{ stats.total }}</td>
+                    <td class="text-center">---</td>
+                    <td class="text-center text-femea">{{ stats.total_f }}</td>
+                    <td class="text-center text-macho">{{ stats.total_m }}</td>
+                    <td class="text-center text-indef">{{ stats.total_i }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

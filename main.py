@@ -92,19 +92,29 @@ class Utilizador(db.Model):
 def get_colony_stats(user_id):
     # Cálculo de estatísticas filtradas por utilizador
     pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
+    current_year = datetime.now().year
+    
     stats = {
         'total': len(pombos),
         'total_f': sum(1 for p in pombos if p.sexo == 'Fêmea'),
         'total_m': sum(1 for p in pombos if p.sexo == 'Macho'),
         'total_i': sum(1 for p in pombos if p.sexo not in ['Fêmea', 'Macho']),
+        
         'voadores': sum(1 for p in pombos if p.categoria == 'Voador'),
         'voadores_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Fêmea'),
         'voadores_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Macho'),
         'voadores_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
+        
+        # Divisão de Voadores por idade
+        'voadores_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
+        'voadores_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
+        'voadores_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
+        
         'reprodutores': sum(1 for p in pombos if p.categoria == 'Reprodutor'),
         'reprodutores_f': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
         'reprodutores_m': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Macho'),
         'reprodutores_i': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo not in ['Fêmea', 'Macho']),
+        
         'cedidos': sum(1 for p in pombos if p.categoria == 'Cedido'),
         'cedidos_f': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Fêmea'),
         'cedidos_m': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Macho'),
