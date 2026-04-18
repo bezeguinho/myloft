@@ -1,37 +1,124 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="card shadow-sm border-0" style="border-radius: 10px;">
-    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-        <h4 class="mb-0 fw-bold">{{ titulo }}</h4>
-        <a href="{{ url_for('novo_pombo') }}" class="btn btn-light btn-sm fw-bold shadow-sm">
-            <i class="bi bi-plus-lg"></i> NOVO POMBO
+<style>
+    /* Estilos personalizados para os botões conforme a imagem */
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: #333 !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .btn-voltar:hover { background-color: #e6b800 !important; }
+
+    .btn-adicionar {
+        background-color: #0056d2 !important;
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .btn-adicionar:hover { background-color: #0044a8 !important; }
+
+    .search-container {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 8px 15px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .print-container {
+        border: 1px solid #0056d2;
+        border-radius: 8px;
+        padding: 8px 15px;
+        background: white;
+        color: #0056d2;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+    .print-container:hover { background: #f0f7ff; }
+
+    @media print {
+        .no-print, .navbar, .btn-retroceder, .mb-4, .btn-group {
+            display: none !important;
+        }
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .card { border: none !important; box-shadow: none !important; }
+        .table { width: 100% !important; }
+        body { background: white !important; }
+    }
+</style>
+
+<!-- Topo: Título e Botões de Ação -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
+    <h1 class="fw-bold text-dark m-0">{{ titulo }}</h1>
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+        <a href="{{ url_for('index') }}" class="btn btn-voltar shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> Voltar
+        </a>
+        <a href="{{ url_for('novo_pombo') }}" class="btn btn-adicionar shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Adicionar Novo
         </a>
     </div>
-    <div class="card-body">
+</div>
+
+<!-- Barra de Pesquisa e Impressão -->
+<div class="row g-3 mb-4 no-print">
+    <div class="col-md-5">
+        <div class="search-container d-flex align-items-center">
+            <i class="bi bi-search text-primary me-2"></i>
+            <input type="text" id="pomboSearch" class="form-control border-0 p-0 shadow-none" 
+                   placeholder="Pesquisar por número, nome ou anilha..." 
+                   onkeyup="searchTable()">
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="print-container shadow-sm" onclick="window.print()">
+            <i class="bi bi-printer me-2"></i> Imprimir Lista
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0" style="border-radius: 10px;">
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle mb-0" id="pomboTable">
                 <thead class="table-light">
                     <tr class="text-uppercase small fw-bold text-muted">
-                        <th style="width: 120px;">Anilha</th>
+                        <th class="ps-4" style="width: 120px;">Anilha</th>
                         <th style="width: 80px;">Ano</th>
                         <th>Nome</th>
                         <th class="text-center">Sexo</th>
                         <th>Cor</th>
                         <th>Categoria</th>
-                        <th>Pais</th>
-                        <th class="text-center" style="width: 220px;">Ações</th>
+                        <th class="text-center">Pais</th>
+                        <th class="text-center" style="width: 250px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in pombos %}
-                    <tr>
-                        <td class="fw-bold">
+                    <tr class="pombo-row">
+                        <td class="fw-bold ps-4">
                             <a href="{{ url_for('editar_pombo', id=p.id) }}" class="text-decoration-none text-primary">
                                 {{ p.anilha[:9] }}
                             </a>
                         </td>
                         <td>{{ p.ano }}</td>
-                        <td>{{ p.nome or '---' }}</td>
+                        <td class="pombo-nome">{{ p.nome or '---' }}</td>
                         <td class="text-center">
                             {% if p.sexo == 'Macho' %}
                             <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
@@ -43,8 +130,8 @@
                         </td>
                         <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3 small">
+                        <td class="text-center small">
+                            <div class="d-flex align-items-center justify-content-center gap-3">
                                 <div>
                                     <span class="fw-bold text-muted">P:</span>
                                     {% if p.pai and p.pai in anilhas_registadas %}
@@ -66,14 +153,14 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3"
+                            <div class="d-flex justify-content-center gap-2 px-3">
+                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center"
                                     title="Editar">
-                                    <i class="bi bi-pencil-square me-1"></i> EDITAR
+                                    <i class="bi bi-pencil-square me-2"></i> EDITAR
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3" title="Eliminar"
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center" title="Eliminar"
                                     onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                    <i class="bi bi-trash me-1"></i> ELIMINAR
+                                    <i class="bi bi-trash me-2"></i> ELIMINAR
                                 </button>
                             </div>
                         </td>
@@ -89,12 +176,13 @@
                 </tbody>
             </table>
         </div>
-        <div class="mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow">
-                <i class="bi bi-arrow-left"></i> VOLTAR
-            </a>
-        </div>
     </div>
+</div>
+
+<div class="mt-4 pb-5 no-print">
+    <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow">
+        <i class="bi bi-arrow-left"></i> VOLTAR
+    </a>
 </div>
 
 <!-- Modal de Confirmação de Eliminação -->
@@ -128,6 +216,30 @@
         document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
         var myModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         myModal.show();
+    }
+
+    function searchTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("pomboSearch");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("pomboTable");
+        tr = table.getElementsByClassName("pombo-row");
+
+        for (i = 0; i < tr.length; i++) {
+            // Procura em Anilha (td 0) e Nome (td 2)
+            var tdAnilha = tr[i].getElementsByTagName("td")[0];
+            var tdNome = tr[i].getElementsByTagName("td")[2];
+            
+            if (tdAnilha || tdNome) {
+                var content = (tdAnilha.textContent || tdAnilha.innerText) + " " + 
+                              (tdNome.textContent || tdNome.innerText);
+                if (content.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
     }
 </script>
 {% endblock %}
