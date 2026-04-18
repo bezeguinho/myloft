@@ -24,6 +24,53 @@
     }
     .btn-adicionar:hover { background-color: #0044a8 !important; }
 
+    /* Novo campo de contagem e botão Tabela Geral */
+    .count-box {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-weight: bold;
+        color: #0056d2;
+        min-width: 50px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .btn-tabela-geral {
+        background-color: #fff;
+        border: 1px solid #0056d2 !important;
+        color: #0056d2 !important;
+        border-radius: 12px;
+        padding: 5px 15px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+    .btn-tabela-geral:hover { background-color: #f0f7ff !important; }
+
+    /* Botão Voltar ao Topo */
+    #backToTop {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        background-color: #0056d2;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+        z-index: 1000;
+        transition: 0.3s;
+    }
+    #backToTop:hover { background-color: #0044a8; transform: translateY(-3px); }
+
     .search-container {
         border: 1px solid #e0e0e0;
         border-radius: 8px;
@@ -65,7 +112,15 @@
 
 <!-- Topo: Título e Botões de Ação -->
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
-    <h1 class="fw-bold text-dark m-0">{{ titulo }}</h1>
+    <div class="d-flex align-items-center gap-3">
+        <h1 class="fw-bold text-dark m-0">{{ titulo }}</h1>
+        <div class="d-flex align-items-center gap-2">
+            <span class="count-box" title="Total nesta categoria">{{ pombos|length }}</span>
+            <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
+                <i class="bi bi-table me-1"></i> Tabela Geral
+            </a>
+        </div>
+    </div>
     <div class="d-flex gap-2 mt-3 mt-md-0">
         <a href="{{ url_for('index') }}" class="btn btn-voltar shadow-sm">
             <i class="bi bi-arrow-left me-2"></i> Voltar
@@ -156,11 +211,11 @@
                             <div class="d-flex justify-content-center gap-2 px-3">
                                 <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center"
                                     title="Editar">
-                                    <i class="bi bi-pencil-square me-2"></i> EDITAR
+                                    <i class="bi bi-pencil-square me-2"></i> Editar
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center" title="Eliminar"
                                     onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                    <i class="bi bi-trash me-2"></i> ELIMINAR
+                                    <i class="bi bi-trash me-2"></i> Eliminar
                                 </button>
                             </div>
                         </td>
@@ -179,11 +234,12 @@
     </div>
 </div>
 
-<div class="mt-4 pb-5 no-print">
-    <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow">
-        <i class="bi bi-arrow-left"></i> VOLTAR
-    </a>
 </div>
+
+<!-- Botão Voltar ao Topo -->
+<button id="backToTop" onclick="scrollToTop()" title="Voltar ao Topo">
+    <i class="bi bi-arrow-up fs-4"></i>
+</button>
 
 <!-- Modal de Confirmação de Eliminação -->
 <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
@@ -216,6 +272,20 @@
         document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
         var myModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         myModal.show();
+    }
+
+    // Botão Voltar ao Topo Logic
+    window.onscroll = function() {
+        var btn = document.getElementById("backToTop");
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            btn.style.display = "flex";
+        } else {
+            btn.style.display = "none";
+        }
+    };
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function searchTable() {

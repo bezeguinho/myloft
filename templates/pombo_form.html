@@ -82,12 +82,12 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label">NOME:</label>
                             <input type="text" name="nome" class="form-control caixa-input w-md-250" maxlength="24"
-                                value="{{ pombo.nome or '' }}">
+                                value="{{ pombo.nome if modo_edicao else '' }}">
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">COR:</label>
                             <input type="text" name="cor" class="form-control caixa-input w-md-250" maxlength="24"
-                                value="{{ pombo.cor or '' }}">
+                                value="{{ pombo.cor if modo_edicao else '' }}">
                         </div>
                     </div>
 
@@ -95,12 +95,12 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label">Nº PAI:</label>
                             <input type="text" name="pai" class="form-control caixa-input w-md-140"
-                                value="{{ pombo.pai or '' }}">
+                                value="{{ pombo.pai if modo_edicao else '' }}">
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">Nº MÃE:</label>
                             <input type="text" name="mae" class="form-control caixa-input w-md-140"
-                                value="{{ pombo.mae or '' }}">
+                                value="{{ pombo.mae if modo_edicao else '' }}">
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">SEXO:</label>
@@ -124,7 +124,7 @@
                             <div id="caixaCedidoA" class="mt-3 {% if not (modo_edicao and pombo.categoria == 'Cedido') %}d-none{% endif %}">
                                 <label class="form-label fw-bold" style="color: #000;">CEDIDO A:</label>
                                 <input type="text" name="cedido_a" id="inputCedidoA"
-                                    class="form-control caixa-input w-md-250" value="{{ pombo.cedido_a or '' }}">
+                                    class="form-control caixa-input w-md-250" value="{{ pombo.cedido_a if modo_edicao else '' }}">
                             </div>
                         </div>
 
@@ -142,7 +142,7 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
                             <textarea name="obs" class="form-control caixa-input w-md-250"
-                                style="height: 250px; resize: none; overflow: hidden;" maxlength="400">{{ pombo.obs or '' }}</textarea>
+                                style="height: 250px; resize: none; overflow: hidden;" maxlength="400">{{ pombo.obs if modo_edicao else '' }}</textarea>
                         </div>
 
                         <div
