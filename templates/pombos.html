@@ -38,11 +38,11 @@
     }
 
     .btn-tabela-geral {
-        background-color: #fff;
-        border: 1px solid #0056d2 !important;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6 !important;
         color: #0056d2 !important;
-        border-radius: 12px;
-        padding: 5px 15px;
+        border-radius: 8px;
+        padding: 4px 15px;
         font-weight: bold;
         font-size: 0.9rem;
         transition: 0.3s;
@@ -160,7 +160,7 @@
                         <th class="text-center">Sexo</th>
                         <th>Cor</th>
                         <th>Categoria</th>
-                        <th class="text-center">Pais</th>
+                        <th>Pais</th>
                         <th class="text-center" style="width: 250px;">Ações</th>
                     </tr>
                 </thead>
@@ -185,8 +185,8 @@
                         </td>
                         <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
-                        <td class="text-center small">
-                            <div class="d-flex align-items-center justify-content-center gap-3">
+                        <td class="small">
+                            <div class="d-flex align-items-center gap-3">
                                 <div>
                                     <span class="fw-bold text-muted">P:</span>
                                     {% if p.pai and p.pai in anilhas_registadas %}
@@ -251,10 +251,9 @@
                     aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 text-center">
-                <i class="bi bi-exclamation-triangle text-danger fs-1 mb-3"></i>
                 <h5 class="mb-3">Tem a certeza que quer eliminar o Pombo?</h5>
-                <p class="text-muted">Esta ação não pode ser revertida. O pombo <strong id="anilhaConfirmar"
-                        class="text-dark"></strong> será removido permanentemente.</p>
+                <p class="text-muted">Depois de apagados os dados, não será possível recuperá-los. (<strong id="anilhaConfirmar"
+                        class="text-dark"></strong>)</p>
             </div>
             <div class="modal-footer border-0 justify-content-center pb-4">
                 <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
