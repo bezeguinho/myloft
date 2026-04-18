@@ -272,32 +272,90 @@ def novo_pombo():
 @app.route("/lista_pombos")
 @login_required
 def lista_pombos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).order_by(Pombo.anilha).all()
+    # Conjunto de anilhas registadas para o utilizador
+    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS", anilhas_registadas=anilhas_registadas)
 
 @app.route("/reprodutores")
 @login_required
 def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).order_by(Pombo.anilha).all()
+    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES", anilhas_registadas=anilhas_registadas)
 
 @app.route("/voadores")
 @login_required
 def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).order_by(Pombo.anilha).all()
+    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    return render_template("pombos.html", pombos=pombos, titulo="VOADORES", anilhas_registadas=anilhas_registadas)
 
 @app.route("/cedidos")
 @login_required
 def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).all()
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).order_by(Pombo.anilha).all()
+    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS", anilhas_registadas=anilhas_registadas)
 
 @app.route("/pombos_ocultos")
 @login_required
 def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).all()
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS")
+    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).order_by(Pombo.anilha).all()
+    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS", anilhas_registadas=anilhas_registadas)
+
+@app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
+@login_required
+def editar_pombo(id):
+    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    anos_lista = list(range(datetime.now().year, 1990, -1))
+    
+    if request.method == 'POST':
+        pombo.anilha = request.form.get('anilha')
+        pombo.nome = request.form.get('nome')
+        pombo.ano = int(request.form.get('ano') or 0)
+        pombo.sexo = request.form.get('sexo')
+        pombo.cor = request.form.get('cor')
+        pombo.categoria = request.form.get('categoria')
+        pombo.pai = request.form.get('pai')
+        pombo.mae = request.form.get('mae')
+        pombo.obs = request.form.get('obs')
+        pombo.cedido_a = request.form.get('cedido_a')
+        pombo.oculto = True if request.form.get('oculto') == 'on' else False
+        
+        try:
+            db.session.commit()
+            flash(f"Pombo {pombo.anilha} atualizado com sucesso!", "success")
+            return redirect(url_for('lista_pombos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
+            
+    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
+
+@app.route("/eliminar_pombo/<int:id>", methods=['POST'])
+@login_required
+def eliminar_pombo(id):
+    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    anilha = pombo.anilha
+    try:
+        db.session.delete(pombo)
+        db.session.commit()
+        flash(f"Pombo {anilha} eliminado com sucesso.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erro ao eliminar pombo: {str(e)}", "danger")
+    return redirect(request.referrer or url_for('lista_pombos'))
+
+@app.route("/pombo_por_anilha/<anilha>")
+@login_required
+def pombo_por_anilha(anilha):
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
+    if pombo:
+        return redirect(url_for('editar_pombo', id=pombo.id))
+    flash(f"Pombo {anilha} não encontrado na sua base de dados.", "warning")
+    return redirect(request.referrer or url_for('lista_pombos'))
 
 @app.route("/estatisticas")
 @login_required

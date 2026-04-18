@@ -1,35 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card shadow-sm border-0" style="border-radius: 10px;">
-    <div class="card-header bg-primary text-white py-3">
+    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
         <h4 class="mb-0 fw-bold">{{ titulo }}</h4>
+        <a href="{{ url_for('novo_pombo') }}" class="btn btn-light btn-sm fw-bold shadow-sm">
+            <i class="bi bi-plus-lg"></i> NOVO POMBO
+        </a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
-                    <tr>
+                    <tr class="text-uppercase small fw-bold text-muted">
                         <th>Anilha</th>
-                        <th>Nome</th>
                         <th>Ano</th>
-                        <th>Sexo</th>
+                        <th>Nome</th>
+                        <th class="text-center">Sexo</th>
                         <th>Cor</th>
                         <th>Categoria</th>
+                        <th>Pais</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in pombos %}
                     <tr>
-                        <td class="fw-bold">{{ p.anilha }}</td>
-                        <td>{{ p.nome or '---' }}</td>
+                        <td class="fw-bold">
+                            <a href="{{ url_for('editar_pombo', id=p.id) }}" class="text-decoration-none text-dark">
+                                {{ p.anilha }}
+                            </a>
+                        </td>
                         <td>{{ p.ano }}</td>
-                        <td>{{ p.sexo }}</td>
+                        <td>{{ p.nome or '---' }}</td>
+                        <td class="text-center">
+                            {% if p.sexo == 'Macho' %}
+                            <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
+                            {% elif p.sexo == 'Fêmea' %}
+                            <i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
+                            {% else %}
+                            <i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>
+                            {% endif %}
+                        </td>
                         <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
+                        <td class="small">
+                            <div class="d-flex flex-column gap-1">
+                                <div>
+                                    <span class="fw-bold text-muted">P:</span>
+                                    {% if p.pai and p.pai in anilhas_registadas %}
+                                    <a href="{{ url_for('pombo_por_anilha', anilha=p.pai) }}"
+                                        class="text-decoration-none fw-bold">{{ p.pai }}</a>
+                                    {% else %}
+                                    <span class="text-muted">{{ p.pai or '---' }}</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span class="fw-bold text-muted">M:</span>
+                                    {% if p.mae and p.mae in anilhas_registadas %}
+                                    <a href="{{ url_for('pombo_por_anilha', anilha=p.mae) }}"
+                                        class="text-decoration-none fw-bold">{{ p.mae }}</a>
+                                    {% else %}
+                                    <span class="text-muted">{{ p.mae or '---' }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group shadow-sm">
+                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary"
+                                    title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">Nenhum pombo encontrado.</td>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhum pombo encontrado nesta categoria.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -42,4 +96,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmação de Eliminação -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalTitulo">Eliminar Pombo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle text-danger fs-1 mb-3"></i>
+                <h5 class="mb-3">Tem a certeza que quer eliminar o Pombo?</h5>
+                <p class="text-muted">Esta ação não pode ser revertida. O pombo <strong id="anilhaConfirmar"
+                        class="text-dark"></strong> será removido permanentemente.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">Apagar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmarEliminar(id, anilha) {
+        document.getElementById('anilhaConfirmar').innerText = anilha;
+        document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
+        var myModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        myModal.show();
+    }
+</script>
 {% endblock %}
