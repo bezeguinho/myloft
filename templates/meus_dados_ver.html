@@ -1,38 +1,112 @@
 {% extends "base.html" %}
+
 {% block content %}
+<style>
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: #333 !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-voltar:hover { background-color: #e6b800 !important; }
+
+    .btn-editar-perfil {
+        background-color: #0056d2 !important;
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-editar-perfil:hover { background-color: #0044a8 !important; }
+
+    .card-perfil {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .foto-moldura {
+        width: 220px;
+        height: 220px;
+        border-radius: 15px;
+        border: 4px solid #f8f9fa;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .label-perfil {
+        color: #777;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .valor-perfil {
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+    }
+</style>
+
+<!-- Topo: Título e Botões -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-dark m-0">OS MEUS DADOS</h1>
+    <div class="d-flex gap-3">
+        <a href="{{ url_for('editar_dados') }}" class="btn-editar-perfil shadow-sm">
+            <i class="bi bi-pencil-square me-2"></i> Editar
+        </a>
+        <a href="{{ url_for('index') }}" class="btn-voltar shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> Voltar
+        </a>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-12 col-lg-10">
-        <div class="card shadow border-0 p-5" style="border-radius: 15px;">
+    <div class="col-12 col-xl-10">
+        <div class="card card-perfil p-4 p-md-5">
             <div class="row align-items-center">
                 <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
-                    <div class="{% if not utilizador.foto %}bg-secondary{% endif %} d-flex align-items-center justify-content-center mx-auto shadow"
-                        style="width: 220px; height: 220px; border-radius: 10px; cursor: pointer; overflow: hidden;">
-                        {% if utilizador.foto %}
-                        <img src="{{ url_for('static', filename=utilizador.foto) }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        {% else %}
-                        <i class="bi bi-person-bounding-box text-white" style="font-size: 80px;"></i>
-                        {% endif %}
+                    {% if utilizador.foto %}
+                    <img src="{{ url_for('static', filename=utilizador.foto) }}" class="foto-moldura">
+                    {% else %}
+                    <div class="foto-moldura bg-light d-flex align-items-center justify-content-center mx-auto">
+                        <i class="bi bi-person-bounding-box text-muted" style="font-size: 80px;"></i>
                     </div>
-                    <p class="small text-muted mt-3 text-uppercase fw-bold">Alterar Foto</p>
+                    {% endif %}
+                    <p class="small text-muted mt-3 mb-0">FOTO DO PERFIL</p>
                 </div>
                 <div class="col-12 col-md-8 ps-md-5">
-                    <h2 class="text-primary fw-bold text-uppercase mb-4">Os Meus Dados</h2>
-                    <div class="row g-4 text-uppercase fw-bold small">
-                        <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
-                            <span class="text-muted">NOME DO COLUMBÓFILO:</span>
-                            <span class="text-dark fs-5">{{ utilizador.nome }}</span>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="label-perfil">Nome do Columbófilo</div>
+                            <div class="valor-perfil">{{ utilizador.nome }}</div>
                         </div>
-                        <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
-                            <span class="text-muted">LOCALIDADE:</span>
-                            <span class="text-dark fs-5">{{ utilizador.localidade or '---' }}</span>
+                        <div class="col-12 col-md-6">
+                            <div class="label-perfil">Localidade</div>
+                            <div class="valor-perfil">{{ utilizador.localidade or '---' }}</div>
                         </div>
-                        <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
-                            <span class="text-muted">EMAIL:</span>
-                            <span class="text-dark fs-5">{{ current_user.email }}</span>
+                        <div class="col-12 col-md-6">
+                            <div class="label-perfil">Telefone</div>
+                            <div class="valor-perfil">{{ utilizador.telefone or '---' }}</div>
                         </div>
-                        <div class="col-12 border-bottom pb-2 d-flex justify-content-between">
-                            <span class="text-muted">TELEFONE:</span>
-                            <span class="text-dark fs-5">{{ utilizador.telefone or '---' }}</span>
+                        <div class="col-12 col-md-6">
+                            <div class="label-perfil">E-mail</div>
+                            <div class="valor-perfil">{{ utilizador.email or current_user.email }}</div>
                         </div>
                     </div>
                 </div>
