@@ -37,6 +37,8 @@
     .text-femea { color: #ff69b4 !important; }
     .text-macho { color: #007bff !important; }
     .text-indef { color: #6c757d !important; }
+    
+    .text-blue-total { color: #0056d2 !important; }
 </style>
 
 <!-- Topo: Título e Botão Voltar -->
@@ -54,37 +56,59 @@
                 <tr>
                     <th class="ps-4 py-3">Categoria</th>
                     <th class="text-center">Total</th>
-                    <th class="text-center">Idade (Voadores)</th>
+                    <th class="text-center"></th> <!-- Título Idade (Voadores) eliminado -->
                     <th class="text-center"><i class="bi bi-gender-female text-femea me-1"></i> Fêmeas</th>
                     <th class="text-center"><i class="bi bi-gender-male text-macho me-1"></i> Machos</th>
                     <th class="text-center"><i class="bi bi-question-circle text-indef me-1"></i> Indefinido</th>
                 </tr>
             </thead>
             <tbody>
-                {% set categorias_lista = [
-                    {'id': 'voadores', 'nome': 'Voadores', 'total': stats.voadores, 'f': stats.voadores_f, 'm': stats.voadores_m, 'i': stats.voadores_i, 
-                     'idade': 'A: ' ~ stats.voadores_adultos ~ ' | Y: ' ~ stats.voadores_yearlings ~ ' | B: ' ~ stats.voadores_borrachos},
-                    {'id': 'reprodutores', 'nome': 'Reprodutores', 'total': stats.reprodutores, 'f': stats.reprodutores_f, 'm': stats.reprodutores_m, 'i': stats.reprodutores_i},
-                    {'id': 'cedidos', 'nome': 'Cedidos', 'total': stats.cedidos, 'f': stats.cedidos_f, 'm': stats.cedidos_m, 'i': stats.cedidos_i}
-                ] %}
-
-                {% for cat in categorias_lista %}
+                <!-- Subdivisão Voadores -->
                 <tr>
-                    <td class="ps-4 py-3 fw-bold text-dark">{{ cat.nome }}</td>
-                    <td class="text-center fw-bold">{{ cat.total }}</td>
-                    <td class="text-center small text-muted">
-                        {{ cat.idade if cat.id == 'voadores' else '---' }}
-                    </td>
-                    <td class="text-center fw-bold text-femea">{{ cat.f }}</td>
-                    <td class="text-center fw-bold text-macho">{{ cat.m }}</td>
-                    <td class="text-center fw-bold text-indef">{{ cat.i }}</td>
+                    <td rowspan="3" class="ps-4 py-3 fw-bold text-dark border-bottom">Voadores</td>
+                    <td class="text-center fw-bold text-blue-total">{{ stats.v_adultos }}</td>
+                    <td class="text-center small text-muted">Adultos</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.v_adultos_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.v_adultos_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.v_adultos_i }}</td>
                 </tr>
-                {% endfor %}
+                <tr>
+                    <td class="text-center fw-bold text-blue-total">{{ stats.v_yearlings }}</td>
+                    <td class="text-center small text-muted">Yearlings</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.v_yearlings_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.v_yearlings_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.v_yearlings_i }}</td>
+                </tr>
+                <tr class="border-bottom">
+                    <td class="text-center fw-bold text-blue-total">{{ stats.v_borrachos }}</td>
+                    <td class="text-center small text-muted">Borrachos</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.v_borrachos_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.v_borrachos_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.v_borrachos_i }}</td>
+                </tr>
 
-                <!-- Linha Total Geral (Agora no fim) -->
+                <!-- Outras Categorias -->
+                <tr>
+                    <td class="ps-4 py-3 fw-bold text-dark">Reprodutores</td>
+                    <td class="text-center fw-bold text-blue-total">{{ stats.reprodutores }}</td>
+                    <td class="text-center small text-muted">---</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.reprodutores_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.reprodutores_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.reprodutores_i }}</td>
+                </tr>
+                <tr>
+                    <td class="ps-4 py-3 fw-bold text-dark border-bottom">Cedidos</td>
+                    <td class="text-center fw-bold text-blue-total">{{ stats.cedidos }}</td>
+                    <td class="text-center small text-muted">---</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.cedidos_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.cedidos_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.cedidos_i }}</td>
+                </tr>
+
+                <!-- Linha Total Geral -->
                 <tr class="table-light fw-bold border-top border-dark border-2">
                     <td class="ps-4 py-3">TOTAL GERAL</td>
-                    <td class="text-center text-primary fs-5">{{ stats.total }}</td>
+                    <td class="text-center text-blue-total fs-5">{{ stats.total }}</td>
                     <td class="text-center">---</td>
                     <td class="text-center text-femea">{{ stats.total_f }}</td>
                     <td class="text-center text-macho">{{ stats.total_m }}</td>

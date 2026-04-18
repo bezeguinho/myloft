@@ -105,10 +105,21 @@ def get_colony_stats(user_id):
         'voadores_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Macho'),
         'voadores_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
         
-        # Divisão de Voadores por idade
-        'voadores_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
-        'voadores_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
-        'voadores_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
+        # Divisão de Voadores por idade e sexo
+        'v_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
+        'v_adultos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Fêmea'),
+        'v_adultos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Macho'),
+        'v_adultos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
+        
+        'v_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
+        'v_yearlings_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Fêmea'),
+        'v_yearlings_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Macho'),
+        'v_yearlings_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
+        
+        'v_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
+        'v_borrachos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Fêmea'),
+        'v_borrachos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Macho'),
+        'v_borrachos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo not in ['Fêmea', 'Macho']),
         
         'reprodutores': sum(1 for p in pombos if p.categoria == 'Reprodutor'),
         'reprodutores_f': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
