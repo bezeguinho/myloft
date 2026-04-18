@@ -12,22 +12,22 @@
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr class="text-uppercase small fw-bold text-muted">
-                        <th>Anilha</th>
-                        <th>Ano</th>
+                        <th style="width: 120px;">Anilha</th>
+                        <th style="width: 80px;">Ano</th>
                         <th>Nome</th>
                         <th class="text-center">Sexo</th>
                         <th>Cor</th>
                         <th>Categoria</th>
                         <th>Pais</th>
-                        <th class="text-center">Ações</th>
+                        <th class="text-center" style="width: 220px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in pombos %}
                     <tr>
                         <td class="fw-bold">
-                            <a href="{{ url_for('editar_pombo', id=p.id) }}" class="text-decoration-none text-dark">
-                                {{ p.anilha }}
+                            <a href="{{ url_for('editar_pombo', id=p.id) }}" class="text-decoration-none text-primary">
+                                {{ p.anilha[:9] }}
                             </a>
                         </td>
                         <td>{{ p.ano }}</td>
@@ -43,8 +43,8 @@
                         </td>
                         <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
-                        <td class="small">
-                            <div class="d-flex flex-column gap-1">
+                        <td>
+                            <div class="d-flex align-items-center gap-3 small">
                                 <div>
                                     <span class="fw-bold text-muted">P:</span>
                                     {% if p.pai and p.pai in anilhas_registadas %}
@@ -66,14 +66,14 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <div class="btn-group shadow-sm">
-                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary"
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3"
                                     title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
+                                    <i class="bi bi-pencil-square me-1"></i> EDITAR
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3" title="Eliminar"
                                     onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-trash me-1"></i> ELIMINAR
                                 </button>
                             </div>
                         </td>
