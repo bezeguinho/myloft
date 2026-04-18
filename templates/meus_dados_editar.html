@@ -77,7 +77,7 @@
 
 <!-- Topo: Título e Botão Voltar -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="fw-bold text-dark m-0">EDITAR PERFIL</h1>
+    <h2 class="fw-bold text-primary m-0">EDITAR PERFIL</h2>
     <a href="{{ url_for('ver_dados') }}" class="btn-voltar shadow-sm">
         <i class="bi bi-arrow-left me-2"></i> Voltar
     </a>
@@ -108,7 +108,7 @@
                     <div class="col-12 col-md-8">
                         <div class="row g-4">
                             <div class="col-12 col-md-6">
-                                <label class="form-label-top">Nome do Columbófilo</label>
+                                <label class="form-label-top">Nome</label>
                                 <input type="text" name="nome" class="form-control input-custom" value="{{ utilizador.nome }}" required>
                             </div>
                             <div class="col-12 col-md-6">
