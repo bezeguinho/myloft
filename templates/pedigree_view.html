@@ -1,27 +1,237 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container bg-white p-5 shadow" id="printableArea"
-    style="min-height: 297mm; border: 1px solid #ddd; border-radius: 10px;">
-    <div class="text-center mb-5 border-bottom pb-3">
-        <h1 class="fw-bold text-primary text-uppercase">Pedigree Columbófilo</h1>
-        <p class="text-muted fw-bold">MYLOFT - GESTÃO DIGITAL</p>
+<style>
+    :root {
+        --pedigree-border: #ccd6e0;
+        --pedigree-bg: #ffffff;
+        --male-color: #0d6efd;
+        --female-color: #d63384;
+    }
+
+    .pedigree-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        padding: 15mm;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        position: relative;
+    }
+
+    header.pedigree-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 15px;
+    }
+
+    .owner-info h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -1px;
+    }
+
+    .owner-info p {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .subject-id h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .logo-container img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #eee;
+    }
+
+    /* Pedigree Tree Grid Layout */
+    .pedigree-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        gap: 10px;
+        height: 850px;
+    }
+
+    .pombo-card {
+        border: 1.5px solid var(--pedigree-border);
+        border-radius: 12px;
+        padding: 8px;
+        background: var(--pedigree-bg);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .pombo-card .anilha-hdr {
+        font-weight: 800;
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .pombo-card .sex-icon {
+        font-size: 1.1rem;
+    }
+
+    .pombo-card .male { color: var(--male-color); }
+    .pombo-card .female { color: var(--female-color); }
+
+    .pombo-card .color-name {
+        font-weight: 700;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 2px;
+    }
+
+    .pombo-card .obs-text {
+        font-size: 0.7rem;
+        color: #555;
+        white-space: pre-line;
+    }
+
+    /* Grid Positioning */
+    .gen-1 { grid-column: 1; grid-row: 1 / span 8; height: 160px; align-self: center; margin-right: 5px; border-width: 2px; border-color: #999;}
+    .gen-2 { grid-column: 2; border-width: 1.5px; }
+    .gen-3 { grid-column: 3; border-width: 1.2px; }
+    .gen-4 { grid-column: 4; border-width: 1px; }
+
+    /* Parents (Gen 2) */
+    .p-1 { grid-row: 1 / span 4; align-self: center; height: 180px; }
+    .p-2 { grid-row: 5 / span 4; align-self: center; height: 180px; }
+
+    /* Grandparents (Gen 3) */
+    .gp-1 { grid-row: 1 / span 2; align-self: center; height: 150px; }
+    .gp-2 { grid-row: 3 / span 2; align-self: center; height: 150px; }
+    .gp-3 { grid-row: 5 / span 2; align-self: center; height: 150px; }
+    .gp-4 { grid-row: 7 / span 2; align-self: center; height: 150px; }
+
+    /* Great-Grandparents (Gen 4) */
+    .ggp-1 { grid-row: 1; height: 100px; }
+    .ggp-2 { grid-row: 2; height: 100px; }
+    .ggp-3 { grid-row: 3; height: 100px; }
+    .ggp-4 { grid-row: 4; height: 100px; }
+    .ggp-5 { grid-row: 5; height: 100px; }
+    .ggp-6 { grid-row: 6; height: 100px; }
+    .ggp-7 { grid-row: 7; height: 100px; }
+    .ggp-8 { grid-row: 8; height: 100px; }
+
+    .pedigree-footer {
+        position: absolute;
+        bottom: 15mm;
+        left: 15mm;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    @media print {
+        body { background: white !important; padding: 0 !important; }
+        .no-print { display: none !important; }
+        .pedigree-container { box-shadow: none; margin: 0; width: 100%; border: none; padding: 10mm;}
+    }
+</style>
+
+{% macro render_pombo_card(node, class_name) %}
+<div class="pombo-card {{ class_name }}">
+    {% if node and node.pombo %}
+        <div class="anilha-hdr">
+            <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
+            <span class="sex-icon {% if node.pombo.sexo == 'Macho' %}male{% else %}female{% endif %}">
+                {% if node.pombo.sexo == 'Macho' %}♂{% else %}♀{% endif %}
+            </span>
+        </div>
+        <div class="color-name">{{ node.pombo.cor or '' }} - {{ node.pombo.nome or '' }}</div>
+        <div class="obs-text">{{ node.pombo.obs or '' }}</div>
+    {% elif node %}
+        <div class="anilha-hdr">
+            <span>{{ node.p_anilha or '.' }}</span>
+        </div>
+        <div class="color-name">{{ node.nome or '' }}</div>
+    {% else %}
+        <div class="anilha-hdr"><span>.</span></div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<div class="pedigree-container" id="printableArea">
+    <header class="pedigree-header">
+        <div class="owner-info">
+            <h1>Pedigree</h1>
+            <p class="mt-2">{{ utilizador.nome or 'Seu Nome Aqui' }}</p>
+            <p>{{ utilizador.localidade or 'Sua Localidade' }}</p>
+            <p>{{ utilizador.telefone or 'Seu Telefone' }}</p>
+            <p>{{ utilizador.email or current_user.email }}</p>
+        </div>
+        <div class="d-flex flex-column align-items-end gap-3">
+            <div class="subject-id">
+                <h2>{{ tree.pombo.anilha }}</h2>
+            </div>
+            <div class="logo-container">
+                {% if utilizador.foto %}
+                <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Logo">
+                {% else %}
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc;">
+                    <i class="bi bi-person-fill" style="font-size: 3rem; color: #ccc;"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="pedigree-grid">
+        <!-- Subject (Gen 1) -->
+        {{ render_pombo_card(tree, 'gen-1') }}
+
+        <!-- Parents (Gen 2) -->
+        {{ render_pombo_card(tree.pai, 'gen-2 p-1') }}
+        {{ render_pombo_card(tree.mae, 'gen-2 p-2') }}
+
+        <!-- Grandparents (Gen 3) -->
+        {{ render_pombo_card(tree.pai.pai if tree.pai else None, 'gen-3 gp-1') }}
+        {{ render_pombo_card(tree.pai.mae if tree.pai else None, 'gen-3 gp-2') }}
+        {{ render_pombo_card(tree.mae.pai if tree.mae else None, 'gen-3 gp-3') }}
+        {{ render_pombo_card(tree.mae.mae if tree.mae else None, 'gen-3 gp-4') }}
+
+        <!-- Great-Grandparents (Gen 4) -->
+        {{ render_pombo_card(tree.pai.pai.pai if tree.pai and tree.pai.pai else None, 'gen-4 ggp-1') }}
+        {{ render_pombo_card(tree.pai.pai.mae if tree.pai and tree.pai.pai else None, 'gen-4 ggp-2') }}
+        {{ render_pombo_card(tree.pai.mae.pai if tree.pai and tree.pai.mae else None, 'gen-4 ggp-3') }}
+        {{ render_pombo_card(tree.pai.mae.mae if tree.pai and tree.pai.mae else None, 'gen-4 ggp-4') }}
+        {{ render_pombo_card(tree.mae.pai.pai if tree.mae and tree.mae.pai else None, 'gen-4 ggp-5') }}
+        {{ render_pombo_card(tree.mae.pai.mae if tree.mae and tree.mae.pai else None, 'gen-4 ggp-6') }}
+        {{ render_pombo_card(tree.mae.mae.pai if tree.mae and tree.mae.mae else None, 'gen-4 ggp-7') }}
+        {{ render_pombo_card(tree.mae.mae.mae if tree.mae and tree.mae.mae else None, 'gen-4 ggp-8') }}
     </div>
-    <div class="row mb-5">
-        <div class="col-6">
-            <h4 class="fw-bold">Pombo: {{ pombo.anilha }}</h4>
-            <p><strong>NOME:</strong> {{ pombo.nome or '---' }}</p>
-            <p><strong>SEXO:</strong> {{ pombo.sexo }}</p>
-        </div>
-        <div class="col-6 text-end">
-            <h5 class="fw-bold text-uppercase">Proprietário</h5>
-            <p>{{ dono.nome if dono else current_user.email }}</p>
-        </div>
+
+    <div class="pedigree-footer">
+        www.myloft.pt
     </div>
 </div>
-<div class="mt-5 text-center no-print pb-5">
-    <button onclick="window.print();" class="btn btn-executar btn-lg px-5 shadow"><i class="bi bi-printer"></i>
-        IMPRIMIR</button>
-    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-retroceder btn-lg px-5 shadow"><i
-            class="bi bi-arrow-left"></i> VOLTAR</a>
+
+<div class="mt-4 mb-5 text-center no-print">
+    <button onclick="window.print();" class="btn btn-primary btn-lg px-5 shadow me-2">
+        <i class="bi bi-printer"></i> IMPRIMIR
+    </button>
+    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-outline-secondary btn-lg px-5">
+        <i class="bi bi-arrow-left"></i> VOLTAR
+    </a>
 </div>
 {% endblock %}

@@ -133,17 +133,17 @@ def get_colony_stats(user_id):
     }
     return stats
 
-def get_pombo_tree(anilha, user_id):
-    if not anilha:
+def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
+    if not anilha or depth >= max_depth:
         return None
     pombo = Pombo.query.filter_by(anilha=anilha, user_id=user_id).first()
     if not pombo:
-        return {'p_anilha': anilha, 'nome': 'Não Registado'} # Para mostrar anilhas mesmo que o pombo não esteja na DB
+        return {'pombo': None, 'p_anilha': anilha, 'nome': 'Não Registado'} 
         
     return {
         'pombo': pombo,
-        'pai': get_pombo_tree(pombo.pai, user_id),
-        'mae': get_pombo_tree(pombo.mae, user_id)
+        'pai': get_pombo_tree(pombo.pai, user_id, depth + 1, max_depth),
+        'mae': get_pombo_tree(pombo.mae, user_id, depth + 1, max_depth)
     }
 
 class Pombo(db.Model):
@@ -388,7 +388,7 @@ def estatisticas():
 @login_required
 def gerar_pedigree():
     # Passamos os pombos para o seletor no frontend
-    pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    pombos = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.anilha).all()
     return render_template("gerar_pedigree.html", pombos=pombos)
 
 @app.route("/pedigree/view", methods=['POST'])

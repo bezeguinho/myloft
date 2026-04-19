@@ -2,18 +2,28 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow border-0 p-5 mt-5 text-center" style="border-radius: 10px;">
+        <div class="card shadow border-0 p-5 mt-5 text-center" style="border-radius: 20px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
             <h2 class="text-primary fw-bold mb-4">GERAR PEDIGREE</h2>
-            <form>
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-muted small d-block text-start text-uppercase">Nº DE
-                        ANILHA:</label>
-                    <input type="text" name="anilha" class="form-control" placeholder="Ex: 123456/23"
-                        style="padding: 15px; background: #f8f9fa;" autofocus>
+            <p class="text-muted mb-4">Selecione o pombo para gerar o documento genealógico profissional.</p>
+            
+            <form action="{{ url_for('view_pedigree') }}" method="POST">
+                <div class="mb-4 text-start">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME:</label>
+                    <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" placeholder="Pesquisar pombo..." autocomplete="off" required style="border-radius: 12px; padding: 15px;">
+                    <datalist id="pombosList">
+                        {% for p in pombos %}
+                        <option value="{{ p.anilha }}">{{ p.anilha }} - {{ p.nome or 'Sem Nome' }}</option>
+                        {% endfor %}
+                    </datalist>
                 </div>
+                
                 <div class="d-flex flex-column gap-3">
-                    <button type="button" class="btn btn-executar btn-lg w-100 p-3 shadow-sm">GERAR DOCUMENTO</button>
-                    <a href="{{ url_for('index') }}" class="btn btn-retroceder btn-lg w-100 p-3 shadow-sm">VOLTAR</a>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 p-3 shadow-sm border-0" style="border-radius: 12px; font-weight: bold; background: linear-gradient(135deg, #0d6efd 0%, #004dc0 100%);">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> GERAR DOCUMENTO
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg w-100 p-3" style="border-radius: 12px; font-weight: bold;">
+                        VOLTAR
+                    </a>
                 </div>
             </form>
         </div>
