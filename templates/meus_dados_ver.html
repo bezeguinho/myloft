@@ -63,26 +63,25 @@
     }
 </style>
 
-<!-- Topo: Título e Botões -->
-<div class="container-fluid px-0">
-    <div class="row align-items-center mb-4">
-        <div class="col-12 col-md-6 text-start">
-            <h2 class="fw-bold text-primary m-0">OS MEUS DADOS</h2>
-        </div>
-        <div class="col-12 col-md-6 text-end d-flex justify-content-end gap-3 mt-3 mt-md-0">
-            <a href="{{ url_for('editar_dados') }}" class="btn-editar-perfil shadow-sm">
-                <i class="bi bi-pencil-square me-2"></i> Editar
-            </a>
-            <a href="{{ url_for('index') }}" class="btn-voltar shadow-sm">
-                <i class="bi bi-arrow-left me-2"></i> Voltar
-            </a>
-        </div>
-    </div>
-</div>
-
+<!-- Conteúdo Principal -->
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
         <div class="card card-perfil p-4 p-md-5">
+            <!-- Cabeçalho Interno: Título e Botões -->
+            <div class="row align-items-center mb-5 pb-3 border-bottom">
+                <div class="col-12 col-md-6 text-start">
+                    <h2 class="fw-bold text-primary m-0">OS MEUS DADOS</h2>
+                </div>
+                <div class="col-12 col-md-6 text-end d-flex justify-content-end gap-3 mt-3 mt-md-0">
+                    <a href="{{ url_for('editar_dados') }}" class="btn-editar-perfil shadow-sm">
+                        <i class="bi bi-pencil-square me-2"></i> Editar
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn-voltar shadow-sm">
+                        <i class="bi bi-arrow-left me-2"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
             <div class="row align-items-center">
                 <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
                     {% if utilizador.foto %}
