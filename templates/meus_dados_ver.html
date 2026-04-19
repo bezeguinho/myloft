@@ -68,7 +68,7 @@
     <div class="col-12 col-xl-10">
         <div class="card card-perfil p-4 p-md-5">
             <!-- Cabeçalho Interno: Título e Botões -->
-            <div class="row align-items-center mb-5 pb-3 border-bottom">
+            <div class="row align-items-center mb-5 pb-3">
                 <div class="col-12 col-md-6 text-start">
                     <h2 class="fw-bold text-primary m-0">OS MEUS DADOS</h2>
                 </div>
@@ -83,7 +83,7 @@
             </div>
 
             <div class="row align-items-center">
-                <div class="col-12 col-md-4 text-center mb-4 mb-md-0">
+                <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
                     {% if utilizador.foto %}
                     <img src="{{ url_for('static', filename=utilizador.foto) }}" class="foto-moldura">
                     {% else %}
