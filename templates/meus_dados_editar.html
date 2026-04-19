@@ -68,6 +68,7 @@
         overflow: hidden;
         cursor: pointer;
         transition: 0.3s;
+        position: relative;
     }
     .foto-placeholder:hover {
         background-color: #eef4ff;
@@ -75,33 +76,48 @@
     }
 </style>
 
-<!-- Topo: Título e Botão Voltar -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-primary m-0">EDITAR PERFIL</h2>
-    <a href="{{ url_for('ver_dados') }}" class="btn-voltar shadow-sm">
-        <i class="bi bi-arrow-left me-2"></i> Voltar
-    </a>
-</div>
-
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
         <div class="card card-editar p-4 p-md-5">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" id="form-perfil">
+                <!-- Cabeçalho Interno: Título e Botão Voltar -->
+                <div class="row align-items-center mb-5 pb-3 border-bottom">
+                    <div class="col-12 col-md-6 text-start">
+                        <h2 class="fw-bold text-primary m-0">EDITAR PERFIL</h2>
+                    </div>
+                    <div class="col-12 col-md-6 text-end d-flex justify-content-end gap-3 mt-3 mt-md-0">
+                        <a href="{{ url_for('ver_dados') }}" class="btn-voltar shadow-sm">
+                            <i class="bi bi-arrow-left me-2"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+
                 <div class="row g-5">
                     <!-- Coluna Foto -->
                     <div class="col-12 col-md-4 text-center d-flex flex-column align-items-center justify-content-center border-end">
                         <label for="foto-upload" class="foto-placeholder shadow-sm mb-3">
-                            {% if utilizador.foto %}
-                            <img src="{{ url_for('static', filename=utilizador.foto) }}" style="width: 100%; height: 100%; object-fit: cover;">
-                            {% else %}
-                            <i class="bi bi-person-bounding-box text-primary" style="font-size: 60px;"></i>
-                            {% endif %}
+                            <div id="preview-container" style="width: 100%; height: 100%;">
+                                {% if utilizador.foto %}
+                                <img src="{{ url_for('static', filename=utilizador.foto) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                <i class="bi bi-person-bounding-box text-primary" style="font-size: 60px;"></i>
+                                {% endif %}
+                            </div>
                         </label>
                         <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*" onchange="previewImage(this)">
-                        <label for="foto-upload" class="btn btn-sm btn-outline-primary px-3 fw-bold" style="border-radius: 8px;">
-                            SELECIONAR FOTO
-                        </label>
-                        <small class="text-muted d-block mt-2">Clique no quadrado ou no botão para alterar.</small>
+                        <input type="hidden" name="remover_foto" id="remover_foto" value="0">
+                        
+                        <div class="d-flex flex-column gap-2 w-100 px-4">
+                            <label for="foto-upload" class="btn btn-sm btn-outline-primary fw-bold p-2" style="border-radius: 8px;">
+                                <i class="bi bi-camera me-1"></i> SELECIONAR FOTO
+                            </label>
+                            {% if utilizador.foto %}
+                            <button type="button" class="btn btn-sm btn-outline-danger fw-bold p-2" style="border-radius: 8px;" onclick="removerFotoVisual()">
+                                <i class="bi bi-trash me-1"></i> ELIMINAR FOTO
+                            </button>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted d-block mt-3 px-2">Clique no quadrado ou no botão para alterar.</small>
                     </div>
 
                     <!-- Coluna Campos -->
@@ -127,7 +143,7 @@
 
                         <div class="mt-5 d-flex justify-content-start">
                             <button type="submit" class="btn-gravar shadow-sm">
-                                <i class="bi bi-check-circle me-2"></i> Gravar Dados
+                                <i class="bi bi-floppy me-2"></i> Gravar Dados
                             </button>
                         </div>
                     </div>
@@ -142,19 +158,19 @@
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                var img = document.querySelector('.foto-placeholder img');
-                if (!img) {
-                    img = document.createElement('img');
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    document.querySelector('.foto-placeholder').innerHTML = '';
-                    document.querySelector('.foto-placeholder').appendChild(img);
-                }
-                img.src = e.target.result;
+                var container = document.getElementById('preview-container');
+                container.innerHTML = '<img src="' + e.target.result + '" style="width: 100%; height: 100%; object-fit: cover;">';
+                document.getElementById('remover_foto').value = '0';
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    function removerFotoVisual() {
+        var container = document.getElementById('preview-container');
+        container.innerHTML = '<i class="bi bi-person-bounding-box text-primary" style="font-size: 60px;"></i>';
+        document.getElementById('remover_foto').value = '1';
+        document.getElementById('foto-upload').value = '';
     }
 </script>
 {% endblock %}
