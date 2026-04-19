@@ -24,7 +24,7 @@
             
             <form action="{{ url_for('view_pedigree') }}" method="POST">
                 <div class="mb-4 text-start">
-                    <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME:</label>
+                    <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME</label>
                     <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" placeholder="Pesquisar pombo..." autocomplete="off" required style="border-radius: 12px; padding: 15px;">
                     <datalist id="pombosList">
                         {% for p in pombos %}
@@ -38,7 +38,7 @@
                         <i class="bi bi-file-earmark-pdf-fill me-2"></i> Gerar Documento
                     </button>
                     <a href="{{ url_for('index') }}" class="btn btn-voltar btn-lg w-100 p-3 shadow-sm">
-                        VOLTAR
+                        <i class="bi bi-arrow-left me-2"></i> Voltar
                     </a>
                 </div>
             </form>

@@ -73,17 +73,17 @@
                     <h2 class="fw-bold text-primary m-0">OS MEUS DADOS</h2>
                 </div>
                 <div class="col-12 col-md-6 text-end d-flex justify-content-end gap-3 mt-3 mt-md-0">
-                    <a href="{{ url_for('editar_dados') }}" class="btn-editar-perfil shadow-sm">
-                        <i class="bi bi-pencil-square me-2"></i> Editar
-                    </a>
                     <a href="{{ url_for('index') }}" class="btn-voltar shadow-sm">
                         <i class="bi bi-arrow-left me-2"></i> Voltar
+                    </a>
+                    <a href="{{ url_for('editar_dados') }}" class="btn-editar-perfil shadow-sm">
+                        <i class="bi bi-pencil-square me-2"></i> Editar
                     </a>
                 </div>
             </div>
 
             <div class="row align-items-center">
-                <div class="col-12 col-md-4 text-center border-end mb-4 mb-md-0">
+                <div class="col-12 col-md-4 text-center mb-4 mb-md-0">
                     {% if utilizador.foto %}
                     <img src="{{ url_for('static', filename=utilizador.foto) }}" class="foto-moldura">
                     {% else %}
