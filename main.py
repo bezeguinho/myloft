@@ -438,6 +438,8 @@ def editar_dados():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             foto.save(filepath)
             utilizador.foto = 'uploads/' + filename
+        elif request.form.get('remover_foto') == '1':
+            utilizador.foto = None
 
         try:
             db.session.commit()
