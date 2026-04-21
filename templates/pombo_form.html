@@ -27,13 +27,19 @@
             width: 110px !important;
         }
 
+        .w-md-150 {
+            width: 150px !important;
+        }
+
         .w-md-250 {
             width: 250px !important;
         }
 
-        .w-md-150 {
-            width: 150px !important;
+        .w-md-300 {
+            width: 300px !important;
         }
+
+        /* Nova largura para a caixa Cedido A */
 
         .caixa-botoes {
             width: 200px;
@@ -66,16 +72,18 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label">Nº ANILHA</label>
                             <input type="text" name="anilha" id="inputAnilha" class="form-control caixa-input w-md-140"
-                                placeholder="{{ proxima_anilha }}" {% if not proxima_anilha and not modo_edicao %}required{% endif %}
-                                value="{{ pombo.anilha if modo_edicao else '' }}" autofocus>
+                                placeholder="{{ proxima_anilha }}" {% if not proxima_anilha and not modo_edicao
+                                %}required{% endif %} value="{{ pombo.anilha if modo_edicao else '' }}" autofocus>
                             <input type="hidden" name="anilha_sugerida" value="{{ proxima_anilha }}">
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">ANO</label>
                             <select name="ano" class="form-select caixa-input w-md-110" required>
-                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..</option>
+                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..
+                                </option>
                                 {% for ano in anos_lista %}
-                                <option value="{{ ano }}" {% if modo_edicao and pombo.ano == ano %}selected{% endif %}>{{ ano }}</option>
+                                <option value="{{ ano }}" {% if modo_edicao and pombo.ano==ano %}selected{% endif %}>{{
+                                    ano }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -105,26 +113,36 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label">SEXO</label>
                             <select name="sexo" class="form-select caixa-input w-md-140" required>
-                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..</option>
-                                <option value="Macho" {% if modo_edicao and pombo.sexo == 'Macho' %}selected{% endif %}>Macho</option>
-                                <option value="Fêmea" {% if modo_edicao and pombo.sexo == 'Fêmea' %}selected{% endif %}>Fêmea</option>
-                                <option value="Indefinido" {% if modo_edicao and pombo.sexo == 'Indefinido' %}selected{% endif %}>Indefinido</option>
+                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..
+                                </option>
+                                <option value="Macho" {% if modo_edicao and pombo.sexo=='Macho' %}selected{% endif %}>
+                                    Macho</option>
+                                <option value="Fêmea" {% if modo_edicao and pombo.sexo=='Fêmea' %}selected{% endif %}>
+                                    Fêmea</option>
+                                <option value="Indefinido" {% if modo_edicao and pombo.sexo=='Indefinido' %}selected{%
+                                    endif %}>Indefinido</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">CATEGORIA</label>
                             <select name="categoria" id="categoriaSelect" class="form-select caixa-input w-md-150"
                                 required onchange="verificarCategoria()">
-                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..</option>
-                                <option value="Voador" {% if modo_edicao and pombo.categoria == 'Voador' %}selected{% endif %}>Voadores</option>
-                                <option value="Reprodutor" {% if modo_edicao and pombo.categoria == 'Reprodutor' %}selected{% endif %}>Reprodutores</option>
-                                <option value="Cedido" {% if modo_edicao and pombo.categoria == 'Cedido' %}selected{% endif %}>Cedido</option>
+                                <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..
+                                </option>
+                                <option value="Voador" {% if modo_edicao and pombo.categoria=='Voador' %}selected{%
+                                    endif %}>Voadores</option>
+                                <option value="Reprodutor" {% if modo_edicao and pombo.categoria=='Reprodutor'
+                                    %}selected{% endif %}>Reprodutores</option>
+                                <option value="Cedido" {% if modo_edicao and pombo.categoria=='Cedido' %}selected{%
+                                    endif %}>Cedido</option>
                             </select>
 
-                            <div id="caixaCedidoA" class="mt-3 {% if not (modo_edicao and pombo.categoria == 'Cedido') %}d-none{% endif %}">
-                                <label class="form-label fw-bold" style="color: #000;">CEDIDO A</label>
-                                <input type="text" name="cedido_a" id="inputCedidoA"
-                                    class="form-control caixa-input w-md-250" value="{{ pombo.cedido_a if modo_edicao else '' }}">
+                            <div id="caixaCedidoA"
+                                class="mt-3 {% if not (modo_edicao and pombo.categoria == 'Cedido') %}d-none{% endif %}">
+                                <label class="form-label fw-bold" style="color: #000;">CEDIDO A:</label>
+                                <input type="text" name="cedido_a" id="inputCedidoA" maxlength="40"
+                                    class="form-control caixa-input w-md-300"
+                                    value="{{ pombo.cedido_a if modo_edicao else '' }}">
                             </div>
                         </div>
 
@@ -132,8 +150,8 @@
                             <div class="d-flex align-items-center bg-light p-2 rounded border shadow-sm mt-3 mt-md-0">
                                 <label class="form-check-label me-3" for="checkOculto">OCULTAR POMBO?</label>
                                 <input class="form-check-input border-secondary" type="checkbox" name="oculto"
-                                    id="checkOculto" style="transform: scale(1.3);"
-                                    {% if modo_edicao and pombo.oculto %}checked{% endif %}>
+                                    id="checkOculto" style="transform: scale(1.3);" {% if modo_edicao and pombo.oculto
+                                    %}checked{% endif %}>
                             </div>
                         </div>
                     </div>
@@ -142,7 +160,8 @@
                         <div class="col-12 col-md-auto">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
                             <textarea name="obs" class="form-control caixa-input w-md-250"
-                                style="height: 250px; resize: none; overflow: hidden;" maxlength="400">{{ pombo.obs if modo_edicao else '' }}</textarea>
+                                style="height: 250px; resize: none; overflow: hidden;"
+                                maxlength="400">{{ pombo.obs if modo_edicao else '' }}</textarea>
                         </div>
 
                         <div
@@ -167,11 +186,14 @@
         var input = document.getElementById("inputCedidoA");
 
         if (dropdown.value === "Cedido") {
+            // Removemos o d-none para mostrar, é mais seguro no Bootstrap
+            caixa.classList.remove("d-none");
             caixa.style.display = "block";
-            setTimeout(function () { input.focus(); }, 10);
+            setTimeout(function () { input.focus(); }, 50); // O cursor salta para aqui!
         } else {
+            caixa.classList.add("d-none");
             caixa.style.display = "none";
-            input.value = "";
+            input.value = ""; // Limpa a caixa se mudarmos de ideias
         }
     }
 
