@@ -61,10 +61,12 @@
         text-transform: uppercase;
     }
 
-    /* Linhas de Destaque (Fundo verde clarinho) */
+    /* LINHAS DE DESTAQUE COM BORDA VERDE CARREGADA */
     .linha-total-destaque {
         background-color: #e8f5e9 !important;
-        border: none !important;
+        /* Aqui está a borda verde carregada que pediste */
+        border-top: 2px solid #198754 !important;
+        border-bottom: 2px solid #198754 !important;
     }
 
     /* Compactação de Colunas */
@@ -165,13 +167,13 @@
                     <td colspan="6"></td>
                 </tr>
 
-                <tr class="border-bottom">
-                    <td class="ps-inicio texto-principal text-dark">REPRODUTORES</td>
-                    <td class="text-start"></td>
-                    <td class="text-center fw-bold text-dark fs-5">{{ stats.reprodutores }}</td>
-                    <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
-                    <td class="text-center fw-bold text-macho fs-5">{{ stats.reprodutores_m }}</td>
-                    <td class="text-center fw-bold text-indef fs-5">{{ stats.reprodutores_i }}</td>
+                <tr>
+                    <td class="ps-inicio texto-principal text-dark border-bottom">REPRODUTORES</td>
+                    <td class="text-start border-bottom"></td>
+                    <td class="text-center fw-bold text-dark fs-5 border-bottom">{{ stats.reprodutores }}</td>
+                    <td class="text-center fw-bold text-femea fs-5 border-bottom">{{ stats.reprodutores_f }}</td>
+                    <td class="text-center fw-bold text-macho fs-5 border-bottom">{{ stats.reprodutores_m }}</td>
+                    <td class="text-center fw-bold text-indef fs-5 border-bottom">{{ stats.reprodutores_i }}</td>
                 </tr>
 
                 <tr class="spacer-row">
