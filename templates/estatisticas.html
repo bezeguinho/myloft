@@ -43,32 +43,29 @@
         color: #6c757d !important;
     }
 
-    .text-light-total {
-        color: #ffffff !important;
+    /* NOVA COR VERDE PARA TEXTO E NÚMEROS DOS TOTAIS */
+    .text-green-total {
+        color: #198754 !important;
     }
 
-    /* 1. CATEGORIAS PRINCIPAIS (VOADORES / REPRODUTORES / TOTAL GERAL) */
+    /* CATEGORIAS PRINCIPAIS (VOADORES / REPRODUTORES / TOTAL GERAL) */
     .texto-principal {
         font-size: 1.3rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* 2. SUBCATEGORIAS (ADULTOS / YEARLINGS / BORRACHOS) */
+    /* SUBCATEGORIAS (ADULTOS / YEARLINGS / BORRACHOS) */
     .texto-subcategoria {
         font-size: 1.0rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* 3. LINHAS TOTAIS A VERDE */
-    .linha-total-verde {
-        background-color: #198754 !important;
-        /* Verde Sucesso Profissional */
-        color: white !important;
-    }
-
-    .linha-total-verde td {
+    /* LINHAS TOTAIS COM FUNDO CLARO E TEXTO VERDE */
+    .linha-total-destaque {
+        background-color: #e8f5e9 !important;
+        /* Verde muito clarinho para destaque */
         border: none !important;
     }
 
@@ -160,12 +157,12 @@
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
-                <tr class="linha-total-verde">
-                    <td class="text-start texto-subcategoria text-light-total">TOTAL DE VOADORES</td>
-                    <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores }}</td>
-                    <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores_f }}</td>
-                    <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores_m }}</td>
-                    <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores_i }}</td>
+                <tr class="linha-total-destaque">
+                    <td class="text-start texto-subcategoria text-green-total">TOTAL DE VOADORES</td>
+                    <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores }}</td>
+                    <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores_f }}</td>
+                    <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores_m }}</td>
+                    <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores_i }}</td>
                 </tr>
 
                 <tr class="spacer-row">
@@ -185,15 +182,15 @@
                     <td colspan="6"></td>
                 </tr>
 
-                <tr class="linha-total-verde texto-principal">
-                    <td class="ps-inicio py-3 text-light-total">TOTAL GERAL</td>
+                <tr class="linha-total-destaque texto-principal">
+                    <td class="ps-inicio py-3 text-green-total">TOTAL GERAL</td>
                     <td class="text-start"></td>
-                    <td class="text-center fw-bold text-light-total fs-4">{{ stats.voadores + stats.reprodutores }}</td>
-                    <td class="text-center fw-bold text-light-total fs-4">{{ stats.voadores_f + stats.reprodutores_f }}
+                    <td class="text-center fw-bold text-green-total fs-4">{{ stats.voadores + stats.reprodutores }}</td>
+                    <td class="text-center fw-bold text-green-total fs-4">{{ stats.voadores_f + stats.reprodutores_f }}
                     </td>
-                    <td class="text-center fw-bold text-light-total fs-4">{{ stats.voadores_m + stats.reprodutores_m }}
+                    <td class="text-center fw-bold text-green-total fs-4">{{ stats.voadores_m + stats.reprodutores_m }}
                     </td>
-                    <td class="text-center fw-bold text-light-total fs-4">{{ stats.voadores_i + stats.reprodutores_i }}
+                    <td class="text-center fw-bold text-green-total fs-4">{{ stats.voadores_i + stats.reprodutores_i }}
                     </td>
                 </tr>
             </tbody>
