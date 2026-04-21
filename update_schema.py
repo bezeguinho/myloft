@@ -1,43 +1,33 @@
 import os
 import sqlite3
-
-def load_env_manual():
-    if os.path.exists('.env'):
-        with open('.env') as f:
-            for line in f:
-                if line.strip() and not line.startswith('#'):
-                    key, val = line.strip().split('=', 1)
-                    os.environ[key] = val
-
-load_env_manual()
-
-from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta
 
-# Obter URL ignorando as mudancas no main.py que forçam o pg8000
-db_url = os.environ.get('DATABASE_URL')
-if db_url and db_url.startswith('postgres://'):
-    db_url = db_url.replace('postgres://', 'postgresql://')
-
-engine = create_engine(db_url, connect_args={"sslmode": "require"})
-
-with engine.connect() as conn:
+def update_local_db():
     try:
-        conn.execute(text('ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;'))
-        conn.commit()
-        print("Coluna 'data_expiracao' adicionada com sucesso.")
-    except Exception as e:
-        print("Erro ou a coluna já existe:", e)
-        conn.rollback()
+        conn = sqlite3.connect('local.db')
+        cursor = conn.cursor()
         
-    print("Preenchendo expiração para contas antigas...")
-    result = conn.execute(text("SELECT id FROM users WHERE data_expiracao IS NULL"))
-    users = result.fetchall()
-    
-    count = 0
-    now = datetime.now() + timedelta(days=365)
-    for u in users:
-        conn.execute(text("UPDATE users SET data_expiracao = :data WHERE id = :idx"), {"data": now, "idx": u[0]})
-        count += 1
-    conn.commit()
-    print(f"Tabela populada com sucesso! Atualizados {count} utilizadores.")
+        # 1. Adicionar coluna (SQLite suporta ADD COLUMN)
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN data_expiracao DATETIME")
+            print("Coluna 'data_expiracao' adicionada com sucesso.")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name" in str(e).lower() or "already exists" in str(e).lower():
+                print("A coluna 'data_expiracao' já existe. Continuando...")
+            else:
+                print(f"Aviso ao adicionar coluna: {e}")
+            
+        # 2. Atualizar as contas existentes para ganharem 1 ano de validade a partir de agora
+        data_expiracao = (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S.000000') 
+        # Formato comum para suportar leitura do db.DateTime
+        cursor.execute("UPDATE users SET data_expiracao = ? WHERE data_expiracao IS NULL", (data_expiracao,))
+        print(f"Atualizadas {cursor.rowcount} contas antigas com a data de expiração ({data_expiracao}).")
+        
+        conn.commit()
+        conn.close()
+        print("\n--> Base de dados local atualizada com sucesso! <--\n")
+    except Exception as e:
+        print(f"Erro inesperado ao atualizar BD local: {e}")
+
+if __name__ == '__main__':
+    update_local_db()

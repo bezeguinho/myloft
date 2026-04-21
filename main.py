@@ -204,14 +204,15 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
+            if not user.conta_ativa:
+                return redirect(url_for('conta_suspensa'))
+                
             if user.data_expiracao and datetime.now() > user.data_expiracao:
                 user.conta_ativa = False
                 db.session.commit()
-                flash("A sua conta expirou! Por favor contacte o administrador.", "danger")
+                flash("A sua conta expirou. Foi bloqueada automaticamente.", "danger")
                 return redirect(url_for('conta_suspensa'))
                 
-            if not user.conta_ativa:
-                return redirect(url_for('conta_suspensa'))
             login_user(user)
             return redirect(url_for('index'))
         flash("Email ou Password incorretos.", "danger")
@@ -226,10 +227,9 @@ def register():
         if User.query.filter_by(email=email).first():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
-            
-        # Define a validade de exatamente 1 ano (365 dias) a partir de hoje
-        validade = datetime.now() + timedelta(days=365)
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')), data_expiracao=validade)
+        
+        data_exp = datetime.now() + timedelta(days=365)
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')), data_expiracao=data_exp)
         db.session.add(new_user)
         db.session.commit()
         flash("Conta criada com sucesso! Faça login.", "success")
@@ -479,7 +479,7 @@ def admin_dashboard():
         flash("Acesso restrito.", "danger")
         return redirect(url_for('index'))
     users = User.query.all()
-    return render_template("admin.html", users=users, now=datetime.now)
+    return render_template("admin.html", users=users)
 
 @app.route("/admin/toggle_conta/<int:user_id>")
 @login_required
@@ -489,29 +489,11 @@ def toggle_conta(user_id):
     user_alvo = User.query.get(user_id)
     if user_alvo and user_alvo.id != current_user.id:
         user_alvo.conta_ativa = not user_alvo.conta_ativa
-        # Se for ativada e estiver expirada (ou sem data), adiciona 1 ano
         if user_alvo.conta_ativa:
-            if not user_alvo.data_expiracao or datetime.now() > user_alvo.data_expiracao:
-                user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
-        db.session.commit()
-        flash(f"Estado da conta de {user_alvo.email} alterado.", "success")
-    return redirect(url_for('admin_dashboard'))
-
-@app.route("/admin/adicionar_tempo/<int:user_id>")
-@login_required
-def adicionar_tempo(user_id):
-    if not current_user.is_admin:
-        return redirect(url_for('index'))
-    user_alvo = User.query.get(user_id)
-    if user_alvo:
-        if user_alvo.data_expiracao and user_alvo.data_expiracao > datetime.now():
-            user_alvo.data_expiracao += timedelta(days=365)
-        else:
             user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
-            
-        user_alvo.conta_ativa = True
         db.session.commit()
-        flash(f"Foi adicionado 1 ano à conta de {user_alvo.email}.", "success")
+        msg = f"Conta de {user_alvo.email} {'ativada (renovada por 1 ano)' if user_alvo.conta_ativa else 'bloqueada'}."
+        flash(msg, "success")
     return redirect(url_for('admin_dashboard'))
 
 @app.route("/admin/toggle_admin/<int:user_id>")
@@ -539,30 +521,6 @@ def limpar_tudo():
         db.drop_all()
         db.create_all()
     return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
-
-@app.route("/admin/migrar_db")
-@login_required
-def migrar_db():
-    if not current_user.is_admin:
-        return redirect(url_for('index'))
-    try:
-        from sqlalchemy import text
-        from datetime import timedelta
-        # Tenta adicionar a coluna
-        db.session.execute(text('ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;'))
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        # Se falhar (ex: coluna já existe), ignoramos mas logamos
-    
-    # Preenche antigos utilizadores
-    users = User.query.filter_by(data_expiracao=None).all()
-    for u in users:
-        u.data_expiracao = datetime.now() + timedelta(days=365)
-    db.session.commit()
-    
-    flash("Base de dados atualizada para suportar data_expiracao!", "success")
-    return redirect(url_for('admin_dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)

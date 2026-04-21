@@ -25,9 +25,14 @@
                                     <span class="text-secondary"><i class="bi bi-person"></i> UTILIZADOR COMUM</span>
                                     {% endif %}
                                     <br>
-                                    <small class="text-muted"><i class="bi bi-calendar-date"></i> Expira a: <span class="{% if u.data_expiracao and u.data_expiracao.date() < now().date() %}text-danger{% else %}text-success{% endif %}">
-                                        {{ u.data_expiracao.strftime('%d/%m/%Y') if u.data_expiracao else 'Vitalício' }}
-                                    </span></small>
+                                    <span class="mt-1 d-inline-block text-muted">
+                                        <i class="bi bi-calendar-event"></i> Expira a: 
+                                        {% if u.data_expiracao %}
+                                            <span class="{% if not u.conta_ativa %}text-danger{% endif %}">{{ u.data_expiracao.strftime('%d/%m/%Y') }}</span>
+                                        {% else %}
+                                            Ilimitado/Não definido
+                                        {% endif %}
+                                    </span>
                                 </div>
                             </div>
 
@@ -37,11 +42,7 @@
                                     {% if u.id != current_user.id %}
                                     <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
                                         class="btn btn-sm {% if u.conta_ativa %}btn-outline-danger{% else %}btn-success{% endif %} fw-bold px-3">
-                                        {% if u.conta_ativa %}Bloquear Acesso{% else %}Ativar (Pago){% endif %}
-                                    </a>
-                                    
-                                    <a href="{{ url_for('adicionar_tempo', user_id=u.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3">
-                                        <i class="bi bi-calendar-plus"></i> +1 Ano
+                                        {% if u.conta_ativa %}Bloquear Acesso{% else %}Ativar (+1 Ano){% endif %}
                                     </a>
 
                                     <a href="{{ url_for('toggle_admin_role', user_id=u.id) }}"
