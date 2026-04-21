@@ -27,43 +27,34 @@
         min-width: 100%;
     }
 
-    /* TABELA E BORDAS */
     .table-stats {
         border-collapse: collapse !important;
         width: 100%;
     }
 
-    /* Esta é a linha cinzenta suave que vês em todo o lado */
+    /* Linha cinzenta padrão - única e simples */
     .table-stats td,
     .table-stats th {
         border-bottom: 1px solid #dee2e6 !important;
         padding: 0.4rem 0.3rem !important;
         white-space: nowrap;
+        width: 1%;
     }
 
+    /* Categorias Principais */
     .texto-principal {
-        font-size: 1.3rem !important;
+        font-size: 1.2rem !important;
         font-weight: bold;
         text-transform: uppercase;
+        color: #212529;
     }
 
+    /* Subcategorias */
     .texto-subcategoria {
         font-size: 0.95rem !important;
         font-weight: bold;
         text-transform: uppercase;
         color: #6c757d !important;
-    }
-
-    /* AQUI ESTÁ O TRUQUE PARA A LINHA VERDE ÚNICA */
-    .linha-verde-fundo {
-        background-color: #f1f8f1 !important;
-    }
-
-    /* Pintamos a borda existente para ela deixar de ser cinzenta e passar a ser verde */
-    .linha-verde-fundo td {
-        border-top: 2px solid #2e7d32 !important;
-        border-bottom: 2px solid #2e7d32 !important;
-        color: #2e7d32 !important;
     }
 
     .text-femea {
@@ -78,10 +69,11 @@
         color: #6c757d !important;
     }
 
+    /* Espaçador entre blocos */
     .spacer-row td {
         height: 15px;
         border: none !important;
-        background: transparent !important;
+        padding: 0 !important;
     }
 
     .ps-inicio {
@@ -95,7 +87,7 @@
 
         .table-stats td,
         .table-stats th {
-            padding: 0.2rem 0.1rem !important;
+            padding: 0.3rem 0.15rem !important;
         }
     }
 </style>
@@ -146,12 +138,12 @@
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
-                <tr class="linha-verde-fundo">
+                <tr>
                     <td class="text-start texto-subcategoria">TOTAL DE VOADORES</td>
                     <td class="text-center fw-bold fs-5">{{ stats.voadores }}</td>
-                    <td class="text-center fw-bold fs-5">{{ stats.voadores_f }}</td>
-                    <td class="text-center fw-bold fs-5">{{ stats.voadores_m }}</td>
-                    <td class="text-center fw-bold fs-5">{{ stats.voadores_i }}</td>
+                    <td class="text-center fw-bold text-femea fs-5">{{ stats.voadores_f }}</td>
+                    <td class="text-center fw-bold text-macho fs-5">{{ stats.voadores_m }}</td>
+                    <td class="text-center fw-bold text-indef fs-5">{{ stats.voadores_i }}</td>
                 </tr>
 
                 <tr class="spacer-row">
@@ -171,13 +163,13 @@
                     <td colspan="6"></td>
                 </tr>
 
-                <tr class="linha-verde-fundo">
+                <tr>
                     <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold fs-4">{{ stats.voadores + stats.reprodutores }}</td>
-                    <td class="text-center fw-bold fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
-                    <td class="text-center fw-bold fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
-                    <td class="text-center fw-bold fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
+                    <td class="text-center fw-bold text-femea fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                    <td class="text-center fw-bold text-macho fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                    <td class="text-center fw-bold text-indef fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
                 </tr>
             </tbody>
         </table>
