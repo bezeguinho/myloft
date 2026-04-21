@@ -2,7 +2,6 @@
 
 {% block content %}
 <style>
-    /* Estilos personalizados */
     .btn-voltar {
         background-color: #ffcc29 !important;
         color: #333 !important;
@@ -30,11 +29,6 @@
         background-color: #f8f9fa;
     }
 
-    .table-stats th {
-        color: #000;
-        text-transform: uppercase;
-    }
-
     .text-femea {
         color: #ff69b4 !important;
     }
@@ -51,39 +45,36 @@
         color: #000000 !important;
     }
 
-    /* Tamanho ainda maior para categorias e subcategorias (Desktop) */
+    /* CATEGORIAS E SUBCATEGORIAS GRANDES */
     .texto-categoria {
-        font-size: 1.3rem !important;
+        font-size: 1.4rem !important;
         font-weight: bold;
     }
 
-    /* Tabela ultra compacta - Removemos os espaços excessivos */
+    /* COMPACTAÇÃO DE COLUNAS - Espaço mínimo entre elas */
     .table-stats td,
     .table-stats th {
+        padding-left: 0.2rem !important;
+        padding-right: 0.2rem !important;
         padding-top: 0.3rem !important;
         padding-bottom: 0.3rem !important;
-        padding-left: 0.4rem !important;
-        padding-right: 0.4rem !important;
         white-space: nowrap;
-        /* Evita que o texto quebre de linha e crie espaços estranhos */
+        width: 1%;
+        /* Força as colunas a colarem-se ao conteúdo */
     }
 
-    /* Linhas de intervalo em branco */
     .spacer-row {
-        height: 15px;
+        height: 20px;
         background-color: transparent !important;
     }
 
     .spacer-row td {
         border: none !important;
-        padding: 0 !important;
     }
 
-    /* Linha Total Geral em Amarelo */
     .linha-total-geral {
         background-color: #ffcc29 !important;
         color: #333 !important;
-        border: none !important;
     }
 
     .linha-total-geral td {
@@ -91,28 +82,20 @@
         font-weight: bold;
     }
 
-    /* =========================================
-       REGRAS EXCLUSIVAS PARA O MODO TELEMÓVEL
-       ========================================= */
     @media (max-width: 767px) {
         .texto-categoria {
-            font-size: 1.05rem !important;
-            /* Reduz um pouco no telemóvel para caber */
+            font-size: 1.1rem !important;
         }
 
         .table-stats td,
         .table-stats th {
-            padding-left: 0.25rem !important;
-            /* Junta ainda mais no telemóvel */
-            padding-right: 0.25rem !important;
-            font-size: 0.9rem !important;
-            /* Reduz números e totais */
+            padding: 0.15rem !important;
+            font-size: 0.95rem !important;
         }
 
-        /* Ajuste fino dos números totais para mobile */
         .fs-5,
         .fs-4 {
-            font-size: 1rem !important;
+            font-size: 1.1rem !important;
         }
     }
 </style>
@@ -126,18 +109,18 @@
 
 <div class="card card-stats overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 table-stats">
+        <table class="table table-hover align-middle mb-0 table-stats" style="width: auto; margin-left: 0;">
             <thead>
-                <tr class="fw-bold" style="font-size: 0.95rem;">
+                <tr class="fw-bold">
                     <th class="ps-3 py-3">Categoria</th>
                     <th class="text-start"></th>
                     <th class="text-center">Total</th>
                     <th class="text-center"><i class="bi bi-gender-female text-femea fs-5"></i><span
-                            class="d-none d-md-inline ms-1">Fêmeas</span></th>
+                            class="ms-1">Fêmeas</span></th>
                     <th class="text-center"><i class="bi bi-gender-male text-macho fs-5"></i><span
-                            class="d-none d-md-inline ms-1">Machos</span></th>
+                            class="ms-1">Machos</span></th>
                     <th class="text-center"><i class="bi bi-question-circle text-indef fs-5"></i><span
-                            class="d-none d-md-inline ms-1">Indef.</span></th>
+                            class="ms-1">Indefinido</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -164,8 +147,7 @@
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
                 <tr class="border-bottom bg-light">
-                    <td class="text-start fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">Total Voadores
-                    </td>
+                    <td class="text-start texto-categoria text-dark text-uppercase">Total Voadores</td>
                     <td class="text-center fw-bold text-total-black fs-5">{{ stats.voadores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.voadores_f }}</td>
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.voadores_m }}</td>
@@ -178,7 +160,7 @@
 
                 <tr class="border-bottom">
                     <td class="ps-3 texto-categoria text-dark">Reprodutores</td>
-                    <td class="text-start texto-categoria text-muted"></td>
+                    <td class="text-start"></td>
                     <td class="text-center fw-bold text-total-black fs-5">{{ stats.reprodutores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.reprodutores_m }}</td>
