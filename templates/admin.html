@@ -1,10 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center">
+
+{% set stats = namespace(ativos=0, bloqueados=0, admins=0) %}
+{% for u in users %}
+{% if u.is_admin %}
+{% set stats.admins = stats.admins + 1 %}
+{% endif %}
+
+{% if u.conta_ativa and (not u.data_expiracao or agora <= u.data_expiracao) %} {% set stats.ativos=stats.ativos + 1 %}
+    {% else %} {% set stats.bloqueados=stats.bloqueados + 1 %} {% endif %} {% endfor %} <div
+    class="row justify-content-center">
     <div class="col-12 col-lg-9">
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold text-primary text-uppercase m-0">Gestão de Utilizadores</h2>
-            <span class="badge bg-primary fs-6">{{ users|length }} Contas</span>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card bg-primary text-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                    <div class="card-body text-center p-3">
+                        <h2 class="fw-bold mb-0 display-6">{{ users|length }}</h2>
+                        <div class="small text-uppercase fw-bold" style="opacity: 0.85;">Total Contas</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-success text-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                    <div class="card-body text-center p-3">
+                        <h2 class="fw-bold mb-0 display-6">{{ stats.ativos }}</h2>
+                        <div class="small text-uppercase fw-bold" style="opacity: 0.85;">Ativos (Em Dia)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-danger text-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                    <div class="card-body text-center p-3">
+                        <h2 class="fw-bold mb-0 display-6">{{ stats.bloqueados }}</h2>
+                        <div class="small text-uppercase fw-bold" style="opacity: 0.85;">Bloqueados</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-dark text-white border-0 shadow-sm h-100" style="border-radius: 12px;">
+                    <div class="card-body text-center p-3">
+                        <h2 class="fw-bold mb-0 display-6">{{ stats.admins }}</h2>
+                        <div class="small text-uppercase fw-bold" style="opacity: 0.85;">Administradores</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="alert alert-danger shadow-sm mb-4 border-0" style="border-radius: 12px;">
@@ -101,6 +145,7 @@
             </div>
             {% endfor %}
         </div>
+
     </div>
-</div>
-{% endblock %}
+    </div>
+    {% endblock %}
