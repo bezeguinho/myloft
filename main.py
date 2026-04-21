@@ -540,5 +540,29 @@ def limpar_tudo():
         db.create_all()
     return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
 
+@app.route("/admin/migrar_db")
+@login_required
+def migrar_db():
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+    try:
+        from sqlalchemy import text
+        from datetime import timedelta
+        # Tenta adicionar a coluna
+        db.session.execute(text('ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;'))
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        # Se falhar (ex: coluna já existe), ignoramos mas logamos
+    
+    # Preenche antigos utilizadores
+    users = User.query.filter_by(data_expiracao=None).all()
+    for u in users:
+        u.data_expiracao = datetime.now() + timedelta(days=365)
+    db.session.commit()
+    
+    flash("Base de dados atualizada para suportar data_expiracao!", "success")
+    return redirect(url_for('admin_dashboard'))
+
 if __name__ == "__main__":
     app.run(debug=True)

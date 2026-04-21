@@ -1,4 +1,5 @@
 import os
+import sqlite3
 
 def load_env_manual():
     if os.path.exists('.env'):
@@ -10,27 +11,33 @@ def load_env_manual():
 
 load_env_manual()
 
-from main import app, db
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta
 
-with app.app_context():
+# Obter URL ignorando as mudancas no main.py que forçam o pg8000
+db_url = os.environ.get('DATABASE_URL')
+if db_url and db_url.startswith('postgres://'):
+    db_url = db_url.replace('postgres://', 'postgresql://')
+
+engine = create_engine(db_url, connect_args={"sslmode": "require"})
+
+with engine.connect() as conn:
     try:
-        db.session.execute(text('ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;'))
-        db.session.commit()
+        conn.execute(text('ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;'))
+        conn.commit()
         print("Coluna 'data_expiracao' adicionada com sucesso.")
     except Exception as e:
         print("Erro ou a coluna já existe:", e)
-        db.session.rollback()
+        conn.rollback()
         
     print("Preenchendo expiração para contas antigas...")
-    from main import User
-    users = User.query.all()
+    result = conn.execute(text("SELECT id FROM users WHERE data_expiracao IS NULL"))
+    users = result.fetchall()
+    
     count = 0
+    now = datetime.now() + timedelta(days=365)
     for u in users:
-        if not u.data_expiracao:
-            # Assumimos 1 ano a partir de agora de borla para contas antigas
-            u.data_expiracao = datetime.now() + timedelta(days=365)
-            count += 1
-    db.session.commit()
+        conn.execute(text("UPDATE users SET data_expiracao = :data WHERE id = :idx"), {"data": now, "idx": u[0]})
+        count += 1
+    conn.commit()
     print(f"Tabela populada com sucesso! Atualizados {count} utilizadores.")
