@@ -178,15 +178,11 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
-            
-            # --- VERIFICAÇÃO DA DATA DE EXPIRAÇÃO ---
             if user.data_expiracao and datetime.now() > user.data_expiracao:
                 user.conta_ativa = False
                 db.session.commit()
-
             if not user.conta_ativa:
                 return redirect(url_for('conta_suspensa'))
-                
             login_user(user)
             return redirect(url_for('index'))
         flash("Email ou Password incorretos.", "danger")
@@ -226,26 +222,38 @@ def api_pombo_existe(search):
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     proxima_anilha = ""
-    ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
+    ultimo_ano = ""
     
-    if ultimo_pombo and ultimo_pombo.anilha:
-        match = re.search(r'(\d+)$', ultimo_pombo.anilha)
-        if match:
-            try:
-                numero_novo = int(match.group(1)) + 1
-                tamanho = len(match.group(1))
-                proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
-            except:
-                proxima_anilha = ultimo_pombo.anilha
+    # SÓ GERA SUGESTÕES SE FOR INSERÇÃO CONTÍNUA (Após Gravar com Sucesso)
+    if request.args.get('saved') == '1':
+        ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
+        if ultimo_pombo:
+            ultimo_ano = ultimo_pombo.ano # Guarda o ano para sugerir
+            if ultimo_pombo.anilha:
+                match = re.search(r'(\d+)$', ultimo_pombo.anilha)
+                if match:
+                    try:
+                        numero_novo = int(match.group(1)) + 1
+                        tamanho = len(match.group(1))
+                        proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
+                    except:
+                        proxima_anilha = ultimo_pombo.anilha
+                else:
+                    proxima_anilha = ultimo_pombo.anilha
                 
     if request.method == 'POST':
+        # Assume anilha digitada ou sugerida
         anilha_form = request.form.get('anilha')
         anilha_final = anilha_form if anilha_form and anilha_form.strip() else request.form.get('anilha_sugerida')
             
+        # Assume ano escolhido ou sugerido
+        ano_form = request.form.get('ano')
+        ano_final = int(ano_form) if ano_form else int(request.form.get('ano_sugerido') or 0)
+
         novo = Pombo(
             anilha=anilha_final, 
             nome=request.form.get('nome'),
-            ano=int(request.form.get('ano') or 0), 
+            ano=ano_final, 
             sexo=request.form.get('sexo'),
             cor=request.form.get('cor'), 
             categoria=request.form.get('categoria'),
@@ -266,7 +274,7 @@ def novo_pombo():
             flash(f"Erro ao gravar pombo: {str(e)}", "danger")
             return redirect(url_for('novo_pombo'))
 
-    return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha)
+    return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha, ultimo_ano=ultimo_ano)
 
 @app.route("/lista_pombos")
 @login_required
@@ -437,7 +445,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# --- ÁREA ADMINISTRATIVA ---
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():
@@ -445,7 +452,6 @@ def admin_dashboard():
         flash("Acesso restrito.", "danger")
         return redirect(url_for('index'))
     users = User.query.order_by(User.id).all()
-    # Enviamos a hora atual para o HTML comparar as datas em tempo real
     agora = datetime.now()
     return render_template("admin.html", users=users, agora=agora)
 
@@ -457,19 +463,15 @@ def toggle_conta(user_id):
     user_alvo = User.query.get(user_id)
     if user_alvo and user_alvo.id != current_user.id:
         agora = datetime.now()
-        
-        # Se a conta está ativa mas a data já expirou, clicar no botão renova por 1 ano
         if user_alvo.conta_ativa and user_alvo.data_expiracao and agora > user_alvo.data_expiracao:
             user_alvo.conta_ativa = True
             user_alvo.data_expiracao = agora + timedelta(days=365)
             msg = f"Conta de {user_alvo.email} ativada (renovada por 1 ano)."
         else:
-            # Alterna normalmente entre Bloquear e Ativar
             user_alvo.conta_ativa = not user_alvo.conta_ativa
             if user_alvo.conta_ativa:
                 user_alvo.data_expiracao = agora + timedelta(days=365)
             msg = f"Conta de {user_alvo.email} {'ativada (renovada por 1 ano)' if user_alvo.conta_ativa else 'bloqueada'}."
-            
         db.session.commit()
         flash(msg, "success")
     return redirect(url_for('admin_dashboard'))
@@ -492,23 +494,6 @@ def ganhar_poderes_secretos():
     current_user.is_admin = True
     db.session.commit()
     return "<h3>BOOOM! Agora és o Dono Disto Tudo!</h3><p><a href='/admin/dashboard'>Entrar no Painel Secreto</a></p>"
-
-@app.route("/limpar_tudo")
-def limpar_tudo():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
-
-@app.route("/atualizar_bd_agora")
-def atualizar_bd_agora():
-    try:
-        with app.app_context():
-            db.session.execute(text("ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;"))
-            db.session.commit()
-        return "<h3>SUCESSO!</h3><p>A coluna 'data_expiracao' foi adicionada à base de dados. Já podes voltar ao site e gerir as contas!</p>"
-    except Exception as e:
-        return f"<h3>Aviso:</h3><p>Se estás a ver isto, provavelmente a coluna já existia ou houve este erro: {str(e)}</p>"
 
 if __name__ == "__main__":
     app.run(debug=True)

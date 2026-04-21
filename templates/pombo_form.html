@@ -12,10 +12,17 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 
+    /* Mais Escuro e Forte para se ver bem o cinzento */
     ::placeholder {
-        color: #b0b0b0 !important;
-        font-weight: normal !important;
+        color: #888888 !important;
+        font-weight: 500 !important;
         opacity: 1;
+    }
+
+    /* Classe especial para o select do Ano ficar cinzento quando sugerido */
+    .select-sugerido {
+        color: #888888 !important;
+        font-weight: 500 !important;
     }
 
     @media (min-width: 768px) {
@@ -38,8 +45,6 @@
         .w-md-300 {
             width: 300px !important;
         }
-
-        /* Nova largura para a caixa Cedido A */
 
         .caixa-botoes {
             width: 200px;
@@ -66,7 +71,7 @@
                     {% if modo_edicao %}Editar Pombo: {{ pombo.anilha }}{% else %}Inserir Novo Pombo{% endif %}
                 </h2>
 
-                <form method="POST" onsubmit="return assumirAnilhaSugerida()">
+                <form method="POST" onsubmit="return assumirSugestoes()">
 
                     <div class="row g-3 mb-4 text-uppercase fw-bold small">
                         <div class="col-12 col-md-auto">
@@ -78,14 +83,25 @@
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">ANO</label>
-                            <select name="ano" class="form-select caixa-input w-md-110" required>
+
+                            <select name="ano" id="inputAno"
+                                class="form-select caixa-input w-md-110 {% if ultimo_ano and not modo_edicao %}select-sugerido{% endif %}"
+                                onchange="this.classList.remove('select-sugerido')" {% if not ultimo_ano and not
+                                modo_edicao %}required{% endif %}>
+
+                                {% if ultimo_ano and not modo_edicao %}
+                                <option value="" selected hidden>Sugere: {{ ultimo_ano }}</option>
+                                {% else %}
                                 <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..
                                 </option>
+                                {% endif %}
+
                                 {% for ano in anos_lista %}
-                                <option value="{{ ano }}" {% if modo_edicao and pombo.ano==ano %}selected{% endif %}>{{
-                                    ano }}</option>
+                                <option value="{{ ano }}" {% if modo_edicao and pombo.ano==ano %}selected{% endif %}
+                                    style="color: #000;">{{ ano }}</option>
                                 {% endfor %}
                             </select>
+                            <input type="hidden" name="ano_sugerido" value="{{ ultimo_ano }}">
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">NOME</label>
@@ -186,23 +202,23 @@
         var input = document.getElementById("inputCedidoA");
 
         if (dropdown.value === "Cedido") {
-            // Removemos o d-none para mostrar, é mais seguro no Bootstrap
             caixa.classList.remove("d-none");
             caixa.style.display = "block";
-            setTimeout(function () { input.focus(); }, 50); // O cursor salta para aqui!
+            setTimeout(function () { input.focus(); }, 50);
         } else {
             caixa.classList.add("d-none");
             caixa.style.display = "none";
-            input.value = ""; // Limpa a caixa se mudarmos de ideias
+            input.value = "";
         }
     }
 
-    function assumirAnilhaSugerida() {
+    function assumirSugestoes() {
+        // Assume Anilha se vazia
         var anilhaInput = document.getElementById("inputAnilha");
         if (anilhaInput.value.trim() === "" && anilhaInput.placeholder !== "") {
             anilhaInput.value = anilhaInput.placeholder;
         }
-        return true;
+        return true; // O backend trata do Ano Sugerido automaticamente!
     }
 </script>
 {% endblock %}
