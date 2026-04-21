@@ -30,34 +30,40 @@
     .table-stats {
         border-collapse: collapse !important;
         width: 100%;
+        border: none !important;
+        /* Remove bordas externas da tabela */
     }
 
-    /* Linha cinzenta suave padrão */
+    /* Reset total: removemos todas as bordas padrão */
     .table-stats td,
     .table-stats th {
+        border: none !important;
         border-bottom: 1px solid #dee2e6 !important;
+        /* Linha cinzenta normal */
         padding: 0.4rem 0.3rem !important;
         white-space: nowrap;
     }
 
-    /* ESTILO PARA AS LINHAS DE TOTAL (Verde + Linha Grossa/Negrito) */
+    /* LINHA EM NEGRITO (Para Totais): Substitui a cinzenta por uma preta/grossa única */
     .linha-destaque-total td {
         color: #2e7d32 !important;
         font-weight: bold !important;
-        /* Esta é a linha "em negrito" que separa as secções */
-        border-top: 2.5px solid #444 !important;
-        border-bottom: 2.5px solid #444 !important;
+        border-bottom: 2.5px solid #333 !important;
+        /* Linha única e forte */
         text-transform: uppercase;
     }
 
-    /* Categorias Principais */
+    /* Para a linha de cima do Total Geral não ser duplicada */
+    .border-top-destaque {
+        border-top: 2.5px solid #333 !important;
+    }
+
     .texto-principal {
         font-size: 1.2rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* Subcategorias */
     .texto-subcategoria {
         font-size: 0.95rem !important;
         font-weight: bold;
@@ -77,7 +83,7 @@
         color: #6c757d !important;
     }
 
-    /* Espaçadores */
+    /* Espaçador sem qualquer linha */
     .spacer-row td {
         height: 15px;
         border: none !important;
@@ -160,7 +166,7 @@
                 </tr>
 
                 <tr>
-                    <td class="ps-inicio texto-principal border-bottom-0">REPRODUTORES</td>
+                    <td class="ps-inicio texto-principal">REPRODUTORES</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold fs-5">{{ stats.reprodutores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
@@ -173,12 +179,12 @@
                 </tr>
 
                 <tr class="linha-destaque-total">
-                    <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
-                    <td class="text-start"></td>
-                    <td class="text-center fs-4">{{ stats.voadores + stats.reprodutores }}</td>
-                    <td class="text-center fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
-                    <td class="text-center fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
-                    <td class="text-center fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
+                    <td class="ps-inicio py-3 texto-principal border-top-destaque">TOTAL GERAL</td>
+                    <td class="text-start border-top-destaque"></td>
+                    <td class="text-center fs-4 border-top-destaque">{{ stats.voadores + stats.reprodutores }}</td>
+                    <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                    <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                    <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_i + stats.reprodutores_i }}</td>
                 </tr>
             </tbody>
         </table>
