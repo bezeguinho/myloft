@@ -32,13 +32,22 @@
         width: 100%;
     }
 
-    /* Linha cinzenta padrão - única e simples */
+    /* Linha padrão cinzenta */
     .table-stats td,
     .table-stats th {
         border-bottom: 1px solid #dee2e6 !important;
         padding: 0.4rem 0.3rem !important;
         white-space: nowrap;
-        width: 1%;
+    }
+
+    /* Estilo para as linhas de TOTAL (Letras Verdes e Linha em Negrito) */
+    .linha-destaque-total td {
+        color: #2e7d32 !important;
+        /* Cor Verde */
+        font-weight: bold !important;
+        border-bottom: 2.5px solid #444 !important;
+        /* Linha "em negrito" para separar */
+        text-transform: uppercase;
     }
 
     /* Categorias Principais */
@@ -46,7 +55,6 @@
         font-size: 1.2rem !important;
         font-weight: bold;
         text-transform: uppercase;
-        color: #212529;
     }
 
     /* Subcategorias */
@@ -54,7 +62,7 @@
         font-size: 0.95rem !important;
         font-weight: bold;
         text-transform: uppercase;
-        color: #6c757d !important;
+        color: #6c757d;
     }
 
     .text-femea {
@@ -74,6 +82,7 @@
         height: 15px;
         border: none !important;
         padding: 0 !important;
+        background-color: transparent !important;
     }
 
     .ps-inicio {
@@ -138,12 +147,12 @@
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
-                <tr>
-                    <td class="text-start texto-subcategoria">TOTAL DE VOADORES</td>
-                    <td class="text-center fw-bold fs-5">{{ stats.voadores }}</td>
-                    <td class="text-center fw-bold text-femea fs-5">{{ stats.voadores_f }}</td>
-                    <td class="text-center fw-bold text-macho fs-5">{{ stats.voadores_m }}</td>
-                    <td class="text-center fw-bold text-indef fs-5">{{ stats.voadores_i }}</td>
+                <tr class="linha-destaque-total">
+                    <td class="text-start">TOTAL DE VOADORES</td>
+                    <td class="text-center fs-5">{{ stats.voadores }}</td>
+                    <td class="text-center fs-5">{{ stats.voadores_f }}</td>
+                    <td class="text-center fs-5">{{ stats.voadores_m }}</td>
+                    <td class="text-center fs-5">{{ stats.voadores_i }}</td>
                 </tr>
 
                 <tr class="spacer-row">
@@ -163,13 +172,13 @@
                     <td colspan="6"></td>
                 </tr>
 
-                <tr>
+                <tr class="linha-destaque-total">
                     <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
                     <td class="text-start"></td>
-                    <td class="text-center fw-bold fs-4">{{ stats.voadores + stats.reprodutores }}</td>
-                    <td class="text-center fw-bold text-femea fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
-                    <td class="text-center fw-bold text-macho fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
-                    <td class="text-center fw-bold text-indef fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
+                    <td class="text-center fs-4">{{ stats.voadores + stats.reprodutores }}</td>
+                    <td class="text-center fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                    <td class="text-center fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                    <td class="text-center fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
                 </tr>
             </tbody>
         </table>
