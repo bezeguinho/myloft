@@ -77,8 +77,8 @@
             <thead>
                 <tr class="fs-5 fw-bold">
                     <th class="ps-4 py-3">Categoria</th>
+                    <th class="text-start"></th>
                     <th class="text-center">Total</th>
-                    <th class="text-center"></th>
                     <th class="text-center"><i class="bi bi-gender-female text-femea me-1"></i> Fêmeas</th>
                     <th class="text-center"><i class="bi bi-gender-male text-macho me-1"></i> Machos</th>
                     <th class="text-center"><i class="bi bi-question-circle text-indef me-1"></i> Indefinido</th>
@@ -86,31 +86,31 @@
             </thead>
             <tbody>
                 <tr>
-                    <td rowspan="4" class="ps-4 py-3 fw-bold text-dark border-bottom">Voadores</td>
+                    <td rowspan="4" class="ps-4 py-3 fw-bold text-dark border-bottom" style="width: 20%;">Voadores</td>
+                    <td class="text-start small text-muted" style="width: 20%;">Adultos</td>
                     <td class="text-center fw-bold text-blue-total">{{ stats.v_adultos }}</td>
-                    <td class="text-start ps-4 small text-muted">Adultos</td>
                     <td class="text-center fw-bold text-femea">{{ stats.v_adultos_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.v_adultos_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.v_adultos_i }}</td>
                 </tr>
                 <tr>
+                    <td class="text-start small text-muted">Yearlings</td>
                     <td class="text-center fw-bold text-blue-total">{{ stats.v_yearlings }}</td>
-                    <td class="text-start ps-4 small text-muted">Yearlings</td>
                     <td class="text-center fw-bold text-femea">{{ stats.v_yearlings_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.v_yearlings_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.v_yearlings_i }}</td>
                 </tr>
                 <tr>
+                    <td class="text-start small text-muted">Borrachos</td>
                     <td class="text-center fw-bold text-blue-total">{{ stats.v_borrachos }}</td>
-                    <td class="text-start ps-4 small text-muted">Borrachos</td>
                     <td class="text-center fw-bold text-femea">{{ stats.v_borrachos_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.v_borrachos_i }}</td>
                 </tr>
                 <tr class="border-bottom bg-light">
+                    <td class="text-start fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">Total Voadores
+                    </td>
                     <td class="text-center fw-bold text-blue-total fs-6">{{ stats.voadores }}</td>
-                    <td class="text-start ps-4 fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">Total
-                        Voadores</td>
                     <td class="text-center fw-bold text-femea">{{ stats.voadores_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.voadores_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.voadores_i }}</td>
@@ -118,8 +118,8 @@
 
                 <tr class="border-bottom">
                     <td class="ps-4 py-3 fw-bold text-dark">Reprodutores</td>
+                    <td class="text-start small text-muted"></td>
                     <td class="text-center fw-bold text-blue-total fs-6">{{ stats.reprodutores }}</td>
-                    <td class="text-start ps-4 small text-muted"></td>
                     <td class="text-center fw-bold text-femea">{{ stats.reprodutores_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.reprodutores_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.reprodutores_i }}</td>
@@ -127,8 +127,8 @@
 
                 <tr class="linha-total-geral fs-5">
                     <td class="ps-4 py-3">TOTAL GERAL</td>
-                    <td class="text-center text-blue-total">{{ stats.voadores + stats.reprodutores }}</td>
                     <td class="text-center"></td>
+                    <td class="text-center text-blue-total">{{ stats.voadores + stats.reprodutores }}</td>
                     <td class="text-center text-femea">{{ stats.voadores_f + stats.reprodutores_f }}</td>
                     <td class="text-center text-macho">{{ stats.voadores_m + stats.reprodutores_m }}</td>
                     <td class="text-center text-indef">{{ stats.voadores_i + stats.reprodutores_i }}</td>
