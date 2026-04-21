@@ -27,12 +27,13 @@
         min-width: 100%;
     }
 
-    /* LIMPEZA TOTAL DE BORDAS DUPLAS */
+    /* TABELA E BORDAS */
     .table-stats {
         border-collapse: collapse !important;
+        width: 100%;
     }
 
-    /* A linha cinzenta padrão que vês em todo o lado */
+    /* Esta é a linha cinzenta suave que vês em todo o lado */
     .table-stats td,
     .table-stats th {
         border-bottom: 1px solid #dee2e6 !important;
@@ -40,14 +41,12 @@
         white-space: nowrap;
     }
 
-    /* CATEGORIAS (VOADORES / REPRODUTORES) */
     .texto-principal {
         font-size: 1.3rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* SUBCATEGORIAS (ADULTOS / YEARLINGS / BORRACHOS) */
     .texto-subcategoria {
         font-size: 0.95rem !important;
         font-weight: bold;
@@ -55,19 +54,16 @@
         color: #6c757d !important;
     }
 
-    /* AQUI ESTÁ A CORREÇÃO: PINTAR A LINHA CINZENTA DE VERDE */
+    /* AQUI ESTÁ O TRUQUE PARA A LINHA VERDE ÚNICA */
     .linha-verde-fundo {
         background-color: #f1f8f1 !important;
     }
 
-    /* Em vez de criar bordas novas, pintamos a borda das células desta linha */
+    /* Pintamos a borda existente para ela deixar de ser cinzenta e passar a ser verde */
     .linha-verde-fundo td {
         border-top: 2px solid #2e7d32 !important;
-        /* Linha de cima verde */
         border-bottom: 2px solid #2e7d32 !important;
-        /* Linha de baixo verde */
         color: #2e7d32 !important;
-        font-weight: bold;
     }
 
     .text-femea {
@@ -82,7 +78,6 @@
         color: #6c757d !important;
     }
 
-    /* Espaçador entre blocos sem qualquer linha */
     .spacer-row td {
         height: 15px;
         border: none !important;
@@ -175,3 +170,17 @@
                 <tr class="spacer-row">
                     <td colspan="6"></td>
                 </tr>
+
+                <tr class="linha-verde-fundo">
+                    <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
+                    <td class="text-start"></td>
+                    <td class="text-center fw-bold fs-4">{{ stats.voadores + stats.reprodutores }}</td>
+                    <td class="text-center fw-bold fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                    <td class="text-center fw-bold fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                    <td class="text-center fw-bold fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
