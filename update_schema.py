@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 def update_local_db():
     try:
-        conn = sqlite3.connect('local.db')
+        conn = sqlite3.connect(os.path.join('instance', 'local.db'))
         cursor = conn.cursor()
         
         # 1. Adicionar coluna (SQLite suporta ADD COLUMN)
