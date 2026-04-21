@@ -23,6 +23,9 @@
         border-radius: 15px;
         border: none;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        display: inline-block;
+        /* Faz o card ajustar-se ao tamanho da tabela */
+        min-width: 100%;
     }
 
     .table-stats thead {
@@ -45,26 +48,31 @@
         color: #000000 !important;
     }
 
-    /* CATEGORIAS E SUBCATEGORIAS GRANDES */
+    /* TAMANHO UNIFICADO PARA CATEGORIAS E TOTAIS */
     .texto-categoria {
-        font-size: 1.4rem !important;
+        font-size: 1.2rem !important;
         font-weight: bold;
     }
 
-    /* COMPACTAÇÃO DE COLUNAS - Espaço mínimo entre elas */
+    /* COMPACTAÇÃO EXTREMA DE COLUNAS */
     .table-stats td,
     .table-stats th {
-        padding-left: 0.2rem !important;
-        padding-right: 0.2rem !important;
-        padding-top: 0.3rem !important;
-        padding-bottom: 0.3rem !important;
+        padding-left: 0.15rem !important;
+        padding-right: 0.15rem !important;
+        padding-top: 0.2rem !important;
+        padding-bottom: 0.2rem !important;
         white-space: nowrap;
         width: 1%;
-        /* Força as colunas a colarem-se ao conteúdo */
+        /* Força as colunas a colarem-se ao máximo */
+    }
+
+    /* Margem especial apenas para a primeira coluna não colar no bordo do card */
+    .table-stats .ps-inicio {
+        padding-left: 1rem !important;
     }
 
     .spacer-row {
-        height: 20px;
+        height: 12px;
         background-color: transparent !important;
     }
 
@@ -84,18 +92,18 @@
 
     @media (max-width: 767px) {
         .texto-categoria {
-            font-size: 1.1rem !important;
+            font-size: 1rem !important;
         }
 
         .table-stats td,
         .table-stats th {
-            padding: 0.15rem !important;
-            font-size: 0.95rem !important;
+            padding-left: 0.1rem !important;
+            padding-right: 0.1rem !important;
+            font-size: 0.9rem !important;
         }
 
-        .fs-5,
-        .fs-4 {
-            font-size: 1.1rem !important;
+        .ps-inicio {
+            padding-left: 0.5rem !important;
         }
     }
 </style>
@@ -109,10 +117,10 @@
 
 <div class="card card-stats overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 table-stats" style="width: auto; margin-left: 0;">
+        <table class="table table-hover align-middle mb-0 table-stats">
             <thead>
                 <tr class="fw-bold">
-                    <th class="ps-3 py-3">Categoria</th>
+                    <th class="ps-inicio py-3">Categoria</th>
                     <th class="text-start"></th>
                     <th class="text-center">Total</th>
                     <th class="text-center"><i class="bi bi-gender-female text-femea fs-5"></i><span
@@ -125,7 +133,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td rowspan="4" class="ps-3 texto-categoria text-dark border-bottom align-middle">Voadores</td>
+                    <td rowspan="4" class="ps-inicio texto-categoria text-dark border-bottom align-middle">Voadores</td>
                     <td class="text-start texto-categoria text-muted">Adultos</td>
                     <td class="text-center fw-bold text-total-black fs-5">{{ stats.v_adultos }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.v_adultos_f }}</td>
@@ -159,7 +167,7 @@
                 </tr>
 
                 <tr class="border-bottom">
-                    <td class="ps-3 texto-categoria text-dark">Reprodutores</td>
+                    <td class="ps-inicio texto-categoria text-dark">Reprodutores</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold text-total-black fs-5">{{ stats.reprodutores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
@@ -172,7 +180,7 @@
                 </tr>
 
                 <tr class="linha-total-geral texto-categoria">
-                    <td class="ps-3 py-3 text-uppercase">Total Geral</td>
+                    <td class="ps-inicio py-3 text-uppercase">Total Geral</td>
                     <td class="text-center"></td>
                     <td class="text-center text-total-black fs-4">{{ stats.voadores + stats.reprodutores }}</td>
                     <td class="text-center text-total-black fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
