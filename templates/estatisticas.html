@@ -31,6 +31,7 @@
         background-color: #f8f9fa;
     }
 
+    /* Cores específicas */
     .text-femea {
         color: #ff69b4 !important;
     }
@@ -43,39 +44,33 @@
         color: #6c757d !important;
     }
 
-    /* NOVA COR VERDE PARA TEXTO E NÚMEROS DOS TOTAIS */
     .text-green-total {
         color: #198754 !important;
     }
 
-    /* CATEGORIAS PRINCIPAIS (VOADORES / REPRODUTORES / TOTAL GERAL) */
+    /* Hierarquia de Letras */
     .texto-principal {
         font-size: 1.3rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* SUBCATEGORIAS (ADULTOS / YEARLINGS / BORRACHOS) */
     .texto-subcategoria {
         font-size: 1.0rem !important;
         font-weight: bold;
         text-transform: uppercase;
     }
 
-    /* LINHAS TOTAIS COM FUNDO CLARO E TEXTO VERDE */
+    /* Linhas de Destaque (Fundo verde clarinho) */
     .linha-total-destaque {
         background-color: #e8f5e9 !important;
-        /* Verde muito clarinho para destaque */
         border: none !important;
     }
 
-    /* COMPACTAÇÃO DE COLUNAS */
+    /* Compactação de Colunas */
     .table-stats td,
     .table-stats th {
-        padding-left: 0.15rem !important;
-        padding-right: 0.15rem !important;
-        padding-top: 0.2rem !important;
-        padding-bottom: 0.2rem !important;
+        padding: 0.2rem 0.15rem !important;
         white-space: nowrap;
         width: 1%;
     }
@@ -84,13 +79,15 @@
         padding-left: 1rem !important;
     }
 
+    /* Espaçador entre secções */
     .spacer-row {
-        height: 12px;
+        height: 15px;
         background-color: transparent !important;
     }
 
     .spacer-row td {
         border: none !important;
+        padding: 0 !important;
     }
 
     @media (max-width: 767px) {
@@ -104,8 +101,7 @@
 
         .table-stats td,
         .table-stats th {
-            padding-left: 0.1rem !important;
-            padding-right: 0.1rem !important;
+            padding: 0.15rem 0.1rem !important;
             font-size: 0.9rem !important;
         }
     }
@@ -120,7 +116,7 @@
 
 <div class="card card-stats overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 table-stats">
+        <table class="table align-middle mb-0 table-stats">
             <thead>
                 <tr class="fw-bold">
                     <th class="ps-inicio py-3">Categoria</th>
