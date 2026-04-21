@@ -21,13 +21,11 @@ db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 if not db_url:
     db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 
-# Normalização para drivers compatíveis com Vercel
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
 elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
     db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-# Removemos sslmode da query string para evitar TypeError no pg8000
 if "sslmode" in db_url:
     if "?" in db_url:
         base, query = db_url.split("?", 1)
@@ -37,23 +35,15 @@ if "sslmode" in db_url:
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração de SSL para pg8000 via ssl_context (a forma definitiva)
 if "postgresql+pg8000" in db_url:
-    # Contexto que ignora validação de certificados (essencial para Neon/Supabase no Vercel)
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "connect_args": {
-            "ssl_context": ctx
-        }
-    }
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
 else:
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
-# --- FIM DA CONFIGURAÇÃO DA BASE DE DADOS ---
 
-# Configuração de Uploads - No Vercel só podemos escrever em /tmp
+# --- Configuração de Uploads ---
 if IS_VERCEL:
     UPLOAD_FOLDER = '/tmp/uploads'
 else:
@@ -78,6 +68,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     conta_ativa = db.Column(db.Boolean, default=True) 
+    # NOVA COLUNA PARA A SUBSCRIÇÃO ANUAL
     data_expiracao = db.Column(db.DateTime, nullable=True)
 
 class Utilizador(db.Model):
@@ -86,66 +77,9 @@ class Utilizador(db.Model):
     nome = db.Column(db.String(100), default="Nome do Columbófilo")
     localidade = db.Column(db.String(100), default="")
     telefone = db.Column(db.String(20), default="")
-    email = db.Column(db.String(100)) # Adicionado para recuperação de perfil
-    foto = db.Column(db.String(255)) # Adicionado para recuperação de perfil
+    email = db.Column(db.String(100)) 
+    foto = db.Column(db.String(255)) 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-def get_colony_stats(user_id):
-    # Cálculo de estatísticas filtradas por utilizador
-    pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
-    current_year = datetime.now().year
-    
-    stats = {
-        'total': len(pombos),
-        'total_f': sum(1 for p in pombos if p.sexo == 'Fêmea'),
-        'total_m': sum(1 for p in pombos if p.sexo == 'Macho'),
-        'total_i': sum(1 for p in pombos if p.sexo not in ['Fêmea', 'Macho']),
-        
-        'voadores': sum(1 for p in pombos if p.categoria == 'Voador'),
-        'voadores_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Fêmea'),
-        'voadores_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Macho'),
-        'voadores_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
-        
-        # Divisão de Voadores por idade e sexo
-        'v_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
-        'v_adultos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Fêmea'),
-        'v_adultos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Macho'),
-        'v_adultos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
-        
-        'v_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
-        'v_yearlings_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Fêmea'),
-        'v_yearlings_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Macho'),
-        'v_yearlings_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
-        
-        'v_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
-        'v_borrachos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Fêmea'),
-        'v_borrachos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Macho'),
-        'v_borrachos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo not in ['Fêmea', 'Macho']),
-        
-        'reprodutores': sum(1 for p in pombos if p.categoria == 'Reprodutor'),
-        'reprodutores_f': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
-        'reprodutores_m': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Macho'),
-        'reprodutores_i': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo not in ['Fêmea', 'Macho']),
-        
-        'cedidos': sum(1 for p in pombos if p.categoria == 'Cedido'),
-        'cedidos_f': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Fêmea'),
-        'cedidos_m': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Macho'),
-        'cedidos_i': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo not in ['Fêmea', 'Macho']),
-    }
-    return stats
-
-def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
-    if not anilha or depth >= max_depth:
-        return None
-    pombo = Pombo.query.filter_by(anilha=anilha, user_id=user_id).first()
-    if not pombo:
-        return {'pombo': None, 'p_anilha': anilha, 'nome': 'Não Registado'} 
-        
-    return {
-        'pombo': pombo,
-        'pai': get_pombo_tree(pombo.pai, user_id, depth + 1, max_depth),
-        'mae': get_pombo_tree(pombo.mae, user_id, depth + 1, max_depth)
-    }
 
 class Pombo(db.Model):
     __tablename__ = 'pombos'
@@ -163,21 +97,63 @@ class Pombo(db.Model):
     oculto = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
+def get_colony_stats(user_id):
+    pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
+    current_year = datetime.now().year
+    
+    stats = {
+        'total': len(pombos),
+        'total_f': sum(1 for p in pombos if p.sexo == 'Fêmea'),
+        'total_m': sum(1 for p in pombos if p.sexo == 'Macho'),
+        'total_i': sum(1 for p in pombos if p.sexo not in ['Fêmea', 'Macho']),
+        'voadores': sum(1 for p in pombos if p.categoria == 'Voador'),
+        'voadores_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Fêmea'),
+        'voadores_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Macho'),
+        'voadores_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
+        'v_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
+        'v_adultos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Fêmea'),
+        'v_adultos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Macho'),
+        'v_adultos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
+        'v_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
+        'v_yearlings_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Fêmea'),
+        'v_yearlings_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Macho'),
+        'v_yearlings_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
+        'v_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
+        'v_borrachos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Fêmea'),
+        'v_borrachos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Macho'),
+        'v_borrachos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo not in ['Fêmea', 'Macho']),
+        'reprodutores': sum(1 for p in pombos if p.categoria == 'Reprodutor'),
+        'reprodutores_f': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
+        'reprodutores_m': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Macho'),
+        'reprodutores_i': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo not in ['Fêmea', 'Macho']),
+        'cedidos': sum(1 for p in pombos if p.categoria == 'Cedido'),
+        'cedidos_f': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Fêmea'),
+        'cedidos_m': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Macho'),
+        'cedidos_i': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo not in ['Fêmea', 'Macho']),
+    }
+    return stats
+
+def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
+    if not anilha or depth >= max_depth:
+        return None
+    pombo = Pombo.query.filter_by(anilha=anilha, user_id=user_id).first()
+    if not pombo:
+        return {'pombo': None, 'p_anilha': anilha, 'nome': 'Não Registado'} 
+    return {
+        'pombo': pombo,
+        'pai': get_pombo_tree(pombo.pai, user_id, depth + 1, max_depth),
+        'mae': get_pombo_tree(pombo.mae, user_id, depth + 1, max_depth)
+    }
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Se for um erro HTTP normal (como 404), deixa o Flask lidar normalmente
     if isinstance(e, HTTPException):
         return e
-        
-    # Log técnico para o Vercel
     app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
-    
-    # Tenta renderizar o template elegante. 
-    # Se falhar (ex: erro de BD na base.html), usa um fail-safe em texto.
     try:
         return render_template("erro_db.html", erro=str(e)), 500
     except Exception:
@@ -187,7 +163,6 @@ def handle_exception(e):
 @app.route("/ping")
 def ping():
     try:
-        # Tenta uma consulta mínima à base de dados
         db.session.execute(text("SELECT 1"))
         return "Ping: OK | Base de Dados: CONECTADA (pg8000 + SSL Context)"
     except Exception as e:
@@ -204,13 +179,13 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
-            if not user.conta_ativa:
-                return redirect(url_for('conta_suspensa'))
-                
+            
+            # --- VERIFICAÇÃO DA DATA DE EXPIRAÇÃO ---
             if user.data_expiracao and datetime.now() > user.data_expiracao:
                 user.conta_ativa = False
                 db.session.commit()
-                flash("A sua conta expirou. Foi bloqueada automaticamente.", "danger")
+
+            if not user.conta_ativa:
                 return redirect(url_for('conta_suspensa'))
                 
             login_user(user)
@@ -227,9 +202,7 @@ def register():
         if User.query.filter_by(email=email).first():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
-        
-        data_exp = datetime.now() + timedelta(days=365)
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')), data_expiracao=data_exp)
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
         db.session.add(new_user)
         db.session.commit()
         flash("Conta criada com sucesso! Faça login.", "success")
@@ -244,21 +217,18 @@ def conta_suspensa():
 @app.route("/api/pombo/existe/<search>")
 @login_required
 def api_pombo_existe(search):
-    # Procura por anilha no contexto do utilizador logado
     pombo = Pombo.query.filter_by(user_id=current_user.id, anilha=search).first()
     if pombo:
         return {"existe": True, "anilha": pombo.anilha, "ano": pombo.ano}
     return {"existe": False}
 
-# --- GESTÃO DE POMBOS ---
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    
-    # Lógica de sugestão: tenta encontrar o último número da anilha anterior e incrementa
     proxima_anilha = ""
     ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
+    
     if ultimo_pombo and ultimo_pombo.anilha:
         match = re.search(r'(\d+)$', ultimo_pombo.anilha)
         if match:
@@ -271,7 +241,6 @@ def novo_pombo():
                 
     if request.method == 'POST':
         anilha_form = request.form.get('anilha')
-        # Se o campo anilha estiver vazio, usa a sugestão
         anilha_final = anilha_form if anilha_form and anilha_form.strip() else request.form.get('anilha_sugerida')
             
         novo = Pombo(
@@ -304,7 +273,6 @@ def novo_pombo():
 @login_required
 def lista_pombos():
     pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).order_by(Pombo.anilha).all()
-    # Conjunto de anilhas registadas para o utilizador
     anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
     return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS", anilhas_registadas=anilhas_registadas)
 
@@ -385,7 +353,7 @@ def pombo_por_anilha(anilha):
     pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
     if pombo:
         return redirect(url_for('editar_pombo', id=pombo.id))
-    flash(f"Pombo {anilha} não encontrado na sua base de dados.", "warning")
+    flash(f"Pombo {anilha} não encontrado.", "warning")
     return redirect(request.referrer or url_for('lista_pombos'))
 
 @app.route("/estatisticas")
@@ -397,7 +365,6 @@ def estatisticas():
 @app.route("/pedigree/gerar")
 @login_required
 def gerar_pedigree():
-    # Passamos os pombos para o seletor no frontend
     pombos = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.anilha).all()
     return render_template("gerar_pedigree.html", pombos=pombos)
 
@@ -438,7 +405,7 @@ def editar_dados():
 
     if request.method == 'POST':
         utilizador.nome = request.form.get('nome')
-        utilizador.localidade = request.form.get('localidade') # Mapeado para o campo correto
+        utilizador.localidade = request.form.get('localidade') 
         utilizador.telefone = request.form.get('telefone')
         utilizador.email = request.form.get('email')
         
@@ -489,8 +456,11 @@ def toggle_conta(user_id):
     user_alvo = User.query.get(user_id)
     if user_alvo and user_alvo.id != current_user.id:
         user_alvo.conta_ativa = not user_alvo.conta_ativa
+        
+        # A TUA LÓGICA DE RENOVAÇÃO POR 1 ANO:
         if user_alvo.conta_ativa:
             user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
+            
         db.session.commit()
         msg = f"Conta de {user_alvo.email} {'ativada (renovada por 1 ano)' if user_alvo.conta_ativa else 'bloqueada'}."
         flash(msg, "success")
@@ -521,6 +491,17 @@ def limpar_tudo():
         db.drop_all()
         db.create_all()
     return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
+
+# --- VACINA PARA ATUALIZAR A BASE DE DADOS SEM APAGAR DADOS ---
+@app.route("/atualizar_bd_agora")
+def atualizar_bd_agora():
+    try:
+        with app.app_context():
+            db.session.execute(text("ALTER TABLE users ADD COLUMN data_expiracao TIMESTAMP;"))
+            db.session.commit()
+        return "<h3>SUCESSO!</h3><p>A coluna 'data_expiracao' foi adicionada à base de dados. Já podes voltar ao site e gerir as contas!</p>"
+    except Exception as e:
+        return f"<h3>Aviso:</h3><p>Se estás a ver isto, provavelmente a coluna já existia ou houve este erro: {str(e)}</p>"
 
 if __name__ == "__main__":
     app.run(debug=True)
