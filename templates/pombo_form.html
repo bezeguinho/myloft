@@ -90,7 +90,7 @@
                                 modo_edicao %}required{% endif %}>
 
                                 {% if ultimo_ano and not modo_edicao %}
-                                <option value="" selected hidden>Sugere: {{ ultimo_ano }}</option>
+                                <option value="" selected hidden>{{ ultimo_ano }}</option>
                                 {% else %}
                                 <option value="" {% if not modo_edicao %}selected{% endif %} disabled hidden>Escolha..
                                 </option>
@@ -218,7 +218,7 @@
         if (anilhaInput.value.trim() === "" && anilhaInput.placeholder !== "") {
             anilhaInput.value = anilhaInput.placeholder;
         }
-        return true; // O backend trata do Ano Sugerido automaticamente!
+        return true;
     }
 </script>
 {% endblock %}
