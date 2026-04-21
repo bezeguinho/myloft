@@ -32,7 +32,7 @@
         width: 100%;
     }
 
-    /* Linha padrão cinzenta */
+    /* Linha cinzenta suave padrão */
     .table-stats td,
     .table-stats th {
         border-bottom: 1px solid #dee2e6 !important;
@@ -40,13 +40,13 @@
         white-space: nowrap;
     }
 
-    /* Estilo para as linhas de TOTAL (Letras Verdes e Linha em Negrito) */
+    /* ESTILO PARA AS LINHAS DE TOTAL (Verde + Linha Grossa/Negrito) */
     .linha-destaque-total td {
         color: #2e7d32 !important;
-        /* Cor Verde */
         font-weight: bold !important;
+        /* Esta é a linha "em negrito" que separa as secções */
+        border-top: 2.5px solid #444 !important;
         border-bottom: 2.5px solid #444 !important;
-        /* Linha "em negrito" para separar */
         text-transform: uppercase;
     }
 
@@ -77,7 +77,7 @@
         color: #6c757d !important;
     }
 
-    /* Espaçador entre blocos */
+    /* Espaçadores */
     .spacer-row td {
         height: 15px;
         border: none !important;
@@ -160,7 +160,7 @@
                 </tr>
 
                 <tr>
-                    <td class="ps-inicio texto-principal">REPRODUTORES</td>
+                    <td class="ps-inicio texto-principal border-bottom-0">REPRODUTORES</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold fs-5">{{ stats.reprodutores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
