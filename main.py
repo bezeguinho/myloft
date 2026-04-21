@@ -8,7 +8,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
@@ -78,6 +78,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     conta_ativa = db.Column(db.Boolean, default=True) 
+    data_expiracao = db.Column(db.DateTime, nullable=True)
 
 class Utilizador(db.Model):
     __tablename__ = 'utilizadores_perfil'
@@ -203,6 +204,12 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(email=request.form.get('email').lower()).first()
         if user and check_password_hash(user.password_hash, request.form.get('password')):
+            if user.data_expiracao and datetime.now() > user.data_expiracao:
+                user.conta_ativa = False
+                db.session.commit()
+                flash("A sua conta expirou! Por favor contacte o administrador.", "danger")
+                return redirect(url_for('conta_suspensa'))
+                
             if not user.conta_ativa:
                 return redirect(url_for('conta_suspensa'))
             login_user(user)
@@ -219,7 +226,10 @@ def register():
         if User.query.filter_by(email=email).first():
             flash("Email já registado.", "danger")
             return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
+            
+        # Define a validade de exatamente 1 ano (365 dias) a partir de hoje
+        validade = datetime.now() + timedelta(days=365)
+        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')), data_expiracao=validade)
         db.session.add(new_user)
         db.session.commit()
         flash("Conta criada com sucesso! Faça login.", "success")
@@ -469,7 +479,7 @@ def admin_dashboard():
         flash("Acesso restrito.", "danger")
         return redirect(url_for('index'))
     users = User.query.all()
-    return render_template("admin.html", users=users)
+    return render_template("admin.html", users=users, now=datetime.now)
 
 @app.route("/admin/toggle_conta/<int:user_id>")
 @login_required
@@ -479,8 +489,29 @@ def toggle_conta(user_id):
     user_alvo = User.query.get(user_id)
     if user_alvo and user_alvo.id != current_user.id:
         user_alvo.conta_ativa = not user_alvo.conta_ativa
+        # Se for ativada e estiver expirada (ou sem data), adiciona 1 ano
+        if user_alvo.conta_ativa:
+            if not user_alvo.data_expiracao or datetime.now() > user_alvo.data_expiracao:
+                user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
         db.session.commit()
         flash(f"Estado da conta de {user_alvo.email} alterado.", "success")
+    return redirect(url_for('admin_dashboard'))
+
+@app.route("/admin/adicionar_tempo/<int:user_id>")
+@login_required
+def adicionar_tempo(user_id):
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+    user_alvo = User.query.get(user_id)
+    if user_alvo:
+        if user_alvo.data_expiracao and user_alvo.data_expiracao > datetime.now():
+            user_alvo.data_expiracao += timedelta(days=365)
+        else:
+            user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
+            
+        user_alvo.conta_ativa = True
+        db.session.commit()
+        flash(f"Foi adicionado 1 ano à conta de {user_alvo.email}.", "success")
     return redirect(url_for('admin_dashboard'))
 
 @app.route("/admin/toggle_admin/<int:user_id>")
