@@ -1,5 +1,14 @@
-from dotenv import load_dotenv
-load_dotenv()
+import os
+
+def load_env_manual():
+    if os.path.exists('.env'):
+        with open('.env') as f:
+            for line in f:
+                if line.strip() and not line.startswith('#'):
+                    key, val = line.strip().split('=', 1)
+                    os.environ[key] = val
+
+load_env_manual()
 
 from main import app, db
 from sqlalchemy import text
