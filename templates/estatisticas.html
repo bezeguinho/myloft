@@ -15,12 +15,15 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-voltar:hover { background-color: #e6b800 !important; }
+
+    .btn-voltar:hover {
+        background-color: #e6b800 !important;
+    }
 
     .card-stats {
         border-radius: 15px;
         border: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
     .table-stats thead {
@@ -32,11 +35,21 @@
         text-transform: uppercase;
     }
 
-    .text-femea { color: #ff69b4 !important; }
-    .text-macho { color: #007bff !important; }
-    .text-indef { color: #6c757d !important; }
-    
-    .text-blue-total { color: #0056d2 !important; }
+    .text-femea {
+        color: #ff69b4 !important;
+    }
+
+    .text-macho {
+        color: #007bff !important;
+    }
+
+    .text-indef {
+        color: #6c757d !important;
+    }
+
+    .text-blue-total {
+        color: #0056d2 !important;
+    }
 
     /* Linha Total Geral em Amarelo */
     .linha-total-geral {
@@ -44,13 +57,13 @@
         color: #333 !important;
         border: none !important;
     }
+
     .linha-total-geral td {
         border: none !important;
         font-weight: bold;
     }
 </style>
 
-<!-- Topo: Título e Botão Voltar -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-primary m-0">TABELA GERAL</h2>
     <a href="{{ url_for('lista_pombos') }}" class="btn btn-voltar shadow-sm">
@@ -65,16 +78,15 @@
                 <tr class="fs-5 fw-bold">
                     <th class="ps-4 py-3">Categoria</th>
                     <th class="text-center">Total</th>
-                    <th class="text-center"></th> 
+                    <th class="text-center"></th>
                     <th class="text-center"><i class="bi bi-gender-female text-femea me-1"></i> Fêmeas</th>
                     <th class="text-center"><i class="bi bi-gender-male text-macho me-1"></i> Machos</th>
                     <th class="text-center"><i class="bi bi-question-circle text-indef me-1"></i> Indefinido</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Subdivisão Voadores -->
                 <tr>
-                    <td rowspan="3" class="ps-4 py-3 fw-bold text-dark border-bottom">Voadores</td>
+                    <td rowspan="4" class="ps-4 py-3 fw-bold text-dark border-bottom">Voadores</td>
                     <td class="text-center fw-bold text-blue-total">{{ stats.v_adultos }}</td>
                     <td class="text-start ps-4 small text-muted">Adultos</td>
                     <td class="text-center fw-bold text-femea">{{ stats.v_adultos_f }}</td>
@@ -88,40 +100,38 @@
                     <td class="text-center fw-bold text-macho">{{ stats.v_yearlings_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.v_yearlings_i }}</td>
                 </tr>
-                <tr class="border-bottom">
+                <tr>
                     <td class="text-center fw-bold text-blue-total">{{ stats.v_borrachos }}</td>
                     <td class="text-start ps-4 small text-muted">Borrachos</td>
                     <td class="text-center fw-bold text-femea">{{ stats.v_borrachos_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.v_borrachos_i }}</td>
                 </tr>
+                <tr class="border-bottom bg-light">
+                    <td class="text-center fw-bold text-blue-total fs-6">{{ stats.voadores }}</td>
+                    <td class="text-start ps-4 fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">Total
+                        Voadores</td>
+                    <td class="text-center fw-bold text-femea">{{ stats.voadores_f }}</td>
+                    <td class="text-center fw-bold text-macho">{{ stats.voadores_m }}</td>
+                    <td class="text-center fw-bold text-indef">{{ stats.voadores_i }}</td>
+                </tr>
 
-                <!-- Outras Categorias -->
-                <tr>
+                <tr class="border-bottom">
                     <td class="ps-4 py-3 fw-bold text-dark">Reprodutores</td>
-                    <td class="text-center fw-bold text-blue-total">{{ stats.reprodutores }}</td>
-                    <td class="text-start ps-4 small text-muted"></td> <!-- Eliminado --- -->
+                    <td class="text-center fw-bold text-blue-total fs-6">{{ stats.reprodutores }}</td>
+                    <td class="text-start ps-4 small text-muted"></td>
                     <td class="text-center fw-bold text-femea">{{ stats.reprodutores_f }}</td>
                     <td class="text-center fw-bold text-macho">{{ stats.reprodutores_m }}</td>
                     <td class="text-center fw-bold text-indef">{{ stats.reprodutores_i }}</td>
                 </tr>
-                <tr class="border-bottom">
-                    <td class="ps-4 py-3 fw-bold text-dark">Cedidos</td>
-                    <td class="text-center fw-bold text-blue-total">{{ stats.cedidos }}</td>
-                    <td class="text-start ps-4 small text-muted"></td> <!-- Eliminado --- -->
-                    <td class="text-center fw-bold text-femea">{{ stats.cedidos_f }}</td>
-                    <td class="text-center fw-bold text-macho">{{ stats.cedidos_m }}</td>
-                    <td class="text-center fw-bold text-indef">{{ stats.cedidos_i }}</td>
-                </tr>
 
-                <!-- Linha Total Geral (Agora em Amarelo e sem contorno preto) -->
                 <tr class="linha-total-geral fs-5">
                     <td class="ps-4 py-3">TOTAL GERAL</td>
-                    <td class="text-center text-blue-total">{{ stats.total }}</td>
-                    <td class="text-center"></td> <!-- Eliminado --- -->
-                    <td class="text-center text-femea">{{ stats.total_f }}</td>
-                    <td class="text-center text-macho">{{ stats.total_m }}</td>
-                    <td class="text-center text-indef">{{ stats.total_i }}</td>
+                    <td class="text-center text-blue-total">{{ stats.voadores + stats.reprodutores }}</td>
+                    <td class="text-center"></td>
+                    <td class="text-center text-femea">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                    <td class="text-center text-macho">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                    <td class="text-center text-indef">{{ stats.voadores_i + stats.reprodutores_i }}</td>
                 </tr>
             </tbody>
         </table>
