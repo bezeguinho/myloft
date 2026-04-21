@@ -7,52 +7,92 @@
             <span class="badge bg-primary fs-6">{{ users|length }} Contas</span>
         </div>
 
+        <div class="alert alert-danger shadow-sm mb-4 border-0" style="border-radius: 12px;">
+            <h5 class="alert-heading fw-bold text-danger mb-3"><i
+                    class="bi bi-exclamation-triangle-fill me-2"></i>Avisos de Pagamento / Expiração</h5>
+            <ul class="mb-0 fs-6">
+                {% set alertas = namespace(total=0) %}
+                {% for u in users %}
+                {% if not u.conta_ativa or (u.data_expiracao and agora > u.data_expiracao) %}
+                {% if u.id != current_user.id %}
+                <li class="mb-2">
+                    <span class="fw-bold text-dark">{{ u.email }}</span>
+                    <span class="badge bg-danger ms-2">
+                        {% if u.data_expiracao and agora > u.data_expiracao %}
+                        Expirou a {{ u.data_expiracao.strftime('%d/%m/%Y') }}
+                        {% else %}
+                        Acesso Bloqueado / Aguarda Pagamento
+                        {% endif %}
+                    </span>
+                </li>
+                {% set alertas.total = alertas.total + 1 %}
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% if alertas.total == 0 %}
+                <li class="list-unstyled text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Todas as
+                    contas estão em dia. Nenhuma ação necessária!</li>
+                {% endif %}
+            </ul>
+        </div>
+
         <div class="row g-3">
             {% for u in users %}
             <div class="col-12">
-                <div class="card shadow-sm border-0 {% if not u.conta_ativa %}bg-light text-muted{% endif %}">
+                <div
+                    class="card shadow-sm border-0 {% if not u.conta_ativa or (u.data_expiracao and agora > u.data_expiracao) %}bg-light text-muted border-danger border-start border-4{% endif %}">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-12 col-md-5 mb-3 mb-md-0">
                                 <h5 class="fw-bold mb-1 text-uppercase">
                                     <i class="bi bi-person-circle me-2"></i>{{ u.email }}
                                 </h5>
-                                <div class="small fw-bold">
+                                <div class="small fw-bold mb-1">
                                     ID: #{{ u.id }} |
                                     {% if u.is_admin %}
-                                    <span class="text-primary"><i class="bi bi-shield-check"></i> ADMINISTRADOR</span>
+                                    <span class="text-primary"><i class="bi bi-shield-check"></i> ADMIN</span>
                                     {% else %}
-                                    <span class="text-secondary"><i class="bi bi-person"></i> UTILIZADOR COMUM</span>
+                                    <span class="text-secondary"><i class="bi bi-person"></i> USER</span>
                                     {% endif %}
-                                    <br>
-                                    <span class="mt-1 d-inline-block text-muted">
-                                        <i class="bi bi-calendar-event"></i> Expira a: 
-                                        {% if u.data_expiracao %}
-                                            <span class="{% if not u.conta_ativa %}text-danger{% endif %}">{{ u.data_expiracao.strftime('%d/%m/%Y') }}</span>
-                                        {% else %}
-                                            Ilimitado/Não definido
-                                        {% endif %}
+                                </div>
+                                <div class="small">
+                                    <i class="bi bi-calendar-event me-1"></i> Expira a:
+                                    {% if u.data_expiracao %}
+                                    <span
+                                        class="{% if agora > u.data_expiracao %}text-danger fw-bold{% else %}text-success fw-bold{% endif %}">
+                                        {{ u.data_expiracao.strftime('%d/%m/%Y') }}
                                     </span>
+                                    {% else %}
+                                    <span class="text-muted">Não definido</span>
+                                    {% endif %}
                                 </div>
                             </div>
 
                             <div class="col-12 col-md-7">
                                 <div class="d-flex flex-wrap gap-2 justify-content-md-end">
-
                                     {% if u.id != current_user.id %}
-                                    <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
-                                        class="btn btn-sm {% if u.conta_ativa %}btn-outline-danger{% else %}btn-success{% endif %} fw-bold px-3">
-                                        {% if u.conta_ativa %}Bloquear Acesso{% else %}Ativar (+1 Ano){% endif %}
-                                    </a>
 
-                                    <a href="{{ url_for('toggle_admin_role', user_id=u.id) }}"
-                                        class="btn btn-sm btn-dark fw-bold px-3">
-                                        {% if u.is_admin %}Retirar Admin{% else %}Tornar Admin{% endif %}
-                                    </a>
-                                    {% else %}
-                                    <span class="badge bg-info text-dark">A tua conta (Protegida)</span>
-                                    {% endif %}
+                                    {% if u.conta_ativa and (not u.data_expiracao or agora <= u.data_expiracao) %} <a
+                                        href="{{ url_for('toggle_conta', user_id=u.id) }}"
+                                        class="btn btn-sm btn-outline-danger fw-bold px-3">
+                                        Bloquear Acesso
+                                        </a>
+                                        {% else %}
+                                        <a href="{{ url_for('toggle_conta', user_id=u.id) }}"
+                                            class="btn btn-sm btn-success fw-bold px-3 shadow-sm">
+                                            Ativar (+1 Ano)
+                                        </a>
+                                        {% endif %}
 
+                                        <a href="{{ url_for('toggle_admin_role', user_id=u.id) }}"
+                                            class="btn btn-sm btn-dark fw-bold px-3">
+                                            {% if u.is_admin %}Retirar Admin{% else %}Tornar Admin{% endif %}
+                                        </a>
+
+                                        {% else %}
+                                        <span class="badge bg-info text-dark shadow-sm py-2 px-3">A tua conta
+                                            (Protegida)</span>
+                                        {% endif %}
                                 </div>
                             </div>
                         </div>

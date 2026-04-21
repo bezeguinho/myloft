@@ -68,7 +68,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     conta_ativa = db.Column(db.Boolean, default=True) 
-    # NOVA COLUNA PARA A SUBSCRIÇÃO ANUAL
     data_expiracao = db.Column(db.DateTime, nullable=True)
 
 class Utilizador(db.Model):
@@ -445,8 +444,10 @@ def admin_dashboard():
     if not current_user.is_admin:
         flash("Acesso restrito.", "danger")
         return redirect(url_for('index'))
-    users = User.query.all()
-    return render_template("admin.html", users=users)
+    users = User.query.order_by(User.id).all()
+    # Enviamos a hora atual para o HTML comparar as datas em tempo real
+    agora = datetime.now()
+    return render_template("admin.html", users=users, agora=agora)
 
 @app.route("/admin/toggle_conta/<int:user_id>")
 @login_required
@@ -455,14 +456,21 @@ def toggle_conta(user_id):
         return redirect(url_for('index'))
     user_alvo = User.query.get(user_id)
     if user_alvo and user_alvo.id != current_user.id:
-        user_alvo.conta_ativa = not user_alvo.conta_ativa
+        agora = datetime.now()
         
-        # A TUA LÓGICA DE RENOVAÇÃO POR 1 ANO:
-        if user_alvo.conta_ativa:
-            user_alvo.data_expiracao = datetime.now() + timedelta(days=365)
+        # Se a conta está ativa mas a data já expirou, clicar no botão renova por 1 ano
+        if user_alvo.conta_ativa and user_alvo.data_expiracao and agora > user_alvo.data_expiracao:
+            user_alvo.conta_ativa = True
+            user_alvo.data_expiracao = agora + timedelta(days=365)
+            msg = f"Conta de {user_alvo.email} ativada (renovada por 1 ano)."
+        else:
+            # Alterna normalmente entre Bloquear e Ativar
+            user_alvo.conta_ativa = not user_alvo.conta_ativa
+            if user_alvo.conta_ativa:
+                user_alvo.data_expiracao = agora + timedelta(days=365)
+            msg = f"Conta de {user_alvo.email} {'ativada (renovada por 1 ano)' if user_alvo.conta_ativa else 'bloqueada'}."
             
         db.session.commit()
-        msg = f"Conta de {user_alvo.email} {'ativada (renovada por 1 ano)' if user_alvo.conta_ativa else 'bloqueada'}."
         flash(msg, "success")
     return redirect(url_for('admin_dashboard'))
 
@@ -492,7 +500,6 @@ def limpar_tudo():
         db.create_all()
     return "<h3>Atualização concluída com sucesso!</h3><p><a href='/'>Clica aqui para voltar ao site</a></p>"
 
-# --- VACINA PARA ATUALIZAR A BASE DE DADOS SEM APAGAR DADOS ---
 @app.route("/atualizar_bd_agora")
 def atualizar_bd_agora():
     try:
