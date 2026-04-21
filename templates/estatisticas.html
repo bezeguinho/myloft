@@ -47,16 +47,18 @@
         color: #ffffff !important;
     }
 
-    /* CATEGORIAS PRINCIPAIS */
-    .texto-categoria {
+    /* 1. CATEGORIAS PRINCIPAIS (MAIÚSCULAS E GRANDES) */
+    .texto-principal {
         font-size: 1.5rem !important;
         font-weight: bold;
+        text-transform: uppercase;
     }
 
-    /* TEXTO TOTAL DE VOADORES */
-    .texto-total-voadores {
+    /* 2. SUBCATEGORIAS (MAIÚSCULAS MAS MAIS PEQUENAS) */
+    .texto-subcategoria {
         font-size: 1.1rem !important;
         font-weight: bold;
+        text-transform: uppercase;
     }
 
     /* LINHAS TOTAIS A VERMELHO */
@@ -94,12 +96,12 @@
     }
 
     @media (max-width: 767px) {
-        .texto-categoria {
+        .texto-principal {
             font-size: 1.2rem !important;
         }
 
-        .texto-total-voadores {
-            font-size: 0.95rem !important;
+        .texto-subcategoria {
+            font-size: 0.9rem !important;
         }
 
         .table-stats td,
@@ -136,29 +138,29 @@
             </thead>
             <tbody>
                 <tr>
-                    <td rowspan="4" class="ps-inicio texto-categoria text-dark border-bottom align-middle">Voadores</td>
-                    <td class="text-start texto-categoria text-muted">Adultos</td>
+                    <td rowspan="4" class="ps-inicio texto-principal text-dark border-bottom align-middle">VOADORES</td>
+                    <td class="text-start texto-subcategoria text-muted">ADULTOS</td>
                     <td class="text-center fw-bold text-dark fs-5">{{ stats.v_adultos }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.v_adultos_f }}</td>
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_adultos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_adultos_i }}</td>
                 </tr>
                 <tr>
-                    <td class="text-start texto-categoria text-muted">Yearlings</td>
+                    <td class="text-start texto-subcategoria text-muted">YEARLINGS</td>
                     <td class="text-center fw-bold text-dark fs-5">{{ stats.v_yearlings }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.v_yearlings_f }}</td>
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_yearlings_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_yearlings_i }}</td>
                 </tr>
                 <tr>
-                    <td class="text-start texto-categoria text-muted">Borrachos</td>
+                    <td class="text-start texto-subcategoria text-muted">BORRACHOS</td>
                     <td class="text-center fw-bold text-dark fs-5">{{ stats.v_borrachos }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.v_borrachos_f }}</td>
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
                 <tr class="linha-total-vermelha">
-                    <td class="text-start texto-total-voadores text-light-total">TOTAL DE VOADORES</td>
+                    <td class="text-start texto-subcategoria text-light-total">TOTAL DE VOADORES</td>
                     <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores }}</td>
                     <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores_f }}</td>
                     <td class="text-center fw-bold text-light-total fs-5">{{ stats.voadores_m }}</td>
@@ -170,7 +172,7 @@
                 </tr>
 
                 <tr class="border-bottom">
-                    <td class="ps-inicio texto-categoria text-dark">Reprodutores</td>
+                    <td class="ps-inicio texto-principal text-dark">REPRODUTORES</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold text-dark fs-5">{{ stats.reprodutores }}</td>
                     <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
@@ -182,8 +184,8 @@
                     <td colspan="6"></td>
                 </tr>
 
-                <tr class="linha-total-vermelha texto-categoria">
-                    <td class="ps-inicio py-3 text-uppercase text-light-total">TOTAL GERAL</td>
+                <tr class="linha-total-vermelha texto-principal">
+                    <td class="ps-inicio py-3 text-light-total">TOTAL GERAL</td>
                     <td class="text-center"></td>
                     <td class="text-center text-light-total fs-4">{{ stats.voadores + stats.reprodutores }}</td>
                     <td class="text-center text-light-total fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
