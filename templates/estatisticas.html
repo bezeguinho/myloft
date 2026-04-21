@@ -31,7 +31,6 @@
         background-color: #f8f9fa;
     }
 
-    /* Cores específicas */
     .text-femea {
         color: #ff69b4 !important;
     }
@@ -44,12 +43,11 @@
         color: #6c757d !important;
     }
 
-    /* NOVO VERDE MENOS CARREGADO */
+    /* VERDE SUAVIZADO PARA TEXTO */
     .text-green-total {
         color: #388e3c !important;
     }
 
-    /* Hierarquia de Letras */
     .texto-principal {
         font-size: 1.3rem !important;
         font-weight: bold;
@@ -62,19 +60,15 @@
         text-transform: uppercase;
     }
 
-    /* LINHAS DE DESTAQUE COM CORREÇÃO DE POSIÇÃO DE BORDA */
-    .linha-total-destaque {
+    /* LINHAS DE TOTAIS: FUNDO CLARO E BORDAS VERDES (Substitui a cinzenta) */
+    .linha-total-verde {
         background-color: #f1f8f1 !important;
-        /* Fundo verde ainda mais suave */
-    }
-
-    /* Aplicar a borda verde no lugar da cinzenta */
-    .border-verde-total {
+        /* A borda verde agora substitui a cinzenta padrão */
         border-top: 2px solid #388e3c !important;
         border-bottom: 2px solid #388e3c !important;
     }
 
-    /* Limpeza de bordas padrão para evitar linhas duplas */
+    /* Limpeza de bordas para evitar conflitos */
     .table-stats,
     .table-stats td,
     .table-stats th {
@@ -85,7 +79,6 @@
         border-bottom: 1px solid #dee2e6 !important;
     }
 
-    /* Compactação de Colunas */
     .table-stats td,
     .table-stats th {
         padding: 0.2rem 0.15rem !important;
@@ -97,7 +90,6 @@
         padding-left: 1rem !important;
     }
 
-    /* Espaçador entre secções */
     .spacer-row {
         height: 15px;
         background-color: transparent !important;
@@ -167,7 +159,7 @@
                     <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
                     <td class="text-center fw-bold text-indef fs-5">{{ stats.v_borrachos_i }}</td>
                 </tr>
-                <tr class="linha-total-destaque border-verde-total">
+                <tr class="linha-total-verde">
                     <td class="text-start texto-subcategoria text-green-total">TOTAL DE VOADORES</td>
                     <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores }}</td>
                     <td class="text-center fw-bold text-green-total fs-5">{{ stats.voadores_f }}</td>
@@ -192,7 +184,7 @@
                     <td></td>
                 </tr>
 
-                <tr class="linha-total-destaque texto-principal border-verde-total">
+                <tr class="linha-total-verde texto-principal">
                     <td class="ps-inicio py-3 text-green-total">TOTAL GERAL</td>
                     <td class="text-start"></td>
                     <td class="text-center fw-bold text-green-total fs-4">{{ stats.voadores + stats.reprodutores }}</td>
