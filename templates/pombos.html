@@ -1,425 +1,61 @@
 {% extends "base.html" %}
+
 {% block content %}
-<style>
-    /* Estilos personalizados para os botões conforme a imagem */
-    .btn-voltar {
-        background-color: #ffcc29 !important;
-        color: #333 !important;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 24px;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .btn-voltar:hover { background-color: #e6b800 !important; }
+<div class="container py-4">
+    <h2 class="text-center fw-bold mb-4">{{ titulo }}</h2>
 
-    .btn-adicionar {
-        background-color: #0056d2 !important;
-        color: white !important;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 24px;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .btn-adicionar:hover { background-color: #0044a8 !important; }
-
-    /* Novo campo de contagem e botão Tabela Geral */
-    .count-box {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 4px 12px;
-        font-weight: bold;
-        color: #0056d2;
-        min-width: 50px;
-        text-align: center;
-        display: inline-block;
-    }
-
-    .btn-tabela-geral {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6 !important;
-        color: #0056d2 !important;
-        border-radius: 8px;
-        padding: 4px 15px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        transition: 0.3s;
-        text-decoration: none;
-    }
-    .btn-tabela-geral:hover { background-color: #f0f7ff !important; }
-
-    /* Botão Voltar ao Topo */
-    #backToTop {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
-        background-color: #0056d2;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        cursor: pointer;
-        z-index: 1000;
-        transition: 0.3s;
-    }
-    #backToTop:hover { background-color: #0044a8; transform: translateY(-3px); }
-
-    .search-container {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 8px 15px;
-        background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .print-container {
-        border: 1px solid #0056d2;
-        border-radius: 8px;
-        padding: 8px 15px;
-        background: white;
-        color: #0056d2;
-        cursor: pointer;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.3s;
-    }
-    .print-container:hover { background: #f0f7ff; }
-
-    @media print {
-        .no-print, .navbar, .btn-retroceder, .mb-4, .btn-group {
-            display: none !important;
-        }
-        .container {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        .card { border: none !important; box-shadow: none !important; }
-        .table { width: 100% !important; }
-        body { background: white !important; }
-    }
-</style>
-
-<!-- Topo: Título e Botões de Ação -->
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
-    <div class="d-flex align-items-center gap-3">
-        <h2 class="fw-bold text-primary m-0">{{ titulo }}</h2>
-        <div class="d-flex align-items-center gap-2">
-            <span class="count-box" title="Total nesta categoria">{{ pombos|length }}</span>
-            <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
-                <i class="bi bi-table me-1"></i> Tabela Geral
-            </a>
-        </div>
-    </div>
-    <div class="d-flex gap-2 mt-3 mt-md-0">
-        <a href="{{ url_for('index') }}" class="btn btn-voltar shadow-sm">
-            <i class="bi bi-arrow-left me-2"></i> Voltar
+    <div class="d-flex justify-content-center gap-3 mb-4">
+        <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
         </a>
-        <a href="{{ url_for('novo_pombo') }}" class="btn btn-adicionar shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Adicionar Novo
+        <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> VOLTAR
         </a>
     </div>
-</div>
 
-<!-- Barra de Pesquisa e Impressão -->
-<div class="row g-3 mb-4 no-print">
-    <div class="col-md-5">
-        <div class="search-container d-flex align-items-center">
-            <i class="bi bi-search text-primary me-2"></i>
-            <input type="text" id="pomboSearch" class="form-control border-0 p-0 shadow-none" 
-                   placeholder="Pesquisar por número, nome ou anilha..." 
-                   onkeyup="searchTable()">
-        </div>
-    </div>
-    <div class="col-md-7">
-        <div class="print-container shadow-sm" data-bs-toggle="modal" data-bs-target="#modalOpcoesImpressao">
-            <i class="bi bi-printer me-2"></i> Imprimir Lista
-        </div>
-    </div>
-</div>
-
-<div class="card shadow-sm border-0" style="border-radius: 10px;">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="pomboTable">
-                <thead class="table-light">
-                    <tr class="text-uppercase small fw-bold text-muted">
-                        <th class="ps-4" style="width: 120px;">Anilha</th>
-                        <th style="width: 80px;">Ano</th>
-                        <th>Nome</th>
-                        <th class="text-center">Sexo</th>
-                        <th>Cor</th>
-                        <th>Categoria</th>
-                        <th>Pais</th>
-                        <th class="text-center" style="width: 250px;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in pombos %}
-                    <tr class="pombo-row">
-                        <td class="fw-bold ps-4">
-                            <a href="{{ url_for('editar_pombo', id=p.id) }}" class="text-decoration-none text-primary">
-                                {{ p.anilha[:9] }}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Anilha</th>
+                    <th>Ano</th>
+                    <th>Nome / Cor</th>
+                    <th>Sexo</th>
+                    <th>Pai</th>
+                    <th>Mãe</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pombo in pombos %}
+                <tr>
+                    <td class="fw-bold">{{ pombo.anilha }}</td>
+                    <td>{{ pombo.ano }}</td>
+                    <td>
+                        {{ pombo.nome if pombo.nome else '' }}
+                        <br><small class="text-muted">{{ pombo.cor if pombo.cor else '' }}</small>
+                    </td>
+                    <td>{{ pombo.sexo }}</td>
+                    <td>{{ pombo.pai if pombo.pai else '---' }}</td>
+                    <td>{{ pombo.mae if pombo.mae else '---' }}</td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <a href="{{ url_for('editar_pombo', id=pombo.id) }}" class="btn btn-sm btn-outline-dark">
+                                <i class="bi bi-pencil"></i>
                             </a>
-                        </td>
-                        <td>{{ p.ano }}</td>
-                        <td class="pombo-nome">{{ p.nome or '---' }}</td>
-                        <td class="text-center">
-                            {% if p.sexo == 'Macho' %}
-                            <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
-                            {% elif p.sexo == 'Fêmea' %}
-                            <i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
-                            {% else %}
-                            <i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>
-                            {% endif %}
-                        </td>
-                        <td>{{ p.cor or '---' }}</td>
-                        <td>{{ p.categoria }}</td>
-                        <td class="small">
-                            <div class="d-flex align-items-center gap-3">
-                                <div>
-                                    <span class="fw-bold text-muted">P:</span>
-                                    {% if p.pai and p.pai in anilhas_registadas %}
-                                    <a href="{{ url_for('pombo_por_anilha', anilha=p.pai) }}"
-                                        class="text-decoration-none fw-bold">{{ p.pai }}</a>
-                                    {% else %}
-                                    <span class="text-muted">{{ p.pai or '---' }}</span>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    <span class="fw-bold text-muted">M:</span>
-                                    {% if p.mae and p.mae in anilhas_registadas %}
-                                    <a href="{{ url_for('pombo_por_anilha', anilha=p.mae) }}"
-                                        class="text-decoration-none fw-bold">{{ p.mae }}</a>
-                                    {% else %}
-                                    <span class="text-muted">{{ p.mae or '---' }}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2 px-3">
-                                <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center"
-                                    title="Editar">
-                                    <i class="bi bi-pencil-square me-2"></i> Editar
-                                </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center" title="Eliminar"
-                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                    <i class="bi bi-trash me-2"></i> Eliminar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
-                            Nenhum pombo encontrado nesta categoria.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">Nenhum pombo encontrado nesta categoria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-
-</div>
-
-<!-- Botão Voltar ao Topo -->
-<button id="backToTop" onclick="scrollToTop()" title="Voltar ao Topo">
-    <i class="bi bi-arrow-up fs-4"></i>
-</button>
-
-<!-- Modal de Opções de Impressão -->
-<div class="modal fade" id="modalOpcoesImpressao" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-primary"><i class="bi bi-printer me-2"></i>Opções de Impressão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formImpressao">
-                    <div class="mb-3 {% if titulo != 'TODOS OS POMBOS' %}d-none{% endif %}">
-                        <label class="form-label fw-bold">Categoria</label>
-                        <select id="printCat" class="form-select border-secondary">
-                            <option value="Todos">Todas as Categorias</option>
-                            <option value="Voador">Voadores</option>
-                            <option value="Reprodutor">Reprodutores</option>
-                            <option value="Cedido">Cedidos</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Sexo</label>
-                        <select id="printSexo" class="form-select border-secondary">
-                            <option value="Todos">Todos</option>
-                            <option value="Macho">Machos</option>
-                            <option value="Fêmea">Fêmeas</option>
-                            <option value="Indefinido">Indefinido</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Ano</label>
-                        <select id="printAno" class="form-select border-secondary">
-                            <option value="Todos">Todos os Anos</option>
-                            <!-- Populado via JS ou range estático -->
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="executarImpressao()">Confirmar e Imprimir</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Confirmação de Eliminação -->
-<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-danger text-white border-0">
-                <h5 class="modal-title fw-bold" id="modalTitulo">Eliminar Pombo</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4 text-center">
-                <h5 class="mb-3">Tem a certeza que quer eliminar o Pombo?</h5>
-                <p class="text-muted">Depois de apagados os dados, não será possível recuperá-los. (<strong id="anilhaConfirmar"
-                        class="text-dark"></strong>)</p>
-            </div>
-            <div class="modal-footer border-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
-                <form id="formEliminar" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">Apagar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function confirmarEliminar(id, anilha) {
-        document.getElementById('anilhaConfirmar').innerText = anilha;
-        document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
-        var myModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-        myModal.show();
-    }
-
-    // Botão Voltar ao Topo Logic
-    window.onscroll = function() {
-        var btn = document.getElementById("backToTop");
-        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-            btn.style.display = "flex";
-        } else {
-            btn.style.display = "none";
-        }
-    };
-
-    function scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function searchTable() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("pomboSearch");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("pomboTable");
-        tr = table.getElementsByClassName("pombo-row");
-
-        for (i = 0; i < tr.length; i++) {
-            // Procura em Anilha (td 0) e Nome (td 2)
-            var tdAnilha = tr[i].getElementsByTagName("td")[0];
-            var tdNome = tr[i].getElementsByTagName("td")[2];
-            
-            if (tdAnilha || tdNome) {
-                var content = (tdAnilha.textContent || tdAnilha.innerText) + " " + 
-                              (tdNome.textContent || tdNome.innerText);
-                if (content.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-    }
-
-    // Inicializar anos no modal de impressão (1990 até o ano atual)
-    document.addEventListener("DOMContentLoaded", function() {
-        var selectAno = document.getElementById("printAno");
-        if (selectAno) {
-            var currentYear = new Date().getFullYear();
-            for (var i = currentYear; i >= 1990; i--) {
-                var opt = document.createElement("option");
-                opt.value = i;
-                opt.innerHTML = i;
-                selectAno.appendChild(opt);
-            }
-        }
-    });
-
-    function executarImpressao() {
-        var catSelect = document.getElementById("printCat");
-        var cat = catSelect ? catSelect.value : "Todos";
-        var sexo = document.getElementById("printSexo").value;
-        var ano = document.getElementById("printAno").value;
-        
-        var table = document.getElementById("pomboTable");
-        var tr = table.getElementsByClassName("pombo-row");
-
-        for (var i = 0; i < tr.length; i++) {
-            var matchCat = true;
-            var matchSexo = true;
-            var matchAno = true;
-
-            // Filtro Categoria (index 6 na tabela, ou seja, td index 5)
-            if (cat !== "Todos") {
-                var cellCat = tr[i].getElementsByTagName("td")[5];
-                if (cellCat && cellCat.textContent.trim() !== cat) matchCat = false;
-            }
-
-            // Filtro Sexo (index 4 na tabela, ou seja, td index 3)
-            if (sexo !== "Todos") {
-                var cellSexo = tr[i].getElementsByTagName("td")[3];
-                var icon = cellSexo.querySelector("i");
-                var textSexo = icon ? icon.getAttribute("title") : cellSexo.textContent.trim();
-                if (textSexo !== sexo) matchSexo = false;
-            }
-
-            // Filtro Ano (index 2 na tabela, ou seja, td index 1)
-            if (ano !== "Todos") {
-                var cellAno = tr[i].getElementsByTagName("td")[1];
-                if (cellAno && cellAno.textContent.trim() !== ano) matchAno = false;
-            }
-
-            if (matchCat && matchSexo && matchAno) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
-
-        // Esconder o modal
-        var modalEl = document.getElementById('modalOpcoesImpressao');
-        var modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) modal.hide();
-
-        // Aguardar o fecho do modal antes de imprimir
-        setTimeout(function() {
-            window.print();
-        }, 500);
-    }
-</script>
 {% endblock %}

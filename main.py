@@ -280,32 +280,26 @@ def novo_pombo():
 @app.route("/lista_pombos/<categoria>")
 @login_required
 def lista_pombos(categoria=None):
-    # 1. Filtro base por utilizador
+    # Filtro base
     query = Pombo.query.filter_by(user_id=current_user.id)
 
-    # 2. Lógica de Categorias
+    # Lógica de Categorias
     if categoria == 'Oculto':
         query = query.filter_by(oculto=True)
         titulo = "POMBOS OCULTOS"
     elif categoria:
-        # Filtra por categoria e garante que não estão ocultos
         query = query.filter_by(categoria=categoria, oculto=False)
-        # Ajusta o título (ex: Reprodutor -> REPRODUTORES)
         nomes = {"Reprodutor": "REPRODUTORES", "Voador": "VOADORES", "Cedido": "CEDIDOS"}
         titulo = nomes.get(categoria, categoria.upper())
     else:
-        # Todos os pombos (não ocultos)
         query = query.filter_by(oculto=False)
         titulo = "TODOS OS POMBOS"
 
     pombos = query.order_by(Pombo.anilha).all()
-    
-    # Mantemos a tua lógica de anilhas registadas que tinhas no código original
     anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
     
-    # IMPORTANTE: Usa o nome do ficheiro que criámos (lista_pombos.html) 
-    # ou muda para "pombos.html" se quiseres usar o teu ficheiro antigo
-    return render_template("lista_pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
+    # Voltamos a usar o TEU ficheiro original: pombos.html
+    return render_template("pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
 
 @app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
 @login_required
