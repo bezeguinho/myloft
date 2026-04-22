@@ -83,7 +83,6 @@
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">ANO</label>
-
                             <select name="ano" id="inputAno"
                                 class="form-select caixa-input w-md-110 {% if ultimo_ano and not modo_edicao %}select-sugerido{% endif %}"
                                 onchange="this.classList.remove('select-sugerido')" {% if not ultimo_ano and not
@@ -183,10 +182,12 @@
                         <div
                             class="col-12 col-md-auto d-flex flex-column justify-content-start gap-3 pt-md-4 caixa-botoes">
                             <button type="submit" class="btn btn-executar btn-lg shadow w-100">
+                                <i class="bi bi-check-lg me-2"></i>
                                 {% if modo_edicao %}ATUALIZAR{% else %}GRAVAR{% endif %}
                             </button>
-                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg shadow w-100">SAIR
-                                (LISTA)</a>
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder btn-lg shadow w-100">
+                                <i class="bi bi-arrow-left me-2"></i> VOLTAR
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -213,7 +214,6 @@
     }
 
     function assumirSugestoes() {
-        // Assume Anilha se vazia
         var anilhaInput = document.getElementById("inputAnilha");
         if (anilhaInput.value.trim() === "" && anilhaInput.placeholder !== "") {
             anilhaInput.value = anilhaInput.placeholder;

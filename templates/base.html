@@ -68,24 +68,53 @@
       text-transform: uppercase;
     }
 
+    /* --- PADRONIZAÇÃO DE BOTÕES MYLOFT --- */
+
+    /* Botão de Execução (AZUL) */
     .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
       font-weight: bold;
-      border-radius: 6px;
+      border-radius: 12px;
       border: none;
       transition: 0.3s;
-      padding: 10px 20px;
+      padding: 10px 24px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
 
+    .btn-executar:hover {
+      background-color: var(--azul-myloft) !important;
+      color: #000000 !important;
+      /* Letras pretas no hover */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Botão de Retrocesso (AMARELO) */
     .btn-retroceder {
       background-color: var(--amarelo-myloft) !important;
-      color: #ffffff !important;
+      color: #000000 !important;
+      /* Letras pretas padrão */
       font-weight: bold;
-      border-radius: 6px;
+      border-radius: 12px;
       border: none;
       transition: 0.3s;
-      padding: 10px 20px;
+      padding: 10px 24px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-retroceder:hover {
+      background-color: var(--amarelo-myloft) !important;
+      color: #ffffff !important;
+      /* Letras brancas no hover */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
