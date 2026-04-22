@@ -17,7 +17,6 @@
       background-color: #f8f9fa;
     }
 
-    /* Barra Superior Azul */
     .navbar {
       background-color: var(--azul-myloft) !important;
       padding: 0.8rem 1rem;
@@ -31,24 +30,50 @@
       text-decoration: none;
     }
 
-    /* Estilo dos Links do Menu */
+    /* Hover no Menu para abrir dropdown automaticamente em PC */
+    @media (min-width: 992px) {
+      .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+      }
+    }
+
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
       text-transform: uppercase;
       margin: 0 5px;
+      border-radius: 6px;
       padding: 8px 15px !important;
       transition: 0.2s;
       text-decoration: none;
     }
 
-    .nav-link:hover {
+    .nav-link:hover,
+    .dropdown-item:hover {
       background-color: var(--amarelo-myloft) !important;
       color: #000000 !important;
-      border-radius: 6px;
     }
 
-    /* --- BOTÕES PADRÃO MYLOFT --- */
+    .dropdown-menu {
+      background-color: var(--azul-myloft) !important;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .dropdown-item {
+      color: #ffffff !important;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 8px 15px;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    /* --- PADRONIZAÇÃO DE BOTÕES MYLOFT (HOVER INVERTIDO) --- */
+
     .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
@@ -64,9 +89,9 @@
       text-decoration: none;
     }
 
-    /* Letras Pretas no Hover Azul */
     .btn-executar:hover {
       color: #000000 !important;
+      /* Azul -> Letra Preta */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
@@ -85,9 +110,9 @@
       text-decoration: none;
     }
 
-    /* Letras Brancas no Hover Amarelo */
     .btn-retroceder:hover {
       color: #ffffff !important;
+      /* Amarelo -> Letra Branca */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   </style>
@@ -96,21 +121,53 @@
 <body>
   <nav class="navbar navbar-expand-lg mb-5 shadow">
     <div class="container-fluid px-4">
-      <a class="navbar-brand" href="/">MYLOFT</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">MYLOFT</a>
 
-      <div class="d-flex align-items-center">
-        {% if current_user.is_authenticated %}
-        <a class="nav-link" href="/lista_pombos">Pombos</a>
-        <a class="nav-link" href="/gerar_pedigree">Pedigree</a>
-        <a class="nav-link" href="/logout">Sair</a>
-        {% else %}
-        <a class="nav-link" href="/login">Entrar</a>
-        {% endif %}
+      <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto ms-4">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown">
+              GESTÃO DE POMBOS
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
+              <li>
+                <hr class="dropdown-divider border-white">
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Reprodutor') }}">REPRODUTORES</a>
+              </li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Voador') }}">VOADORES</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Cedido') }}">CEDIDOS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Oculto') }}">POMBOS OCULTOS</a>
+              </li>
+              <li><a class="dropdown-item" href="/estatisticas">TABELA GERAL</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/ver_dados">OS MEUS DADOS</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
+          </li>
+          {% endif %}
+        </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container text-center">
+  <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
