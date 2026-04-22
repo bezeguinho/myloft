@@ -30,7 +30,6 @@
       text-decoration: none;
     }
 
-    /* Hover no Menu para abrir dropdown automaticamente em PC */
     @media (min-width: 992px) {
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
@@ -72,8 +71,7 @@
       text-decoration: none;
     }
 
-    /* --- PADRONIZAÇÃO DE BOTÕES MYLOFT (HOVER INVERTIDO) --- */
-
+    /* --- PADRONIZAÇÃO DE BOTÕES MYLOFT --- */
     .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
@@ -91,7 +89,6 @@
 
     .btn-executar:hover {
       color: #000000 !important;
-      /* Azul -> Letra Preta */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
@@ -112,7 +109,6 @@
 
     .btn-retroceder:hover {
       color: #ffffff !important;
-      /* Amarelo -> Letra Branca */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   </style>
@@ -146,7 +142,7 @@
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Cedido') }}">CEDIDOS</a></li>
               <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Oculto') }}">POMBOS OCULTOS</a>
               </li>
-              <li><a class="dropdown-item" href="/estatisticas">TABELA GERAL</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('estatisticas') }}">TABELA GERAL</a></li>
             </ul>
           </li>
 
@@ -155,8 +151,16 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="/ver_dados">OS MEUS DADOS</a>
+            <a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a>
           </li>
+
+          {% if current_user.is_admin %}
+          <li class="nav-item ms-lg-3">
+            <a class="nav-link bg-warning text-dark shadow-sm" href="{{ url_for('admin_dashboard') }}">
+              <i class="bi bi-shield-lock-fill me-1"></i> ADMIN
+            </a>
+          </li>
+          {% endif %}
 
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
