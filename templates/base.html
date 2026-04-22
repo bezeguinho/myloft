@@ -17,6 +17,7 @@
       background-color: #f8f9fa;
     }
 
+    /* Barra Superior Azul */
     .navbar {
       background-color: var(--azul-myloft) !important;
       padding: 0.8rem 1rem;
@@ -30,7 +31,24 @@
       text-decoration: none;
     }
 
-    /* --- ESTILO DOS BOTÕES (PADRÃO MYLOFT) --- */
+    /* Estilo dos Links do Menu */
+    .nav-link {
+      color: #ffffff !important;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 0 5px;
+      padding: 8px 15px !important;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-link:hover {
+      background-color: var(--amarelo-myloft) !important;
+      color: #000000 !important;
+      border-radius: 6px;
+    }
+
+    /* --- BOTÕES PADRÃO MYLOFT --- */
     .btn-executar {
       background-color: var(--azul-myloft) !important;
       color: #ffffff !important;
@@ -46,7 +64,7 @@
       text-decoration: none;
     }
 
-    /* Letras PRETAS no hover do azul */
+    /* Letras Pretas no Hover Azul */
     .btn-executar:hover {
       color: #000000 !important;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -67,35 +85,43 @@
       text-decoration: none;
     }
 
-    /* Letras BRANCAS no hover do amarelo */
+    /* Letras Brancas no Hover Amarelo */
     .btn-retroceder:hover {
       color: #ffffff !important;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .nav-link {
-      color: #ffffff !important;
-      font-weight: bold;
-      margin: 0 10px;
-      text-decoration: none;
-      text-transform: uppercase;
     }
   </style>
 </head>
 
 <body>
-  <nav class="navbar mb-5 shadow">
-    <div class="container-fluid d-flex justify-content-between">
+  <nav class="navbar navbar-expand-lg mb-5 shadow">
+    <div class="container-fluid px-4">
       <a class="navbar-brand" href="/">MYLOFT</a>
-      <div>
+
+      <div class="d-flex align-items-center">
         {% if current_user.is_authenticated %}
-        <a class="nav-link d-inline" href="/logout">SAIR</a>
+        <a class="nav-link" href="/lista_pombos">Pombos</a>
+        <a class="nav-link" href="/gerar_pedigree">Pedigree</a>
+        <a class="nav-link" href="/logout">Sair</a>
+        {% else %}
+        <a class="nav-link" href="/login">Entrar</a>
         {% endif %}
       </div>
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container text-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
   </div>
 
