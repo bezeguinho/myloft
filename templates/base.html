@@ -1,174 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MYLOFT</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-  <style>
-    :root {
-      --azul-myloft: #0d6efd;
-      --amarelo-myloft: #ffc107;
-    }
+{% block content %}
+<div class="container text-center py-4">
 
-    body {
-      background-color: #f8f9fa;
-    }
+  {% if categoria %}
+  <h2 class="fw-bold mb-4 text-primary text-uppercase">Lista de Pombos: {{ categoria }}</h2>
+  {% else %}
+  <h2 class="fw-bold mb-4 text-primary text-uppercase">Todos os Pombos</h2>
+  {% endif %}
 
-    .navbar {
-      background-color: var(--azul-myloft) !important;
-      padding: 0.8rem 1rem;
-    }
-
-    .navbar-brand {
-      color: #ffffff !important;
-      font-weight: bold;
-      text-transform: uppercase;
-      font-size: 1.6rem;
-    }
-
-    @media (min-width: 992px) {
-      .nav-item.dropdown:hover .dropdown-menu {
-        display: block;
-        margin-top: 0;
-      }
-    }
-
-    .nav-link {
-      color: #ffffff !important;
-      font-weight: bold;
-      text-transform: uppercase;
-      margin: 0 5px;
-      border-radius: 6px;
-      padding: 8px 15px !important;
-      transition: 0.2s;
-    }
-
-    .nav-link:hover,
-    .dropdown-item:hover {
-      background-color: var(--amarelo-myloft) !important;
-      color: #000000 !important;
-    }
-
-    .dropdown-menu {
-      background-color: var(--azul-myloft) !important;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .dropdown-item {
-      color: #ffffff !important;
-      font-weight: bold;
-      border-radius: 6px;
-      padding: 8px 15px;
-      text-transform: uppercase;
-    }
-
-    /* --- PADRONIZAÇÃO DE BOTÕES MYLOFT --- */
-
-    /* Botão de Execução (AZUL) */
-    .btn-executar {
-      background-color: var(--azul-myloft) !important;
-      color: #ffffff !important;
-      /* Branco padrão */
-      font-weight: bold;
-      border-radius: 12px;
-      border: none;
-      transition: 0.3s;
-      padding: 10px 24px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }
-
-    .btn-executar:hover {
-      background-color: var(--azul-myloft) !important;
-      color: #000000 !important;
-      /* Letras PRETAS no hover */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Botão de Retrocesso (AMARELO) */
-    .btn-retroceder {
-      background-color: var(--amarelo-myloft) !important;
-      color: #000000 !important;
-      /* Preto padrão */
-      font-weight: bold;
-      border-radius: 12px;
-      border: none;
-      transition: 0.3s;
-      padding: 10px 24px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }
-
-    .btn-retroceder:hover {
-      background-color: var(--amarelo-myloft) !important;
-      color: #ffffff !important;
-      /* Letras BRANCAS no hover */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-  </style>
-</head>
-
-<body>
-  <nav class="navbar navbar-expand-lg mb-5 shadow">
-    <div class="container-fluid px-4">
-      <a class="navbar-brand" href="{{ url_for('index') }}">MYLOFT</a>
-      <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto ms-4 text-uppercase fw-bold align-items-center">
-          {% if current_user.is_authenticated %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">GESTÃO DE POMBOS</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
-              <li>
-                <hr class="dropdown-divider border-white">
-              </li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('reprodutores') }}">REPRODUTORES</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('voadores') }}">VOADORES</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('cedidos') }}">CEDIDOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('pombos_ocultos') }}">POMBOS OCULTOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('estatisticas') }}">TABELA GERAL</a></li>
-            </ul>
-          </li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a></li>
-          {% if current_user.is_admin %}
-          <li class="nav-item ms-lg-3"><a class="nav-link bg-warning text-dark shadow-sm"
-              href="{{ url_for('admin_dashboard') }}"><i class="bi bi-shield-lock-fill me-1"></i> ADMIN</a></li>
-          {% endif %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SAIR</a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </div>
-  </nav>
-  <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}{% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-      {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endfor %}{% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+  <div class="d-flex justify-content-center gap-3 mb-4">
+    <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm">
+      <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
+    </a>
+    <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow-sm">
+      <i class="bi bi-arrow-left me-2"></i> VOLTAR
+    </a>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
-</html>
+  <p class="lead text-muted">Bem-vindo ao ecrã de gestão da sua colónia.</p>
+
+  <div class="alert alert-success mt-4 d-inline-block">
+    <i class="bi bi-check-circle me-2"></i> Esta página está pronta para receber a sua base de dados!
+  </div>
+
+  <div class="mt-5 p-5 border rounded bg-light shadow-sm">
+    <i class="bi bi-table fs-1 text-secondary mb-3"></i>
+    <h4 class="text-secondary text-uppercase">A tabela de pombos aparecerá aqui</h4>
+    <p class="text-muted small">A grelha com as anilhas, cores e sexos será carregada nesta secção.</p>
+  </div>
+</div>
+{% endblock %}
