@@ -1,33 +1,81 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container text-center py-4">
+<div class="container py-4">
 
-    {% if categoria %}
-    <h2 class="fw-bold mb-4 text-primary text-uppercase">Lista de Pombos: {{ categoria }}</h2>
-    {% else %}
-    <h2 class="fw-bold mb-4 text-primary text-uppercase">Todos os Pombos</h2>
-    {% endif %}
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary text-uppercase">{{ categoria }}</h2>
+        <p class="lead text-muted">Gestão detalhada da sua colónia MYLOFT.</p>
 
-    <div class="d-flex justify-content-center gap-3 mb-4">
-        <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm">
-            <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
-        </a>
-        <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow-sm">
-            <i class="bi bi-arrow-left me-2"></i> VOLTAR
-        </a>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-retroceder shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i> VOLTAR
+            </a>
+        </div>
     </div>
 
-    <p class="lead text-muted">Bem-vindo ao ecrã de gestão da sua colónia.</p>
-
-    <div class="alert alert-success mt-4 d-inline-block">
-        <i class="bi bi-check-circle me-2"></i> Esta página está pronta para receber a sua base de dados!
-    </div>
-
-    <div class="mt-5 p-5 border rounded bg-light shadow-sm">
-        <i class="bi bi-table fs-1 text-secondary mb-3"></i>
-        <h4 class="text-secondary text-uppercase">A tabela de pombos aparecerá aqui</h4>
-        <p class="text-muted small">A grelha com as anilhas, cores e sexos será carregada nesta secção.</p>
+    <div class="card shadow border-0" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-primary text-uppercase">
+                    <tr>
+                        <th class="ps-4">Anilha</th>
+                        <th>Ano</th>
+                        <th>Nome / Cor</th>
+                        <th>Sexo</th>
+                        <th>Pai / Mãe</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pombo in pombos %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ pombo.anilha }}</td>
+                        <td>{{ pombo.ano }}</td>
+                        <td>
+                            <div class="fw-bold">{{ pombo.nome if pombo.nome else '---' }}</div>
+                            <small class="text-muted">{{ pombo.cor if pombo.cor else 'Cor não definida' }}</small>
+                        </td>
+                        <td>
+                            {% if pombo.sexo == 'Macho' %}
+                            <span class="badge bg-info text-dark"><i class="bi bi-gender-male"></i> Macho</span>
+                            {% elif pombo.sexo == 'Fêmea' %}
+                            <span class="badge bg-danger text-white"><i class="bi bi-gender-female"></i> Fêmea</span>
+                            {% else %}
+                            <span class="badge bg-secondary text-white">Indefinido</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="small"><b>P:</b> {{ pombo.pai if pombo.pai else '???' }}</div>
+                            <div class="small"><b>M:</b> {{ pombo.mae if pombo.mae else '???' }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group shadow-sm">
+                                <a href="{{ url_for('gerar_pedigree', anilha=pombo.anilha) }}"
+                                    class="btn btn-sm btn-outline-primary" title="Ver Pedigree">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                </a>
+                                <a href="{{ url_for('editar_pombo', id=pombo.id) }}" class="btn btn-sm btn-outline-dark"
+                                    title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                            Não foram encontrados pombos nesta categoria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

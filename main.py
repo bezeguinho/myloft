@@ -277,39 +277,35 @@ def novo_pombo():
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha, ultimo_ano=ultimo_ano)
 
 @app.route("/lista_pombos")
+@app.route("/lista_pombos/<categoria>")
 @login_required
-def lista_pombos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=False).order_by(Pombo.anilha).all()
-    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
-    return render_template("pombos.html", pombos=pombos, titulo="TODOS OS POMBOS", anilhas_registadas=anilhas_registadas)
+def lista_pombos(categoria=None):
+    # 1. Filtro base por utilizador
+    query = Pombo.query.filter_by(user_id=current_user.id)
 
-@app.route("/reprodutores")
-@login_required
-def reprodutores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Reprodutor", oculto=False).order_by(Pombo.anilha).all()
-    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
-    return render_template("pombos.html", pombos=pombos, titulo="REPRODUTORES", anilhas_registadas=anilhas_registadas)
+    # 2. Lógica de Categorias
+    if categoria == 'Oculto':
+        query = query.filter_by(oculto=True)
+        titulo = "POMBOS OCULTOS"
+    elif categoria:
+        # Filtra por categoria e garante que não estão ocultos
+        query = query.filter_by(categoria=categoria, oculto=False)
+        # Ajusta o título (ex: Reprodutor -> REPRODUTORES)
+        nomes = {"Reprodutor": "REPRODUTORES", "Voador": "VOADORES", "Cedido": "CEDIDOS"}
+        titulo = nomes.get(categoria, categoria.upper())
+    else:
+        # Todos os pombos (não ocultos)
+        query = query.filter_by(oculto=False)
+        titulo = "TODOS OS POMBOS"
 
-@app.route("/voadores")
-@login_required
-def voadores():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Voador", oculto=False).order_by(Pombo.anilha).all()
+    pombos = query.order_by(Pombo.anilha).all()
+    
+    # Mantemos a tua lógica de anilhas registadas que tinhas no código original
     anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
-    return render_template("pombos.html", pombos=pombos, titulo="VOADORES", anilhas_registadas=anilhas_registadas)
-
-@app.route("/cedidos")
-@login_required
-def cedidos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, categoria="Cedido", oculto=False).order_by(Pombo.anilha).all()
-    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
-    return render_template("pombos.html", pombos=pombos, titulo="CEDIDOS", anilhas_registadas=anilhas_registadas)
-
-@app.route("/pombos_ocultos")
-@login_required
-def pombos_ocultos():
-    pombos = Pombo.query.filter_by(user_id=current_user.id, oculto=True).order_by(Pombo.anilha).all()
-    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
-    return render_template("pombos.html", pombos=pombos, titulo="POMBOS OCULTOS", anilhas_registadas=anilhas_registadas)
+    
+    # IMPORTANTE: Usa o nome do ficheiro que criámos (lista_pombos.html) 
+    # ou muda para "pombos.html" se quiseres usar o teu ficheiro antigo
+    return render_template("lista_pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
 
 @app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
 @login_required
