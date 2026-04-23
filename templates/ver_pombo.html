@@ -23,8 +23,9 @@
                     <span class="fs-5">{{ pombo.cor if pombo.cor else '---' }}</span>
                 </div>
                 <div class="col-4">
-                    <span class="text-muted small text-uppercase fw-bold d-block">Ano</span>
-                    <span class="fs-5">{{ pombo.ano }}</span>
+                    <span class="text-muted small text-uppercase fw-bold d-block">Nome</span>
+                    <span class="fs-5 fw-bold text-uppercase text-primary">{{ pombo.nome if pombo.nome else '---'
+                        }}</span>
                 </div>
                 <div class="col-4">
                     <span class="text-muted small text-uppercase fw-bold d-block">Sexo</span>
@@ -45,14 +46,14 @@
                     <span class="text-muted small text-uppercase fw-bold d-block">Pai</span>
                     <span class="fs-5">
                         <b class="text-primary">{{ pombo.pai if pombo.pai else '---' }}</b>
-                        <span class="ms-2 text-dark">{{ nome_pai }}</span>
+                        <span class="ms-2 text-dark">({{ nome_pai }})</span>
                     </span>
                 </div>
                 <div class="col-md-6 ps-md-4">
                     <span class="text-muted small text-uppercase fw-bold d-block">Mãe</span>
                     <span class="fs-5">
                         <b class="text-primary">{{ pombo.mae if pombo.mae else '---' }}</b>
-                        <span class="ms-2 text-dark">{{ nome_mae }}</span>
+                        <span class="ms-2 text-dark">({{ nome_mae }})</span>
                     </span>
                 </div>
             </div>
@@ -63,7 +64,7 @@
                     <span class="fs-5">
                         <span class="badge bg-secondary">{{ pombo.categoria }}</span>
                         {% if pombo.categoria == 'Cedido' and pombo.cedido_a %}
-                        <span class="ms-3 fw-bold">a: <span class="text-primary">{{ pombo.cedido_a
+                        <span class="ms-3 fw-bold">Cedido a: <span class="text-primary">{{ pombo.cedido_a
                                 }}</span></span>
                         {% endif %}
                     </span>
