@@ -181,13 +181,17 @@
 
                         <div
                             class="col-12 col-md-auto d-flex flex-column justify-content-start gap-3 pt-md-4 caixa-botoes">
-                            <button type="submit" class="btn btn-executar btn-lg shadow w-100">
+
+                            <button type="submit" class="btn btn-executar shadow" style="min-width: 160px;">
                                 <i class="bi bi-check-lg me-2"></i>
                                 {% if modo_edicao %}ATUALIZAR{% else %}GRAVAR{% endif %}
                             </button>
-                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm">
+
+                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm"
+                                style="min-width: 160px;">
                                 <i class="bi bi-arrow-left me-2"></i> VOLTAR
                             </a>
+
                         </div>
                     </div>
                 </form>
