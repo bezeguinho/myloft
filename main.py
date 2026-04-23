@@ -306,6 +306,30 @@ def lista_pombos(categoria=None):
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
+    
+    if request.method == 'POST':
+        pombo.anilha = request.form.get('anilha')
+        pombo.nome = request.form.get('nome')
+        pombo.ano = int(request.form.get('ano') or 0)
+        pombo.sexo = request.form.get('sexo')
+        pombo.cor = request.form.get('cor')
+        pombo.categoria = request.form.get('categoria')
+        pombo.pai = request.form.get('pai')
+        pombo.mae = request.form.get('mae')
+        pombo.obs = request.form.get('obs')
+        pombo.cedido_a = request.form.get('cedido_a')
+        pombo.oculto = True if request.form.get('oculto') == 'on' else False
+        
+        try:
+            db.session.commit()
+            flash(f"Pombo {pombo.anilha} atualizado com sucesso!", "success")
+            return redirect(url_for('lista_pombos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
+            
+    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
+
 
 @app.route("/ver_pombo/<int:id>")
 @login_required
