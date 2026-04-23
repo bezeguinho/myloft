@@ -201,16 +201,74 @@
 <button id="backToTop" onclick="scrollToTop()"><i class="bi bi-arrow-up fs-4"></i></button>
 
 <script>
-    // Script de Pesquisa Ajustado para as novas colunas
+    // 1. Pesquisa na Tabela
     function searchTable() {
         var input = document.getElementById("pomboSearch");
         var filter = input.value.toUpperCase();
         var tr = document.getElementsByClassName("pombo-row");
+
         for (var i = 0; i < tr.length; i++) {
-            var txt = tr[i].innerText || tr[i].textContent;
-            tr[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            var tdAnilha = tr[i].getElementsByTagName("td")[0];
+            var tdNome = tr[i].getElementsByTagName("td")[2];
+            if (tdAnilha || tdNome) {
+                var txt = (tdAnilha.textContent || tdAnilha.innerText) + " " + (tdNome.textContent || tdNome.innerText);
+                tr[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
         }
     }
-    // Restantes funções originais de impressão e eliminar...
+
+    // 2. Modal Eliminar
+    function confirmarEliminar(id, anilha) {
+        document.getElementById('anilhaConfirmar').innerText = anilha;
+        document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
+        new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+    }
+
+    // 3. Voltar ao Topo
+    window.onscroll = function () {
+        var btn = document.getElementById("backToTop");
+        btn.style.display = (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) ? "flex" : "none";
+    };
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    // 4. Inicializar Anos no Modal
+    document.addEventListener("DOMContentLoaded", function () {
+        var selectAno = document.getElementById("printAno");
+        if (selectAno) {
+            var currentYear = new Date().getFullYear();
+            for (var i = currentYear; i >= 1990; i--) {
+                var opt = document.createElement("option");
+                opt.value = i; opt.innerHTML = i;
+                selectAno.appendChild(opt);
+            }
+        }
+    });
+
+    // 5. Função de Impressão com Filtros
+    function executarImpressao() {
+        var cat = document.getElementById("printCat") ? document.getElementById("printCat").value : "Todos";
+        var sexo = document.getElementById("printSexo").value;
+        var ano = document.getElementById("printAno").value;
+        var tr = document.getElementsByClassName("pombo-row");
+
+        for (var i = 0; i < tr.length; i++) {
+            // Verifica a nova coluna 5 (Categoria)
+            var matchCat = (cat === "Todos" || tr[i].getElementsByTagName("td")[5].textContent.trim() === cat);
+
+            // Verifica a coluna 3 (Sexo)
+            var cellSexo = tr[i].getElementsByTagName("td")[3];
+            var icon = cellSexo.querySelector("i");
+            var textSexo = icon ? icon.getAttribute("title") : "Indefinido";
+            var matchSexo = (sexo === "Todos" || textSexo === sexo);
+
+            // Verifica a coluna 1 (Ano)
+            var matchAno = (ano === "Todos" || tr[i].getElementsByTagName("td")[1].textContent.trim() === ano);
+
+            tr[i].style.display = (matchCat && matchSexo && matchAno) ? "" : "none";
+        }
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalOpcoesImpressao'));
+        if (modal) modal.hide();
+        setTimeout(function () { window.print(); }, 500);
+    }
 </script>
 {% endblock %}
