@@ -274,4 +274,79 @@
         setTimeout(function () { window.print(); }, 500);
     }
 </script>
+
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header bg-danger text-white" style="border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title fw-bold" id="modalEliminarLabel"><i
+                        class="bi bi-exclamation-triangle-fill me-2"></i>Atenção!</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="fs-5 mb-1">Tens a certeza que queres eliminar o pombo</p>
+                <h3 class="text-danger fw-bold" id="anilhaConfirmar"></h3>
+                <p class="text-muted small mt-3 mb-0">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal"
+                    style="border-radius: 10px;">Cancelar</button>
+                <form id="formEliminar" method="POST" action="">
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm"
+                        style="border-radius: 10px;">Sim, Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOpcoesImpressao" tabindex="-1" aria-labelledby="modalImpressaoLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header text-white"
+                style="background-color: var(--azul-myloft, #0d6efd); border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title fw-bold" id="modalImpressaoLabel"><i class="bi bi-printer me-2"></i>Opções de
+                    Impressão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Categoria</label>
+                    <select id="printCat" class="form-select shadow-sm" style="border-radius: 10px;">
+                        <option value="Todos">Todas as Categorias</option>
+                        <option value="Voador">Voador</option>
+                        <option value="Reprodutor">Reprodutor</option>
+                        <option value="Cedido">Cedido</option>
+                        <option value="Perdido">Perdido</option>
+                        <option value="Morto">Morto</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Sexo</label>
+                    <select id="printSexo" class="form-select shadow-sm" style="border-radius: 10px;">
+                        <option value="Todos">Todos</option>
+                        <option value="Macho">Machos</option>
+                        <option value="Fêmea">Fêmeas</option>
+                        <option value="Indefinido">Indefinidos</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Ano</label>
+                    <select id="printAno" class="form-select shadow-sm" style="border-radius: 10px;">
+                        <option value="Todos">Todos os Anos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal"
+                    style="border-radius: 10px;">Cancelar</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 10px;"
+                    onclick="executarImpressao()"><i class="bi bi-printer me-2"></i>Imprimir</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
