@@ -2,27 +2,31 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="card shadow-sm border-0" style="border-radius: 15px; max-width: 600px; margin: 0 auto;">
+    <div class="card shadow-sm border-0" style="border-radius: 15px; max-width: 800px; margin: 0 auto;">
 
         <div class="card-header text-white text-center py-3"
             style="background-color: var(--azul-myloft); border-radius: 15px 15px 0 0;">
-            <h3 class="mb-0 fw-bold"><i class="bi bi-card-heading me-2"></i>Ficha do Pombo</h3>
+            <h3 class="mb-0 fw-bold"><i class="bi bi-file-earmark-person me-2"></i>FICHA TÉCNICA</h3>
         </div>
 
         <div class="card-body p-4 p-md-5">
-            <h2 class="text-center text-dark fw-bold mb-4" style="letter-spacing: 2px;">{{ pombo.anilha }}</h2>
+            <div class="text-center mb-4">
+                <h2 class="fw-bold d-inline">{{ pombo.anilha }}</h2>
+                <h2 class="fw-bold d-inline text-muted ms-3">- {{ pombo.ano }}</h2>
+            </div>
 
-            <div class="row g-4 mb-4">
-                <div class="col-6">
-                    <span class="text-muted small text-uppercase fw-bold d-block">Nome</span>
-                    <span class="fs-5">{{ pombo.nome if pombo.nome else '---' }}</span>
+            <hr>
+
+            <div class="row text-center mb-4">
+                <div class="col-4">
+                    <span class="text-muted small text-uppercase fw-bold d-block">Cor</span>
+                    <span class="fs-5">{{ pombo.cor if pombo.cor else '---' }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <span class="text-muted small text-uppercase fw-bold d-block">Ano</span>
                     <span class="fs-5">{{ pombo.ano }}</span>
                 </div>
-
-                <div class="col-6">
+                <div class="col-4">
                     <span class="text-muted small text-uppercase fw-bold d-block">Sexo</span>
                     <span class="fs-5">
                         {% if pombo.sexo == 'Macho' %}
@@ -34,41 +38,55 @@
                         {% endif %}
                     </span>
                 </div>
-                <div class="col-6">
-                    <span class="text-muted small text-uppercase fw-bold d-block">Cor</span>
-                    <span class="fs-5">{{ pombo.cor if pombo.cor else '---' }}</span>
-                </div>
+            </div>
 
-                <div class="col-6">
+            <div class="row mb-4 border-bottom pb-3">
+                <div class="col-md-6 border-end">
                     <span class="text-muted small text-uppercase fw-bold d-block">Pai</span>
-                    <span class="fs-5 fw-bold text-primary">{{ pombo.pai if pombo.pai else '---' }}</span>
+                    <span class="fs-5">
+                        <b class="text-primary">{{ pombo.pai if pombo.pai else '---' }}</b>
+                        <span class="ms-2 text-dark">({{ pombo.nome_pai if pombo.nome_pai else '---' }})</span>
+                    </span>
                 </div>
-                <div class="col-6">
+                <div class="col-md-6 ps-md-4">
                     <span class="text-muted small text-uppercase fw-bold d-block">Mãe</span>
-                    <span class="fs-5 fw-bold text-primary">{{ pombo.mae if pombo.mae else '---' }}</span>
+                    <span class="fs-5">
+                        <b class="text-primary">{{ pombo.mae if pombo.mae else '---' }}</b>
+                        <span class="ms-2 text-dark">({{ pombo.nome_mae if pombo.nome_mae else '---' }})</span>
+                    </span>
                 </div>
+            </div>
 
+            <div class="row mb-4">
                 <div class="col-12">
                     <span class="text-muted small text-uppercase fw-bold d-block">Categoria</span>
-                    <span class="badge bg-secondary fs-6">{{ pombo.categoria }}</span>
+                    <span class="fs-5">
+                        <span class="badge bg-secondary">{{ pombo.categoria }}</span>
+                        {% if pombo.categoria == 'Cedido' and pombo.cedido_a %}
+                        <span class="ms-3 fw-bold">Cedido a: <span class="text-primary">{{ pombo.cedido_a
+                                }}</span></span>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
 
             {% if pombo.obs %}
-            <div class="mt-4 pt-3 border-top">
+            <div class="mt-4">
                 <span class="text-muted small text-uppercase fw-bold d-block mb-2">Observações</span>
-                <p class="p-3 bg-light rounded text-dark" style="font-size: 0.95rem;">{{ pombo.obs }}</p>
+                <div class="p-3 bg-light rounded border-start border-4 border-primary">
+                    {{ pombo.obs }}
+                </div>
             </div>
             {% endif %}
         </div>
 
-        <div class="card-footer bg-white border-0 text-center pb-4 pt-0" style="border-radius: 0 0 15px 15px;">
+        <div class="card-footer bg-white border-0 text-center pb-4 pt-0">
             <div class="d-flex justify-content-center gap-3">
-                <a href="{{ request.referrer or url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm">
-                    <i class="bi bi-arrow-left me-2"></i> Voltar à Lista
+                <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i> VOLTAR
                 </a>
                 <a href="{{ url_for('editar_pombo', id=pombo.id) }}" class="btn btn-executar shadow-sm">
-                    <i class="bi bi-pencil me-2"></i> Editar Pombo
+                    <i class="bi bi-pencil me-2"></i> EDITAR
                 </a>
             </div>
         </div>
