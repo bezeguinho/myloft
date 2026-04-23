@@ -306,6 +306,12 @@ def lista_pombos(categoria=None):
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
+
+@app.route("/ver_pombo/<int:id>")
+@login_required
+def ver_pombo(id):
+    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    return render_template("ver_pombo.html", pombo=pombo)
     
     if request.method == 'POST':
         pombo.anilha = request.form.get('anilha')
