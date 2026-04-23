@@ -224,11 +224,11 @@ def novo_pombo():
     proxima_anilha = ""
     ultimo_ano = ""
     
-    # SÓ GERA SUGESTÕES SE FOR INSERÇÃO CONTÍNUA (Após Gravar com Sucesso)
+    # SÓ GERA SUGESTÕES SE FOR INSERÇÃO CONTÍNUA
     if request.args.get('saved') == '1':
         ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
         if ultimo_pombo:
-            ultimo_ano = ultimo_pombo.ano # Guarda o ano para sugerir
+            ultimo_ano = ultimo_pombo.ano
             if ultimo_pombo.anilha:
                 match = re.search(r'(\d+)$', ultimo_pombo.anilha)
                 if match:
@@ -242,13 +242,25 @@ def novo_pombo():
                     proxima_anilha = ultimo_pombo.anilha
                 
     if request.method == 'POST':
-        # Assume anilha digitada ou sugerida
         anilha_form = request.form.get('anilha')
         anilha_final = anilha_form if anilha_form and anilha_form.strip() else request.form.get('anilha_sugerida')
             
-        # Assume ano escolhido ou sugerido
         ano_form = request.form.get('ano')
         ano_final = int(ano_form) if ano_form else int(request.form.get('ano_sugerido') or 0)
+
+        # --- NOVA VALIDAÇÃO AQUI ---
+        # Verificamos se já existe um pombo com a mesma anilha E ano para ESTE utilizador
+        existe = Pombo.query.filter_by(
+            anilha=anilha_final, 
+            ano=ano_final, 
+            user_id=current_user.id
+        ).first()
+
+        if existe:
+            flash("Pombo já existente!", "danger")
+            # Redireciona de volta para não criar o duplicado
+            return redirect(url_for('novo_pombo'))
+        # ---------------------------
 
         novo = Pombo(
             anilha=anilha_final, 
