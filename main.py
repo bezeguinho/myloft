@@ -349,10 +349,10 @@ def eliminar_pombo(id):
 def pombo_por_anilha(anilha):
     pombo = Pombo.query.filter_by(anilha=anilha, user_id=current_user.id).first()
     if pombo:
-        return redirect(url_for('editar_pombo', id=pombo.id))
+        # MUDANÇA AQUI: Agora redireciona para 'ver_pombo' em vez de 'editar_pombo'
+        return redirect(url_for('ver_pombo', id=pombo.id))
     flash(f"Pombo {anilha} não encontrado.", "warning")
     return redirect(request.referrer or url_for('lista_pombos'))
-
 @app.route("/estatisticas")
 @login_required
 def estatisticas():
