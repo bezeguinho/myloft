@@ -330,7 +330,6 @@ def editar_pombo(id):
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
 
-
 @app.route("/ver_pombo/<int:id>")
 @login_required
 def ver_pombo(id):
