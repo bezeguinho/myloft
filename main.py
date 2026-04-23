@@ -334,7 +334,22 @@ def editar_pombo(id):
 @login_required
 def ver_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
-    return render_template("ver_pombo.html", pombo=pombo)
+    
+    # Vamos pesquisar o Pai na base de dados
+    nome_pai = "---"
+    if pombo.pai:
+        pai_obj = Pombo.query.filter_by(anilha=pombo.pai, user_id=current_user.id).first()
+        if pai_obj and pai_obj.nome:
+            nome_pai = pai_obj.nome
+
+    # Vamos pesquisar a Mãe na base de dados
+    nome_mae = "---"
+    if pombo.mae:
+        mae_obj = Pombo.query.filter_by(anilha=pombo.mae, user_id=current_user.id).first()
+        if mae_obj and mae_obj.nome:
+            nome_mae = mae_obj.nome
+
+    return render_template("ver_pombo.html", pombo=pombo, nome_pai=nome_pai, nome_mae=nome_mae)
     
     if request.method == 'POST':
         pombo.anilha = request.form.get('anilha')
