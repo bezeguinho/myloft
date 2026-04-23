@@ -2,23 +2,6 @@
 
 {% block content %}
 <style>
-    .btn-voltar {
-        background-color: #ffcc29 !important;
-        color: #333 !important;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 24px;
-        font-weight: bold;
-        transition: 0.3s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .btn-voltar:hover {
-        background-color: #e6b800 !important;
-    }
-
     .card-stats {
         border-radius: 15px;
         border: none;
@@ -109,8 +92,8 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-primary m-0">TABELA GERAL</h2>
-    <a href="{{ url_for('lista_pombos') }}" class="btn btn-voltar shadow-sm">
-        <i class="bi bi-arrow-left me-2 d-none d-md-inline"></i> Voltar
+    <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm">
+        <i class="bi bi-arrow-left me-2"></i> VOLTAR
     </a>
 </div>
 
