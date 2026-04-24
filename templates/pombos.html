@@ -111,7 +111,7 @@
             Adicionar Novo</a>
     </div>
 </div>
-<div class="d-none d-print-block text-center" style="margin-bottom: 30px;">
+<div class="d-none d-print-block text-start" style="margin-bottom: 30px;">
     <h2 class="fw-bold text-primary text-uppercase">{{ titulo }}</h2>
 </div>
 
@@ -184,7 +184,7 @@
                             <div class="d-flex justify-content-center gap-2 px-2">
                                 <a href="{{ url_for('editar_pombo', id=p.id) }}"
                                     class="btn btn-sm btn-outline-primary fw-bold shadow-sm" title="Editar">
-                                    <i class="bi bi-pencil me-1"></i> Editar
+                                    <i class="bi bi-pencil-square me-1"></i> Editar
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline-danger fw-bold shadow-sm"
                                     onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')" title="Eliminar">
