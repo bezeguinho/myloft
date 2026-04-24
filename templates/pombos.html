@@ -96,7 +96,7 @@
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
     <div class="d-flex align-items-center gap-3">
-        <h2 class="fw-bold text-primary mb-4 text-uppercase">{{ titulo }}</h2>
+        <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
         <div class="d-flex align-items-center gap-2">
             <span class="count-box">{{ pombos|length }}</span>
             <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
@@ -110,6 +110,9 @@
         <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm"><i class="bi bi-plus-lg me-1"></i>
             Adicionar Novo</a>
     </div>
+</div>
+<div class="d-none d-print-block mb-4 text-center">
+    <h2 class="fw-bold text-primary text-uppercase">{{ titulo }}</h2>
 </div>
 
 <div class="row g-3 mb-4 no-print">
@@ -135,13 +138,13 @@
                     <tr>
                         <th class="ps-4">Anilha</th>
                         <th>Ano</th>
+                        <th>Cor</th>
                         <th>Nome</th>
                         <th class="text-center">Sexo</th>
-                        <th>Cor</th>
                         <th>Categoria</th>
-                        <th>Pai</th>
-                        <th>Mãe</th>
-                        <th class="text-center">Ações</th>
+                        <th class="d-print-none">Pai</th>
+                        <th class="d-print-none">Mãe</th>
+                        <th class="text-center d-print-none">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,6 +155,7 @@
                                 p.anilha }}</a>
                         </td>
                         <td>{{ p.ano }}</td>
+                        <td>{{ p.cor or '---' }}</td>
                         <td class="pombo-nome text-uppercase">{{ p.nome or '---' }}</td>
                         <td class="text-center">
                             {% if p.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
@@ -160,24 +164,23 @@
                             {% else %}<i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>{%
                             endif %}
                         </td>
-                        <td>{{ p.cor or '---' }}</td>
                         <td>{{ p.categoria }}</td>
 
-                        <td>
+                        <td class="d-print-none">
                             {% if p.pai and p.pai in anilhas_registadas %}
                             <a href="{{ url_for('pombo_por_anilha', anilha=p.pai) }}"
                                 class="text-decoration-none fw-bold">{{ p.pai }}</a>
                             {% else %}<span class="text-muted">{{ p.pai or '---' }}</span>{% endif %}
                         </td>
 
-                        <td>
+                        <td class="d-print-none">
                             {% if p.mae and p.mae in anilhas_registadas %}
                             <a href="{{ url_for('pombo_por_anilha', anilha=p.mae) }}"
                                 class="text-decoration-none fw-bold">{{ p.mae }}</a>
                             {% else %}<span class="text-muted">{{ p.mae or '---' }}</span>{% endif %}
                         </td>
 
-                        <td class="text-center">
+                        <td class="text-center d-print-none">
                             <div class="d-flex justify-content-center gap-2 px-2">
                                 <a href="{{ url_for('editar_pombo', id=p.id) }}"
                                     class="btn btn-sm btn-outline-primary fw-bold shadow-sm" title="Editar">
@@ -212,7 +215,7 @@
 
         for (var i = 0; i < tr.length; i++) {
             var tdAnilha = tr[i].getElementsByTagName("td")[0];
-            var tdNome = tr[i].getElementsByTagName("td")[2];
+            var tdNome = tr[i].getElementsByTagName("td")[3];
             if (tdAnilha || tdNome) {
                 var txt = (tdAnilha.textContent || tdAnilha.innerText) + " " + (tdNome.textContent || tdNome.innerText);
                 tr[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
@@ -259,7 +262,7 @@
             var matchCat = (cat === "Todos" || tr[i].getElementsByTagName("td")[5].textContent.trim() === cat);
 
             // Verifica a coluna 3 (Sexo)
-            var cellSexo = tr[i].getElementsByTagName("td")[3];
+            var cellSexo = tr[i].getElementsByTagName("td")[4];
             var icon = cellSexo.querySelector("i");
             var textSexo = icon ? icon.getAttribute("title") : "Indefinido";
             var matchSexo = (sexo === "Todos" || textSexo === sexo);
@@ -320,8 +323,6 @@
                         <option value="Voador">Voador</option>
                         <option value="Reprodutor">Reprodutor</option>
                         <option value="Cedido">Cedido</option>
-                        <option value="Perdido">Perdido</option>
-                        <option value="Morto">Morto</option>
                     </select>
                 </div>
                 <div class="mb-3">
