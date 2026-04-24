@@ -111,7 +111,7 @@
             Adicionar Novo</a>
     </div>
 </div>
-<div class="d-none d-print-block mb-4 text-center">
+<div class="d-none d-print-block text-center" style="margin-bottom: 30px;">
     <h2 class="fw-bold text-primary text-uppercase">{{ titulo }}</h2>
 </div>
 
@@ -316,15 +316,20 @@
                     aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
+                {% if titulo == "TODOS OS POMBOS" %}
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small text-uppercase">Categoria</label>
                     <select id="printCat" class="form-select shadow-sm" style="border-radius: 10px;">
                         <option value="Todos">Todas as Categorias</option>
-                        <option value="Voador">Voador</option>
-                        <option value="Reprodutor">Reprodutor</option>
-                        <option value="Cedido">Cedido</option>
+                        <option value="Voador">Voadores</option>
+                        <option value="Reprodutor">Reprodutores</option>
+                        <option value="Cedido">Cedidos</option>
+                        <option value="Oculto">Ocultos</option>
                     </select>
                 </div>
+                {% else %}
+                <input type="hidden" id="printCat" value="Todos">
+                {% endif %}
                 <div class="mb-3">
                     <label class="form-label fw-bold text-muted small text-uppercase">Sexo</label>
                     <select id="printSexo" class="form-select shadow-sm" style="border-radius: 10px;">
