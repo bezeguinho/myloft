@@ -42,6 +42,14 @@
     .header-owner-info {
         font-size: 1rem;
         line-height: 1.3;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .header-owner-info .owner-name {
+        font-weight: bold;
+        font-size: 1.25rem;
+        color: #333;
     }
 
     .header-owner-info div {
@@ -53,11 +61,15 @@
         display: flex;
         flex-direction: row;
         align-items: flex-start;
-        gap: 20px;
+        gap: 7mm;
     }
 
     .pigeon-id {
-        display: none;
+        font-size: 1.68rem;
+        font-weight: bold;
+        margin-top: 12px;
+        color: #0d6efd;
+        text-transform: uppercase;
     }
 
     .owner-photo {
@@ -130,18 +142,19 @@
 
     .rect-box .box-title,
     .rect-box .box-detail {
-        font-size: 0.68rem;
+        font-size: 0.70rem;
     }
 
     .rect-box .descricao-text {
-        font-size: 0.74rem;
+        font-size: 0.70rem;
     }
 
     .sex-badge-pedigree {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 4px;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 1rem;
+        line-height: 1;
     }
 
     .box-title {
@@ -210,9 +223,9 @@
     <div class="box-title">
         <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
         <span class="sex-badge-pedigree">
-            {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
-            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
-            {% else %}<i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>{% endif %}
+            {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary" title="Macho"></i>
+            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;" title="Fêmea"></i>
+            {% else %}<i class="bi bi-question-circle text-secondary" title="Indefinido"></i>{% endif %}
         </span>
     </div>
     <div class="box-detail">
@@ -230,10 +243,10 @@
     <div class="header-top">
         <div class="header-left">
             <div class="header-title">
-                <h1>Pedigree, {{ tree.pombo.anilha }}{% if tree.pombo.ano %} / {{ tree.pombo.ano }}{% endif %}</h1>
+                <h1>Pedigree</h1>
             </div>
             <div class="header-owner-info">
-                <div class="fw-bold fs-5">{{ utilizador.nome or 'NOME NÃO CONFIGURADO' }}</div>
+                <div class="owner-name">{{ utilizador.nome or 'NOME NÃO CONFIGURADO' }}</div>
                 <div>{{ utilizador.localidade or '' }}</div>
                 <div>{{ utilizador.telefone or '' }}</div>
                 <div>{{ utilizador.email or current_user.email }}</div>
@@ -241,6 +254,7 @@
         </div>
 
         <div class="header-right">
+            <div class="pigeon-id">{{ tree.pombo.anilha }}{% if tree.pombo.ano %} / {{ tree.pombo.ano }}{% endif %}</div>
             {% if utilizador and utilizador.foto %}
             <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Logo" class="owner-photo">
             {% else %}
