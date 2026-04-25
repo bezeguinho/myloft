@@ -148,6 +148,8 @@
     .rect-box .box-detail {
         font-size: 0.68rem;
         border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     .rect-box .descricao-text {
@@ -209,6 +211,12 @@
 
     @media print {
         body { margin: 0; padding: 0; }
+        .container, .container-fluid {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
 
         .pedigree-container {
             margin: 0 !important;
