@@ -4,7 +4,7 @@
     /* RESET PARA IMPRESSÃO A4 */
     @page {
         size: A4 portrait;
-        margin: 10mm;
+        margin: 0;
     }
 
     body {
@@ -36,6 +36,7 @@
         font-weight: bold;
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
+        margin-top: 12px;
         color: #0d6efd;
     }
 
@@ -140,9 +141,13 @@
         font-size: 0.70rem;
     }
 
-    .rect-box .box-title,
+    .rect-box .box-title {
+        font-size: 0.68rem;
+    }
+
     .rect-box .box-detail {
         font-size: 0.68rem;
+        border-bottom: none;
     }
 
     .rect-box .descricao-text {
@@ -188,18 +193,36 @@
         color: #1a365d;
     }
 
+    .btn-imprimir-pedigree {
+        background-color: #0d6efd !important;
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-imprimir-pedigree:hover { background-color: #0044a8 !important; }
+
     @media print {
-        body {
-            background-color: #fff;
-            -webkit-print-color-adjust: exact;
-        }
+        body { margin: 0; padding: 0; }
 
         .pedigree-container {
-            margin: 0;
-            padding: 10mm;
+            margin: 0 !important;
+            padding: 10mm !important;
             box-shadow: none;
-            width: 100%;
+            width: 210mm !important;
+            height: 297mm !important;
             background-color: #ffffff;
+            box-sizing: border-box !important;
+            overflow: hidden;
+        }
+
+        .tree-wrapper {
+            max-width: 100%;
         }
 
         .no-print, .navbar {
@@ -209,10 +232,10 @@
 </style>
 
 <div class="d-flex justify-content-end gap-2 my-3 no-print" style="width: 210mm; margin: 0 auto;">
-    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-secondary px-4 shadow-sm fw-bold">
+    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-secondary px-4 shadow-sm fw-bold" style="border-radius: 12px; display: inline-flex; align-items: center; padding: 10px 24px;">
         <i class="bi bi-arrow-left me-2"></i>Voltar
     </a>
-    <button onclick="window.print()" class="btn btn-primary px-4 shadow-sm fw-bold">
+    <button onclick="window.print()" class="btn-imprimir-pedigree shadow-sm">
         <i class="bi bi-printer me-2"></i>Imprimir Pedigree (PDF)
     </button>
 </div>
