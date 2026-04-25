@@ -75,22 +75,34 @@
     }
 
     .print-container {
-        border: 1px solid #dee2e6; /* Cinza */
+        border: 1px solid #0d6efd;
         border-radius: 12px;
         padding: 8px 15px;
         background: white;
-        color: #555555; /* Letra mais escura/neutra */
+        color: #0d6efd;
         cursor: pointer;
         font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: 0.3s;
     }
 
     .print-container:hover {
-        border-color: #bbbbbb;
-        background-color: #f8f9fa;
+        background-color: #f0f7ff;
+    }
+
+    /* Estilo para o botão Cancelar do Modal */
+    .btn-modal-cancelar {
+        background-color: white !important;
+        color: #777777 !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+    .btn-modal-cancelar:hover {
+        background-color: #f8f9fa !important;
+        border-color: #bbbbbb !important;
     }
 
     @media print {
@@ -301,7 +313,7 @@
 
         // Lógica para Coluna Categoria vs Cedido a: (APENAS IMPRESSÃO)
         var headerCat = document.getElementById("headerCategoria");
-        var isCedidoFilter = (cat === "Cedido");
+        var isCedidoFilter = (cat === "Cedido" || "{{ titulo }}" === "CEDIDOS");
 
         if (headerCat) {
             headerCat.innerText = isCedidoFilter ? "Cedido a:" : "Categoria";
@@ -321,6 +333,9 @@
                 spanNormal.classList.add("d-print-none");
                 spanCedido.classList.remove("d-none");
                 spanCedido.classList.add("d-print-inline");
+            } else if (isCedidoFilter && !spanCedido && catText === "Cedido") {
+                // Caso o pombo seja Cedido mas não tenha spanCedido (pode acontecer se o dado estiver incompleto)
+                spanNormal.innerText = "---"; 
             } else {
                 spanNormal.classList.remove("d-print-none");
                 if (spanCedido) {
@@ -346,7 +361,12 @@
             window.print(); 
             // Resetar após a janela de impressão abrir (opcional, mas bom para consistência)
             setTimeout(function() {
-                if (headerCat) headerCat.innerText = "Categoria";
+                if (headerCat) {
+                    headerCat.innerText = ("{{ titulo }}" === "CEDIDOS" && !isCedidoFilter) ? "Cedido a:" : "Categoria";
+                    // Se voltarmos à lista Cedidos, o header deve refletir o estado da lista se houver alguma lógica JS lá, 
+                    // mas como o user quer apenas na impressão, voltamos para "Categoria" por defeito.
+                    headerCat.innerText = "Categoria"; 
+                }
                 for (var i = 0; i < tr.length; i++) {
                     var catCell = tr[i].getElementsByTagName("td")[5];
                     var spanNormal = catCell.querySelector(".cat-normal");
@@ -431,8 +451,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal"
-                    style="border-radius: 10px;">Cancelar</button>
+                <button type="button" class="btn btn-modal-cancelar px-4 shadow-sm" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 10px;"
                     onclick="executarImpressao()"><i class="bi bi-printer me-2"></i>Imprimir</button>
             </div>
