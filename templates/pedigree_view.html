@@ -16,7 +16,7 @@
     .pedigree-container {
         width: 210mm;
         min-height: 277mm;
-        background-color: #f7f9fc;
+        background-color: #ffffff;
         margin: 10px auto;
         padding: 10mm;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -32,10 +32,11 @@
     }
 
     .header-title h1 {
-        font-weight: 800;
+        font-weight: bold;
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
-        color: #1a365d;
+        color: #0d6efd;
+        text-transform: uppercase;
     }
 
     .header-owner-info {
@@ -56,10 +57,7 @@
     }
 
     .pigeon-id {
-        font-size: 1.6rem;
-        font-weight: bold;
-        margin-top: 12px;
-        color: #1a365d;
+        display: none;
     }
 
     .owner-photo {
@@ -120,39 +118,30 @@
 
     .square-box {
         height: 55mm;
-        border-radius: 12px;
+        border-radius: 10.8px;
         font-size: 0.85rem;
     }
 
     .rect-box {
         height: 27.5mm;
-        border-radius: 8px;
+        border-radius: 7.2px;
         font-size: 0.70rem;
+    }
+
+    .rect-box .box-title,
+    .rect-box .box-detail {
+        font-size: 0.68rem;
+    }
+
+    .rect-box .descricao-text {
+        font-size: 0.74rem;
     }
 
     .sex-badge-pedigree {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 16px;
-        padding: 2px 4px;
-        font-size: 0.80rem;
-        border-radius: 4px;
-        font-weight: bold;
-        color: #fff;
         margin-left: 4px;
-    }
-
-    .bg-pink {
-        background-color: #ffc0cb !important;
-    }
-
-    .bg-dark-blue {
-        background-color: #00008b !important;
-    }
-
-    .bg-grey {
-        background-color: #6c757d !important;
     }
 
     .box-title {
@@ -197,7 +186,7 @@
             padding: 10mm;
             box-shadow: none;
             width: 100%;
-            background-color: #f7f9fc;
+            background-color: #ffffff;
         }
 
         .no-print {
@@ -220,9 +209,10 @@
     {% if node and node.pombo %}
     <div class="box-title">
         <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
-        <span
-            class="sex-badge-pedigree {% if node.pombo.sexo == 'Macho' %}bg-dark-blue{% elif node.pombo.sexo == 'Fêmea' %}bg-pink{% else %}bg-grey{% endif %}">
-            {% if node.pombo.sexo == 'Macho' %}M{% elif node.pombo.sexo == 'Fêmea' %}F{% else %}?{% endif %}
+        <span class="sex-badge-pedigree">
+            {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
+            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
+            {% else %}<i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>{% endif %}
         </span>
     </div>
     <div class="box-detail">
@@ -240,7 +230,7 @@
     <div class="header-top">
         <div class="header-left">
             <div class="header-title">
-                <h1>Pedigree</h1>
+                <h1>Pedigree, {{ tree.pombo.anilha }}{% if tree.pombo.ano %} / {{ tree.pombo.ano }}{% endif %}</h1>
             </div>
             <div class="header-owner-info">
                 <div class="fw-bold fs-5">{{ utilizador.nome or 'NOME NÃO CONFIGURADO' }}</div>
@@ -251,7 +241,6 @@
         </div>
 
         <div class="header-right">
-            <div class="pigeon-id">{{ tree.pombo.anilha }}</div>
             {% if utilizador and utilizador.foto %}
             <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Logo" class="owner-photo">
             {% else %}
