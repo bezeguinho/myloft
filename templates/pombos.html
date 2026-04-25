@@ -30,6 +30,19 @@
         background-color: #f0f7ff !important;
     }
 
+    /* Remover preenchimento no hover para Editar e Eliminar */
+    .btn-outline-primary:hover {
+        background-color: transparent !important;
+        color: #0d6efd !important;
+        border-color: #0d6efd !important;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: transparent !important;
+        color: #dc3545 !important;
+        border-color: #dc3545 !important;
+    }
+
     #backToTop {
         position: fixed;
         bottom: 30px;
@@ -62,16 +75,22 @@
     }
 
     .print-container {
-        border: 1px solid #0d6efd;
+        border: 1px solid #dee2e6; /* Cinza */
         border-radius: 12px;
         padding: 8px 15px;
         background: white;
-        color: #0d6efd;
+        color: #555555; /* Letra mais escura/neutra */
         cursor: pointer;
         font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: 0.3s;
+    }
+
+    .print-container:hover {
+        border-color: #bbbbbb;
+        background-color: #f8f9fa;
     }
 
     @media print {
@@ -112,7 +131,7 @@
     </div>
 </div>
 <div class="d-none d-print-block text-start" style="margin-bottom: 30px;">
-    <h2 class="fw-bold text-primary text-uppercase">{{ titulo }}</h2>
+    <h2 id="printPageTitle" class="fw-bold text-primary text-uppercase">{{ titulo }}</h2>
 </div>
 
 <div class="row g-3 mb-4 no-print">
@@ -141,7 +160,7 @@
                         <th>Cor</th>
                         <th>Nome</th>
                         <th class="text-center">Sexo</th>
-                        <th>Categoria</th>
+                        <th id="headerCategoria">Categoria</th>
                         <th class="d-print-none">Pai</th>
                         <th class="d-print-none">Mãe</th>
                         <th class="text-center d-print-none">Ações</th>
@@ -164,7 +183,12 @@
                             {% else %}<i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>{%
                             endif %}
                         </td>
-                        <td>{{ p.categoria }}</td>
+                        <td>
+                            <span class="cat-normal">{{ p.categoria }}</span>
+                            {% if p.categoria == 'Cedido' %}
+                            <span class="cat-cedido d-none">{{ p.cedido_a or '---' }}</span>
+                            {% endif %}
+                        </td>
 
                         <td class="d-print-none">
                             {% if p.pai and p.pai in anilhas_registadas %}
@@ -252,14 +276,58 @@
 
     // 5. Função de Impressão com Filtros
     function executarImpressao() {
-        var cat = document.getElementById("printCat") ? document.getElementById("printCat").value : "Todos";
+        var catSelect = document.getElementById("printCat");
+        var cat = catSelect ? catSelect.value : "Todos";
         var sexo = document.getElementById("printSexo").value;
         var ano = document.getElementById("printAno").value;
         var tr = document.getElementsByClassName("pombo-row");
 
+        // Atualizar Título para Impressão
+        var printTitle = document.getElementById("printPageTitle");
+        var titles = {
+            "Todos": "{{ titulo }}",
+            "Voador": "VOADORES",
+            "Reprodutor": "REPRODUTORES",
+            "Cedido": "CEDIDOS",
+            "Oculto": "OCULTOS"
+        };
+        
+        // Se estivermos em "TODOS OS POMBOS" e selecionarmos "Todos", manter "TODOS OS POMBOS"
+        var novoTitulo = titles[cat];
+        if (cat === "Todos" && "{{ titulo }}" === "TODOS OS POMBOS") {
+            novoTitulo = "TODOS OS POMBOS";
+        }
+        if (printTitle) printTitle.innerText = novoTitulo;
+
+        // Lógica para Coluna Categoria vs Cedido a: (APENAS IMPRESSÃO)
+        var headerCat = document.getElementById("headerCategoria");
+        var isCedidoFilter = (cat === "Cedido");
+
+        if (headerCat) {
+            headerCat.innerText = isCedidoFilter ? "Cedido a:" : "Categoria";
+        }
+
         for (var i = 0; i < tr.length; i++) {
             // Verifica a nova coluna 5 (Categoria)
-            var matchCat = (cat === "Todos" || tr[i].getElementsByTagName("td")[5].textContent.trim() === cat);
+            var catCell = tr[i].getElementsByTagName("td")[5];
+            var catText = catCell.querySelector(".cat-normal").textContent.trim();
+            var matchCat = (cat === "Todos" || catText === cat);
+
+            // Alternar visibilidade interna da célula para impressão
+            var spanNormal = catCell.querySelector(".cat-normal");
+            var spanCedido = catCell.querySelector(".cat-cedido");
+            
+            if (isCedidoFilter && spanCedido) {
+                spanNormal.classList.add("d-print-none");
+                spanCedido.classList.remove("d-none");
+                spanCedido.classList.add("d-print-inline");
+            } else {
+                spanNormal.classList.remove("d-print-none");
+                if (spanCedido) {
+                    spanCedido.classList.add("d-none");
+                    spanCedido.classList.remove("d-print-inline");
+                }
+            }
 
             // Verifica a coluna 3 (Sexo)
             var cellSexo = tr[i].getElementsByTagName("td")[4];
@@ -274,7 +342,23 @@
         }
         var modal = bootstrap.Modal.getInstance(document.getElementById('modalOpcoesImpressao'));
         if (modal) modal.hide();
-        setTimeout(function () { window.print(); }, 500);
+        setTimeout(function () { 
+            window.print(); 
+            // Resetar após a janela de impressão abrir (opcional, mas bom para consistência)
+            setTimeout(function() {
+                if (headerCat) headerCat.innerText = "Categoria";
+                for (var i = 0; i < tr.length; i++) {
+                    var catCell = tr[i].getElementsByTagName("td")[5];
+                    var spanNormal = catCell.querySelector(".cat-normal");
+                    var spanCedido = catCell.querySelector(".cat-cedido");
+                    spanNormal.classList.remove("d-print-none");
+                    if (spanCedido) {
+                        spanCedido.classList.add("d-none");
+                        spanCedido.classList.remove("d-print-inline");
+                    }
+                }
+            }, 1000);
+        }, 500);
     }
 </script>
 
