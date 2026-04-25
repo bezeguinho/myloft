@@ -143,12 +143,13 @@
     .rect-box .box-title {
         font-size: 0.68rem;
         line-height: 1.35;
+        margin-bottom: 1px;
     }
 
     .rect-box .box-detail {
         font-size: 0.68rem;
         border-bottom: none;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
         padding-bottom: 0;
         line-height: 1.35;
     }
@@ -211,6 +212,25 @@
     }
     .btn-imprimir-pedigree:hover { background-color: #0044a8 !important; }
 
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
+    }
+    .btn-voltar:hover {
+        background-color: #e6b800 !important;
+        color: #422006 !important;
+        box-shadow: 0 8px 25px rgba(251, 192, 45, 0.4);
+    }
+
     @media print {
         body { margin: 0; padding: 0; }
         .container, .container-fluid {
@@ -242,7 +262,7 @@
 </style>
 
 <div class="d-flex justify-content-end gap-2 my-3 no-print" style="width: 210mm; margin: 0 auto;">
-    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-secondary px-4 shadow-sm fw-bold" style="border-radius: 12px; display: inline-flex; align-items: center; padding: 10px 24px;">
+    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-voltar px-4 shadow-sm fw-bold">
         <i class="bi bi-arrow-left me-2"></i>Voltar
     </a>
     <button onclick="window.print()" class="btn-imprimir-pedigree shadow-sm">
