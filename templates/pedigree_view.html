@@ -21,6 +21,7 @@
         padding: 10mm;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         position: relative;
+        box-sizing: border-box;
     }
 
     /* HEADER */
@@ -36,7 +37,6 @@
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
         color: #0d6efd;
-        text-transform: uppercase;
     }
 
     .header-owner-info {
@@ -142,11 +142,11 @@
 
     .rect-box .box-title,
     .rect-box .box-detail {
-        font-size: 0.70rem;
+        font-size: 0.68rem;
     }
 
     .rect-box .descricao-text {
-        font-size: 0.70rem;
+        font-size: 0.68rem;
     }
 
     .sex-badge-pedigree {
@@ -202,19 +202,19 @@
             background-color: #ffffff;
         }
 
-        .no-print {
+        .no-print, .navbar {
             display: none !important;
         }
     }
 </style>
 
-<div class="text-center my-3 no-print">
-    <button onclick="window.print()" class="btn btn-primary px-4 shadow">
-        <i class="bi bi-printer me-2"></i>Imprimir Pedigree (PDF)
-    </button>
-    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-secondary px-4">
+<div class="d-flex justify-content-end gap-2 my-3 no-print" style="width: 210mm; margin: 0 auto;">
+    <a href="{{ url_for('gerar_pedigree') }}" class="btn btn-secondary px-4 shadow-sm fw-bold">
         <i class="bi bi-arrow-left me-2"></i>Voltar
     </a>
+    <button onclick="window.print()" class="btn btn-primary px-4 shadow-sm fw-bold">
+        <i class="bi bi-printer me-2"></i>Imprimir Pedigree (PDF)
+    </button>
 </div>
 
 {% macro render_box(node, extra_class='square-box') %}
