@@ -210,16 +210,19 @@
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td>
                             {% if p.pai_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">{{ p.pai or '---'
-                                }}</a>
+                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
+                                {{ p.pai or '---' }}
+                            </a>
                             {% else %}
                             <span class="text-muted">{{ p.pai or '---' }}</span>
                             {% endif %}
                         </td>
+
                         <td>
                             {% if p.mae_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">{{ p.mae or '---'
-                                }}</a>
+                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
+                                {{ p.mae or '---' }}
+                            </a>
                             {% else %}
                             <span class="text-muted">{{ p.mae or '---' }}</span>
                             {% endif %}
