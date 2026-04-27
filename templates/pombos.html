@@ -107,6 +107,33 @@
         background-color: #0056d2 !important;
         color: white !important;
     }
+
+    /* 1. Remove espaços inúteis das células para os botões ganharem espaço */
+    #pomboTable th,
+    #pomboTable td {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        white-space: nowrap;
+        /* Impede que o texto de qualquer coluna quebre linha */
+    }
+
+    /* 2. Força os botões a ficarem na horizontal e define um tamanho fixo para não dançarem */
+    .btn-horizontal {
+        display: inline-flex !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+        gap: 6px;
+        padding: 4px 12px !important;
+        min-width: 100px;
+        /* Garante que o botão tem largura para o texto */
+        justify-content: center;
+    }
+
+    /* 3. Faz com que a tabela possa "transbordar" o cartão se necessário (gera scroll lateral se o ecrã for pequeno) */
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
 </style>
 
 <div class="container py-4">
@@ -197,13 +224,13 @@
                             <span class="text-muted">{{ p.mae or '---' }}</span>
                             {% endif %}
                         </td>
-                        <td class="text-center pe-4">
-                            <div class="d-flex justify-content-center gap-2">
+                        <td class="text-center" style="width: 230px; min-width: 230px;">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
                                 <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                    class="btn btn-sm btn-outline-primary fw-bold px-3">
+                                    class="btn btn-sm btn-outline-primary fw-bold btn-horizontal">
                                     <i class="bi bi-pencil-square"></i> Editar
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3"
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
                                     onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
