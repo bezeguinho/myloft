@@ -85,7 +85,24 @@
     .anilha-link:hover {
         text-decoration: underline;
     }
+
+    <style>
+    /* ... todos os teus estilos que já lá estavam ... */
+
+    /* ADICIONA ISTO AQUI NO FIM DO BLOCO DE STYLE: */
+    .btn-horizontal {
+        display: inline-flex !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+        gap: 6px;
+        padding: 5px 10px !important;
+    }
+
+    #pomboTable {
+        font-size: 0.85rem;
+    }
 </style>
+
 
 <div class="row justify-content-center">
     <div class="col-12 col-xl-11">
@@ -120,63 +137,51 @@
             <div class="card-body p-0 bg-white">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="pomboTable">
-                        <thead class="table-light text-uppercase small fw-bold text-muted">
+                        <thead class="table-light text-uppercase small fw-bold">
                             <tr>
-                                <th class="ps-4 py-3 border-0">Anilha</th>
-                                <th class="py-3 border-0">Ano</th>
-                                <th class="py-3 border-0">Cor</th>
-                                <th class="py-3 border-0">Nome</th>
-                                <th class="text-center py-3 border-0">Sexo</th>
-                                <th class="py-3 border-0">Categoria</th>
-                                <th class="d-print-none py-3 border-0">Pai</th>
-                                <th class="d-print-none py-3 border-0">Mãe</th>
-                                <th class="text-center d-print-none pe-4 py-3 border-0">Ações</th>
+                                <th class="ps-3">Anilha</th>
+                                <th>Ano</th>
+                                <th class="d-none d-md-table-cell">Cor</th>
+                                <th>Nome</th>
+                                <th class="text-center">Sexo</th>
+                                <th class="d-none d-lg-table-cell">Categoria</th>
+                                <th class="d-none d-xl-table-cell">Pai</th>
+                                <th class="d-none d-xl-table-cell">Mãe</th>
+                                <th class="text-center pe-3">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for p in pombos %}
-                            <tr {% if p.oculto %}class="opacity-50" style="background-color: #fcfcfc;" {% endif %}>
-                                <td class="ps-4 fw-bold">
-                                    <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">
-                                        {{ p.anilha }}
-                                    </a>
-                                </td>
+                            <tr class="pombo-row">
+                                <td class="ps-3"><a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{
+                                        p.anilha }}</a></td>
                                 <td>{{ p.ano }}</td>
-                                <td>{{ p.cor or '-' }}</td>
+                                <td class="d-none d-md-table-cell text-muted small">{{ p.cor or '-' }}</td>
                                 <td>{{ p.nome or '-' }}</td>
                                 <td class="text-center">
                                     {% if p.sexo == 'Macho' %}
-                                    <span class="text-primary fw-bold">M</span>
+                                    <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
                                     {% elif p.sexo == 'Fêmea' %}
-                                    <span class="text-danger fw-bold">F</span>
+                                    <div class="sex-circle sex-f"><i class="bi bi-gender-female"></i></div>
                                     {% else %}
-                                    <span class="text-muted">?</span>
+                                    <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <span
-                                        class="badge {% if p.categoria == 'Voador' %}bg-info{% elif p.categoria == 'Reprodutor' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill px-3">
-                                        {{ p.categoria }}
-                                    </span>
-                                </td>
-                                <td class="d-print-none">{{ p.pai or '-' }}</td>
-                                <td class="d-print-none">{{ p.mae or '-' }}</td>
-                                <td class="text-center pe-4">
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                <td class="d-none d-lg-table-cell small">{{ p.categoria }}</td>
+                                <td class="d-none d-xl-table-cell small">{{ p.pai or '-' }}</td>
+                                <td class="d-none d-xl-table-cell small">{{ p.mae or '-' }}</td>
 
+                                <td class="text-center pe-3">
+                                    <div class="d-flex justify-content-center gap-1">
                                         <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                            class="btn btn-sm btn-outline-primary fw-bold px-2 d-inline-flex align-items-center justify-content-center"
-                                            style="min-width: 90px; height: 38px;">
-                                            <i class="bi bi-pencil-square me-2"></i> Editar
+                                            class="btn btn-sm btn-outline-primary fw-bold btn-horizontal">
+                                            <i class="bi bi-pencil-square"></i> Editar
                                         </a>
-
                                         <button type="button"
-                                            class="btn btn-sm btn-outline-danger fw-bold px-2 d-inline-flex align-items-center justify-content-center"
-                                            onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')"
-                                            style="min-width: 95px; height: 38px;">
-                                            <i class="bi bi-trash me-2"></i> Eliminar
+                                            class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
+                                            onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                            <i class="bi bi-trash"></i> Eliminar
                                         </button>
-
                                     </div>
                                 </td>
                             </tr>
