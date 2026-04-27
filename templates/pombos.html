@@ -161,80 +161,47 @@
     </div>
 </div>
 
-<div class="card shadow-sm border-0" style="border-radius: 10px;">
+<div class="card shadow border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
+
+    <div class="card-body p-4 bg-white border-bottom">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold text-primary m-0 text-uppercase">Meus Pombos</h2>
+                <p class="text-muted small mb-0">Gestão geral de todo o pombal</p>
+            </div>
+
+            <div class="d-flex gap-3 align-items-center">
+                <span class="count-box fs-5">{{ pombos|length }}</span>
+
+                <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm px-4 fw-bold">
+                    <i class="bi bi-plus-lg me-2"></i>INSERIR NOVO
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-4 no-print">
+            <input type="text" id="searchInput" class="form-control search-container shadow-sm"
+                placeholder="🔎 Pesquisar por anilha, nome, cor, linhagem..." style="border: 1px solid #ddd;">
+        </div>
+    </div>
+
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="pomboTable">
                 <thead class="table-light text-uppercase small fw-bold text-muted">
                     <tr>
-                        <th class="ps-4">Anilha</th>
-                        <th>Ano</th>
-                        <th>Cor</th>
-                        <th>Nome</th>
-                        <th class="text-center">Sexo</th>
-                        <th id="headerCategoria">Categoria</th>
-                        <th class="d-print-none">Pai</th>
-                        <th class="d-print-none">Mãe</th>
-                        <th class="text-center d-print-none">Ações</th>
+                        <th class="ps-4 py-3 border-0">Anilha</th>
+                        <th class="py-3 border-0">Ano</th>
+                        <th class="py-3 border-0">Cor</th>
+                        <th class="py-3 border-0">Nome</th>
+                        <th class="text-center py-3 border-0">Sexo</th>
+                        <th id="headerCategoria" class="py-3 border-0">Categoria</th>
+                        <th class="d-print-none py-3 border-0">Pai</th>
+                        <th class="d-print-none py-3 border-0">Mãe</th>
+                        <th class="text-center d-print-none pe-4 py-3 border-0">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in pombos %}
-                    <tr class="pombo-row">
-                        <td class="fw-bold ps-4">
-                            <a href="{{ url_for('ver_pombo', id=p.id) }}" class="text-decoration-none text-primary">{{
-                                p.anilha }}</a>
-                        </td>
-                        <td>{{ p.ano }}</td>
-                        <td>{{ p.cor or '---' }}</td>
-                        <td class="pombo-nome text-uppercase">{{ p.nome or '---' }}</td>
-                        <td class="text-center">
-                            {% if p.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
-                            {% elif p.sexo == 'Fêmea' %}<i class="bi bi-gender-female fs-5" style="color: #ff69b4;"
-                                title="Fêmea"></i>
-                            {% else %}<i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>{%
-                            endif %}
-                        </td>
-                        <td>
-                            <span class="cat-normal">{{ p.categoria }}</span>
-                            {% if p.categoria == 'Cedido' %}
-                            <span class="cat-cedido d-none">{{ p.cedido_a or '---' }}</span>
-                            {% endif %}
-                        </td>
-
-                        <td class="d-print-none">
-                            {% if p.pai and p.pai in anilhas_registadas %}
-                            <a href="{{ url_for('pombo_por_anilha', anilha=p.pai) }}"
-                                class="text-decoration-none fw-bold">{{ p.pai }}</a>
-                            {% else %}<span class="text-muted">{{ p.pai or '---' }}</span>{% endif %}
-                        </td>
-
-                        <td class="d-print-none">
-                            {% if p.mae and p.mae in anilhas_registadas %}
-                            <a href="{{ url_for('pombo_por_anilha', anilha=p.mae) }}"
-                                class="text-decoration-none fw-bold">{{ p.mae }}</a>
-                            {% else %}<span class="text-muted">{{ p.mae or '---' }}</span>{% endif %}
-                        </td>
-
-                        <td class="text-center d-print-none">
-                            <div class="d-flex justify-content-center gap-2 px-2">
-                                <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                    class="btn btn-sm btn-outline-primary fw-bold shadow-sm" title="Editar">
-                                    <i class="bi bi-pencil-square me-1"></i> Editar
-                                </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold shadow-sm"
-                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')" title="Eliminar">
-                                    <i class="bi bi-trash me-1"></i> Eliminar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="9" class="text-center py-5 text-muted">Nenhum pombo encontrado.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
             </table>
         </div>
     </div>
@@ -303,7 +270,7 @@
             "Cedido": "CEDIDOS",
             "Oculto": "OCULTOS"
         };
-        
+
         // Se estivermos em "TODOS OS POMBOS" e selecionarmos "Todos", manter "TODOS OS POMBOS"
         var novoTitulo = titles[cat];
         if (cat === "Todos" && "{{ titulo }}" === "TODOS OS POMBOS") {
@@ -328,14 +295,14 @@
             // Alternar visibilidade interna da célula para impressão
             var spanNormal = catCell.querySelector(".cat-normal");
             var spanCedido = catCell.querySelector(".cat-cedido");
-            
+
             if (isCedidoFilter && spanCedido) {
                 spanNormal.classList.add("d-print-none");
                 spanCedido.classList.remove("d-none");
                 spanCedido.classList.add("d-print-inline");
             } else if (isCedidoFilter && !spanCedido && catText === "Cedido") {
                 // Caso o pombo seja Cedido mas não tenha spanCedido (pode acontecer se o dado estiver incompleto)
-                spanNormal.innerText = "---"; 
+                spanNormal.innerText = "---";
             } else {
                 spanNormal.classList.remove("d-print-none");
                 if (spanCedido) {
@@ -357,15 +324,15 @@
         }
         var modal = bootstrap.Modal.getInstance(document.getElementById('modalOpcoesImpressao'));
         if (modal) modal.hide();
-        setTimeout(function () { 
-            window.print(); 
+        setTimeout(function () {
+            window.print();
             // Resetar após a janela de impressão abrir (opcional, mas bom para consistência)
-            setTimeout(function() {
+            setTimeout(function () {
                 if (headerCat) {
                     headerCat.innerText = ("{{ titulo }}" === "CEDIDOS" && !isCedidoFilter) ? "Cedido a:" : "Categoria";
                     // Se voltarmos à lista Cedidos, o header deve refletir o estado da lista se houver alguma lógica JS lá, 
                     // mas como o user quer apenas na impressão, voltamos para "Categoria" por defeito.
-                    headerCat.innerText = "Categoria"; 
+                    headerCat.innerText = "Categoria";
                 }
                 for (var i = 0; i < tr.length; i++) {
                     var catCell = tr[i].getElementsByTagName("td")[5];
@@ -451,7 +418,8 @@
                 </div>
             </div>
             <div class="modal-footer border-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-modal-cancelar px-4 shadow-sm" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-cancelar px-4 shadow-sm"
+                    data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" style="border-radius: 10px;"
                     onclick="executarImpressao()"><i class="bi bi-printer me-2"></i>Imprimir</button>
             </div>
