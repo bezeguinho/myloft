@@ -136,19 +136,19 @@
     }
 
 
-    /* FORÇAR COR AZUL E EXECUÇÃO */
+    <style>
+
+    /* Este código garante o azul, o negrito e o sublinhado */
     a.anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
         cursor: pointer !important;
-        display: inline-block;
     }
 
-    /* FORÇAR SUBLINHADO NO HOVER */
     a.anilha-link:hover {
         text-decoration: underline !important;
-        color: #0044a8 !important;
+        color: #0033a0 !important;
     }
 </style>
 
@@ -225,22 +225,22 @@
                         </td>
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
-                            {% if p.pai_id %}
-                            <a href="/pombo/{{ p.pai_id }}" class="anilha-link">
+                            {% if p.pai and p.pai != '---' %}
+                            <a href="/ver_pombo_por_anilha/{{ p.pai }}" class="anilha-link">
                                 {{ p.pai }}
                             </a>
                             {% else %}
-                            <span class="text-muted">{{ p.pai or '---' }}</span>
+                            <span class="text-muted">---</span>
                             {% endif %}
                         </td>
 
                         <td class="align-middle">
-                            {% if p.mae_id %}
-                            <a href="/pombo/{{ p.mae_id }}" class="anilha-link">
+                            {% if p.mae and p.mae != '---' %}
+                            <a href="/ver_pombo_por_anilha/{{ p.mae }}" class="anilha-link">
                                 {{ p.mae }}
                             </a>
                             {% else %}
-                            <span class="text-muted">{{ p.mae or '---' }}</span>
+                            <span class="text-muted">---</span>
                             {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
