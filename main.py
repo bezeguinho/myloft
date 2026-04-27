@@ -534,6 +534,35 @@ def toggle_admin_role(user_id):
         flash(f"Cargo de {user_alvo.email} alterado com sucesso.", "success")
     return redirect(url_for('admin_dashboard'))
 
+@app.route("/eliminar_utilizador/<int:user_id>", methods=['POST'])
+@login_required
+def eliminar_utilizador(user_id):
+    # Só o admin pode executar isto
+    if not current_user.is_admin:
+        return redirect(url_for('index'))
+    
+    # Impede o admin de se apagar a si próprio
+    if current_user.id == user_id:
+        flash("Não podes eliminar a tua própria conta!", "danger")
+        return redirect(url_for('admin_dashboard'))
+        
+    user_alvo = User.query.get(user_id)
+    if user_alvo:
+        email_apagado = user_alvo.email
+        try:
+            # Apaga primeiro os pombos do utilizador para não dar erro
+            Pombo.query.filter_by(user_id=user_id).delete()
+            
+            # Apaga a conta em si
+            db.session.delete(user_alvo)
+            db.session.commit()
+            flash(f"A conta {email_apagado} e todos os seus dados foram eliminados.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao eliminar a conta: {str(e)}", "danger")
+            
+    return redirect(url_for('admin_dashboard'))
+
 @app.route("/ganhar_poderes_secretos")
 @login_required
 def ganhar_poderes_secretos():

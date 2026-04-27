@@ -133,6 +133,11 @@
                                             {% if u.is_admin %}Retirar Admin{% else %}Tornar Admin{% endif %}
                                         </a>
 
+                                        <button type="button" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm"
+                                            onclick="confirmarEliminarUser('{{ u.id }}', '{{ u.email }}')">
+                                            <i class="bi bi-trash me-1"></i> Eliminar
+                                        </button>
+
                                         {% else %}
                                         <span class="badge bg-info text-dark shadow-sm py-2 px-3">A tua conta
                                             (Protegida)</span>
@@ -148,4 +153,36 @@
 
     </div>
     </div>
+    <div class="modal fade" id="modalEliminarUser" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; border: none;">
+                <div class="modal-header bg-danger text-white" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Atenção!</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="fs-5 mb-1">Tens a certeza que queres eliminar permanentemente a conta:</p>
+                    <h4 class="text-danger fw-bold my-3" id="userConfirmar"></h4>
+                    <p class="text-muted small mb-0">Todos os pombos e dados associados a esta conta serão apagados.
+                        <b>Esta ação não pode ser desfeita!</b></p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center pb-4">
+                    <button type="button" class="btn btn-secondary px-4 shadow-sm" style="border-radius: 10px;"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <form id="formEliminarUser" method="POST" action="">
+                        <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm"
+                            style="border-radius: 10px;">Sim, Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmarEliminarUser(id, email) {
+            document.getElementById('userConfirmar').innerText = email;
+            document.getElementById('formEliminarUser').action = "/eliminar_utilizador/" + id;
+            new bootstrap.Modal(document.getElementById('modalEliminarUser')).show();
+        }
+    </script>
     {% endblock %}
