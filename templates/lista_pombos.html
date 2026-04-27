@@ -1,9 +1,71 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+    .count-box {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-weight: bold;
+        color: #0d6efd;
+        min-width: 50px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    /* Estilo para os botões de ação com texto */
+    .btn-acao-editar {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #0d6efd;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-weight: bold;
+        font-size: 0.75rem;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-acao-editar:hover {
+        background-color: #0d6efd;
+        color: white !important;
+    }
+
+    .btn-acao-eliminar {
+        background-color: #fff5f5;
+        border: 1px solid #feb2b2;
+        color: #c53030;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-weight: bold;
+        font-size: 0.75rem;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-acao-eliminar:hover {
+        background-color: #c53030;
+        color: white !important;
+    }
+
+    .anilha-link {
+        color: #0d6efd;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .anilha-link:hover {
+        text-decoration: underline;
+        color: #004da8;
+    }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-12 col-xl-11">
-
         <div class="card shadow border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
 
             <div class="card-body p-4 p-md-5 bg-white border-bottom">
@@ -14,28 +76,21 @@
                     </div>
 
                     <div class="d-flex gap-2 align-items-center">
-                        <span class="badge bg-light text-primary border fs-6 px-3 py-2 rounded-pill">
-                            {{ pombos|length if pombos else 0 }}
-                        </span>
-
-                        <a href="/novo_pombo" class="btn btn-primary shadow-sm px-4 fw-bold rounded-pill">
+                        <span class="count-box fs-5">{{ pombos|length }}</span>
+                        <a href="{{ url_for('novo_pombo') }}"
+                            class="btn btn-primary shadow-sm px-4 fw-bold rounded-pill">
                             <i class="bi bi-plus-lg me-2"></i>INSERIR NOVO
                         </a>
-
-                        <a href="/estatisticas" class="btn btn-outline-primary shadow-sm px-3 fw-bold rounded-pill">
+                        <a href="{{ url_for('estatisticas') }}"
+                            class="btn btn-outline-primary shadow-sm px-3 fw-bold border-2 rounded-pill">
                             <i class="bi bi-table me-2"></i>TABELA GERAL
                         </a>
                     </div>
                 </div>
 
                 <div class="mt-4 no-print">
-                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="bi bi-search text-muted"></i>
-                        </span>
-                        <input type="text" id="searchInput" class="form-control border-start-0"
-                            placeholder="Pesquisar por anilha, nome, cor..." style="padding: 12px;">
-                    </div>
+                    <input type="text" id="searchInput" class="form-control shadow-sm"
+                        placeholder="🔎 Pesquisar por anilha, nome, cor ou linhagem..." style="border-radius: 10px;">
                 </div>
             </div>
 
@@ -50,13 +105,19 @@
                                 <th class="py-3 border-0">Nome</th>
                                 <th class="text-center py-3 border-0">Sexo</th>
                                 <th class="py-3 border-0">Categoria</th>
-                                <th class="text-center pe-4 py-3 border-0">Ações</th>
+                                <th class="d-print-none py-3 border-0">Pai</th>
+                                <th class="d-print-none py-3 border-0">Mãe</th>
+                                <th class="text-center d-print-none pe-4 py-3 border-0">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for p in pombos %}
-                            <tr>
-                                <td class="ps-4 fw-bold text-primary">{{ p.anilha }}</td>
+                            <tr {% if p.oculto %}class="opacity-50" style="background-color: #fcfcfc;" {% endif %}>
+                                <td class="ps-4 fw-bold">
+                                    <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">
+                                        {{ p.anilha }}
+                                    </a>
+                                </td>
                                 <td>{{ p.ano }}</td>
                                 <td>{{ p.cor or '-' }}</td>
                                 <td>{{ p.nome or '-' }}</td>
@@ -66,43 +127,48 @@
                                     {% elif p.sexo == 'Fêmea' %}
                                     <span class="text-danger fw-bold">F</span>
                                     {% else %}
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">?</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     <span
-                                        class="badge {% if p.categoria == 'Voador' %}bg-info{% else %}bg-primary{% endif %} rounded-pill px-3">
+                                        class="badge {% if p.categoria == 'Voador' %}bg-info{% elif p.categoria == 'Reprodutor' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill px-3">
                                         {{ p.categoria }}
                                     </span>
                                 </td>
-                                <td class="text-center pe-4">
-                                    <div class="d-flex justify-content-center gap-1">
-                                        <a href="/editar_pombo/{{ p.id }}" class="btn btn-sm btn-light border"
+                                <td class="d-print-none">{{ p.pai or '-' }}</td>
+                                <td class="d-print-none">{{ p.mae or '-' }}</td>
+                                <td class="text-center pe-4 d-print-none">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn-acao-editar"
                                             title="Editar">
-                                            <i class="bi bi-pencil text-dark"></i>
+                                            <i class="bi bi-pencil me-1"></i> EDITAR
                                         </a>
-                                        <button class="btn btn-sm btn-light border text-danger"
+                                        <button type="button" class="btn-acao-eliminar"
                                             onclick="confirmarEliminarUser('{{ p.id }}', '{{ p.anilha }}')">
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash me-1"></i> ELIMINAR
                                         </button>
                                     </div>
                                 </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">Nenhum pombo encontrado.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <div class="card-footer bg-white border-0 p-4 text-end no-print">
+                <button onclick="window.print()"
+                    class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold shadow-sm">
+                    <i class="bi bi-printer me-2"></i> IMPRIMIR LISTA
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Motor de busca simples e funcional
+    // Motor de busca funcional
     document.getElementById('searchInput').addEventListener('keyup', function () {
         let filter = this.value.toUpperCase();
         let rows = document.querySelector("#pomboTable tbody").rows;
