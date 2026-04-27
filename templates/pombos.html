@@ -136,22 +136,19 @@
     }
 
 
-    /* Estilo para as anilhas (pombo, pai e mãe) */
-    .anilha-link {
+    /* FORÇAR COR AZUL E EXECUÇÃO */
+    a.anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
-        /* Sem sublinhado por padrão */
-        transition: 0.2s;
-        cursor: pointer;
+        cursor: pointer !important;
+        display: inline-block;
     }
 
-    /* Efeito de Execução: Quando passa o rato */
-    .anilha-link:hover {
+    /* FORÇAR SUBLINHADO NO HOVER */
+    a.anilha-link:hover {
         text-decoration: underline !important;
-        /* Aparece o sublinhado */
         color: #0044a8 !important;
-        /* Azul mais escuro */
     }
 </style>
 
@@ -229,7 +226,7 @@
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
                             {% if p.pai_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
+                            <a href="/pombo/{{ p.pai_id }}" class="anilha-link">
                                 {{ p.pai }}
                             </a>
                             {% else %}
@@ -239,7 +236,7 @@
 
                         <td class="align-middle">
                             {% if p.mae_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
+                            <a href="/pombo/{{ p.mae_id }}" class="anilha-link">
                                 {{ p.mae }}
                             </a>
                             {% else %}
