@@ -78,7 +78,9 @@
                             <label class="form-label">Nº ANILHA</label>
                             <input type="text" name="anilha" id="inputAnilha" class="form-control caixa-input w-md-140"
                                 placeholder="{{ proxima_anilha }}" {% if not proxima_anilha and not modo_edicao
-                                %}required{% endif %} value="{{ pombo.anilha if modo_edicao else '' }}" autofocus>
+                                %}required{% endif %} value="{{ pombo.anilha if modo_edicao else '' }}" {% if
+                                modo_edicao %}readonly style="background-color: #e9ecef; cursor: not-allowed;" {% endif
+                                %} {% if not modo_edicao %}autofocus{% endif %}>
                             <input type="hidden" name="anilha_sugerida" value="{{ proxima_anilha }}">
                         </div>
                         <div class="col-12 col-md-auto">
@@ -86,7 +88,8 @@
                             <select name="ano" id="inputAno"
                                 class="form-select caixa-input w-md-110 {% if ultimo_ano and not modo_edicao %}select-sugerido{% endif %}"
                                 onchange="this.classList.remove('select-sugerido')" {% if not ultimo_ano and not
-                                modo_edicao %}required{% endif %}>
+                                modo_edicao %}required{% endif %} {% if modo_edicao %}disabled
+                                style="background-color: #e9ecef; cursor: not-allowed;" {% endif %}>
 
                                 {% if ultimo_ano and not modo_edicao %}
                                 <option value="" selected hidden>{{ ultimo_ano }}</option>
@@ -100,7 +103,12 @@
                                     style="color: #000;">{{ ano }}</option>
                                 {% endfor %}
                             </select>
+
+                            {% if modo_edicao %}
+                            <input type="hidden" name="ano" value="{{ pombo.ano }}">
+                            {% else %}
                             <input type="hidden" name="ano_sugerido" value="{{ ultimo_ano }}">
+                            {% endif %}
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">NOME</label>

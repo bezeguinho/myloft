@@ -313,16 +313,16 @@ def lista_pombos(categoria=None):
     # Voltamos a usar o TEU ficheiro original: pombos.html
     return render_template("pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
 
-@app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
+@@app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
     if request.method == 'POST':
-        pombo.anilha = request.form.get('anilha')
+        # REMOVIDOS: pombo.anilha e pombo.ano para garantir que nunca são alterados na edição!
+        
         pombo.nome = request.form.get('nome')
-        pombo.ano = int(request.form.get('ano') or 0)
         pombo.sexo = request.form.get('sexo')
         pombo.cor = request.form.get('cor')
         pombo.categoria = request.form.get('categoria')
@@ -341,7 +341,6 @@ def editar_pombo(id):
             flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
-
 @app.route("/ver_pombo/<int:id>")
 @login_required
 def ver_pombo(id):
