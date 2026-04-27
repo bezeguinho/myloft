@@ -12,42 +12,36 @@
     .table-stats th {
         border: none !important;
         border-bottom: 1px solid #dee2e6 !important;
-        padding: 0.75rem 0.5rem !important;
+        padding: 0.8rem 0.5rem !important;
+        /* Aumentado ligeiramente para melhor leitura */
         white-space: nowrap;
-        /* Garante que todas as linhas tenham a mesma altura */
-        height: 55px;
+        vertical-align: middle;
     }
 
-    /* ==== LINHAS DE TOTAIS (Fundo sombreado e Texto Amarelo) ==== */
+    /* ==== LINHAS DE TOTAIS (AMARELO E SOMBRA) ==== */
     .linha-destaque-total td {
         color: #d4a017 !important;
         background-color: #f8f9fa !important;
         font-weight: bold !important;
-        border-bottom: none !important;
         text-transform: uppercase;
-        border-top: 1px solid #dee2e6 !important;
-        /* Linha contínua acima do total */
     }
 
-    /* ==== LINHA DOS REPRODUTORES (Correção da linha e altura) ==== */
+    /* ==== FORÇAR LINHA CONTÍNUA ==== */
+    /* Aplicamos a borda no topo de cada célula destas linhas para garantir que a linha atravessa tudo */
+    .linha-destaque-total td,
     .linha-reprodutores td {
         border-top: 1px solid #dee2e6 !important;
-        /* Força a linha contínua acima dos reprodutores */
-        height: 55px !important;
-    }
-
-    .linha-pre-total td {
-        border-bottom: none !important;
     }
 
     .texto-principal {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
         font-weight: bold;
         text-transform: uppercase;
+        color: #212529;
     }
 
     .texto-subcategoria {
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
         font-weight: bold;
         text-transform: uppercase;
         color: #6c757d;
@@ -65,9 +59,9 @@
         color: #6c757d !important;
     }
 
+    /* Espaçador entre blocos */
     .spacer-row td {
         height: 20px;
-        /* Espaço entre blocos */
         border: none !important;
         padding: 0 !important;
         background-color: transparent !important;
@@ -78,18 +72,13 @@
     }
 
     @media (max-width: 767px) {
-        .texto-principal {
-            font-size: 1.1rem !important;
-        }
-
-        .table-stats td,
-        .table-stats th {
-            padding: 0.5rem 0.25rem !important;
-            height: auto;
-        }
-
         .ps-inicio {
             padding-left: 1rem !important;
+        }
+
+        .table-stats td {
+            padding: 0.5rem 0.2rem !important;
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -112,36 +101,35 @@
                     <table class="table align-middle table-stats m-0">
                         <thead class="table-light text-muted">
                             <tr class="fw-bold text-uppercase small">
-                                <th class="ps-inicio py-3 border-0">CATEGORIA</th>
-                                <th class="text-start py-3 border-0"></th>
-                                <th class="text-center py-3 border-0">TOTAL</th>
-                                <th class="text-center py-3 border-0"><i
-                                        class="bi bi-gender-female text-femea"></i><span class="ms-1">FÊMEAS</span></th>
-                                <th class="text-center py-3 border-0"><i class="bi bi-gender-male text-macho"></i><span
+                                <th class="ps-inicio py-3">CATEGORIA</th>
+                                <th></th>
+                                <th class="text-center">TOTAL</th>
+                                <th class="text-center"><i class="bi bi-gender-female text-femea"></i><span
+                                        class="ms-1">FÊMEAS</span></th>
+                                <th class="text-center"><i class="bi bi-gender-male text-macho"></i><span
                                         class="ms-1">MACHOS</span></th>
-                                <th class="text-center py-3 border-0"><i
-                                        class="bi bi-question-circle text-indef"></i><span
+                                <th class="text-center"><i class="bi bi-question-circle text-indef"></i><span
                                         class="ms-1">INDEFINIDO</span></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td rowspan="4" class="ps-inicio texto-principal align-middle">VOADORES</td>
-                                <td class="text-start texto-subcategoria">ADULTOS</td>
+                                <td rowspan="4" class="ps-inicio texto-principal">VOADORES</td>
+                                <td class="texto-subcategoria text-start">ADULTOS</td>
                                 <td class="text-center fw-bold fs-5">{{ stats.v_adultos }}</td>
                                 <td class="text-center fw-bold text-femea fs-5">{{ stats.v_adultos_f }}</td>
                                 <td class="text-center fw-bold text-macho fs-5">{{ stats.v_adultos_m }}</td>
                                 <td class="text-center fw-bold text-indef fs-5">{{ stats.v_adultos_i }}</td>
                             </tr>
                             <tr>
-                                <td class="text-start texto-subcategoria">YEARLINGS</td>
+                                <td class="texto-subcategoria text-start">YEARLINGS</td>
                                 <td class="text-center fw-bold fs-5">{{ stats.v_yearlings }}</td>
                                 <td class="text-center fw-bold text-femea fs-5">{{ stats.v_yearlings_f }}</td>
                                 <td class="text-center fw-bold text-macho fs-5">{{ stats.v_yearlings_m }}</td>
                                 <td class="text-center fw-bold text-indef fs-5">{{ stats.v_yearlings_i }}</td>
                             </tr>
-                            <tr class="linha-pre-total">
-                                <td class="text-start texto-subcategoria">BORRACHOS</td>
+                            <tr>
+                                <td class="texto-subcategoria text-start">BORRACHOS</td>
                                 <td class="text-center fw-bold fs-5">{{ stats.v_borrachos }}</td>
                                 <td class="text-center fw-bold text-femea fs-5">{{ stats.v_borrachos_f }}</td>
                                 <td class="text-center fw-bold text-macho fs-5">{{ stats.v_borrachos_m }}</td>
@@ -161,7 +149,7 @@
 
                             <tr class="linha-reprodutores">
                                 <td class="ps-inicio texto-principal">REPRODUTORES</td>
-                                <td class="text-start"></td>
+                                <td></td>
                                 <td class="text-center fw-bold fs-5">{{ stats.reprodutores }}</td>
                                 <td class="text-center fw-bold text-femea fs-5">{{ stats.reprodutores_f }}</td>
                                 <td class="text-center fw-bold text-macho fs-5">{{ stats.reprodutores_m }}</td>
@@ -173,8 +161,8 @@
                             </tr>
 
                             <tr class="linha-destaque-total">
-                                <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
-                                <td class="text-start"></td>
+                                <td class="ps-inicio texto-principal">TOTAL GERAL</td>
+                                <td></td>
                                 <td class="text-center fs-4">{{ stats.voadores + stats.reprodutores }}</td>
                                 <td class="text-center fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
                                 <td class="text-center fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
