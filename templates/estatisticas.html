@@ -16,15 +16,19 @@
         white-space: nowrap;
     }
 
-    /* ==== ESTILO PARA AS LINHAS DE TOTAIS (VOADORES E GERAL) ==== */
+    /* ESTILO PARA AS LINHAS DE TOTAIS */
     .linha-destaque-total td {
         color: #d4a017 !important;
-        /* Amarelo Dourado */
         background-color: #f8f9fa !important;
-        /* Fundo Sombreado */
         font-weight: bold !important;
-        border-bottom: 1px solid #dee2e6 !important;
+        /* Removemos a borda aqui para não haver conflitos de linhas */
+        border-bottom: none !important;
         text-transform: uppercase;
+    }
+
+    /* Ajuste específico para a linha antes do Total Geral */
+    .sem-borda-bottom td {
+        border-bottom: none !important;
     }
 
     .texto-principal {
@@ -81,7 +85,6 @@
 
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
-
         <div class="card shadow border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
 
             <div class="card-body p-4 p-md-5 bg-white border-bottom">
@@ -145,7 +148,7 @@
                                 <td colspan="6"></td>
                             </tr>
 
-                            <tr>
+                            <tr class="sem-borda-bottom">
                                 <td class="ps-inicio texto-principal">REPRODUTORES</td>
                                 <td class="text-start"></td>
                                 <td class="text-center fw-bold fs-5">{{ stats.reprodutores }}</td>
