@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block content %}
 
+{% block content %}
 <style>
-    /* 1. Cores e Hovers dos Botões Superiores */
+    /* 1. BOTÕES DE ACÇÃO (Execução e Retrocesso) */
     .btn-adicionar {
         background-color: #0056d2 !important;
         color: white !important;
@@ -37,21 +37,18 @@
         color: white !important;
     }
 
-    /* 2. Caixa de Pesquisa com bordas bem visíveis */
-    .search-container-box {
-        border: 2px solid #ced4da !important;
+    /* 2. CAIXA DE PESQUISA COM MOLDURA */
+    .search-container {
+        border: 2px solid #dee2e6 !important;
         border-radius: 10px;
-        overflow: hidden;
         background-color: white;
+        display: flex;
+        align-items: center;
+        padding: 5px 15px;
+        margin-bottom: 20px;
     }
 
-    .search-input-field {
-        border: none !important;
-        padding: 12px;
-        box-shadow: none !important;
-    }
-
-    /* 3. Ícones de Sexo em Círculo */
+    /* 3. ÍCONES DE SEXO EM CÍRCULO */
     .sex-circle {
         width: 35px;
         height: 35px;
@@ -78,33 +75,53 @@
         border: 1px solid #dee2e6;
     }
 
-    /* 4. Links de Anilha (Pombo, Pai e Mãe) em Azul */
+    /* 4. LINKS AZUIS (Anilha, Pai, Mãe) */
     .anilha-link {
         color: #0056d2 !important;
-        text-decoration: none !important;
         font-weight: bold;
+        text-decoration: none !important;
     }
 
     .anilha-link:hover {
         text-decoration: underline !important;
     }
 
-    /* Categoria apenas texto preto */
-    .text-preto {
-        color: #000 !important;
-        font-weight: 500;
+    /* Botões secundários */
+    .btn-tabela-geral,
+    .print-container {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6 !important;
+        color: #0056d2 !important;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .btn-tabela-geral:hover,
+    .print-container:hover {
+        background-color: #0056d2 !important;
+        color: white !important;
     }
 </style>
 
 <div class="container py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 no-print">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
         <div class="d-flex align-items-center gap-3">
             <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
-            <div class="badge bg-light text-primary border px-3 py-2 fs-6 rounded-pill">
-                {{ pombos|length }} Pombos
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-primary border px-3 py-2 fs-6 rounded-pill">{{ pombos|length }}
+                    Pombos</span>
+                <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
+                    <i class="bi bi-table me-1"></i> Tabela Geral
+                </a>
             </div>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 mt-3 mt-md-0">
             <a href="{{ url_for('novo_pombo') }}" class="btn btn-adicionar shadow-sm">
                 <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
             </a>
@@ -114,10 +131,19 @@
         </div>
     </div>
 
-    <div class="search-container shadow-sm mb-4 no-print">
-        <i class="bi bi-search text-primary"></i>
-        <input type="text" id="pomboSearch" class="form-control" placeholder="Pesquisar por anilha, nome ou cor..."
-            onkeyup="searchTable()">
+    <div class="row g-3 mb-4 no-print">
+        <div class="col-md-5">
+            <div class="search-container shadow-sm">
+                <i class="bi bi-search text-primary me-2"></i>
+                <input type="text" id="pomboSearch" class="form-control border-0 p-0 shadow-none"
+                    placeholder="Pesquisar..." onkeyup="searchTable()">
+            </div>
+        </div>
+        <div class="col-md-7 text-end">
+            <div class="print-container shadow-sm no-print" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i> Imprimir Lista
+            </div>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
@@ -136,60 +162,56 @@
                         <th class="text-center pe-4">Ações</th>
                     </tr>
                 </thead>
-                {% for p in pombos %}
-                <tr class="pombo-row">
-                    <td class="ps-4">
-                        <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">
-                            {{ p.anilha }}
-                        </a>
-                    </td>
-
-                    <td>{{ p.ano }}</td>
-                    <td>{{ p.cor or '---' }}</td>
-                    <td>{{ p.nome or '---' }}</td>
-
-                    <td class="text-center">
-                        {% if p.sexo == 'Macho' %}
-                        <div class="sex-circle sex-m" title="Macho"><i class="bi bi-gender-male"></i></div>
-                        {% elif p.sexo == 'Fêmea' %}
-                        <div class="sex-circle sex-f" title="Fêmea"><i class="bi bi-gender-female"></i></div>
-                        {% else %}
-                        <div class="sex-circle sex-u" title="Indefinido"><i class="bi bi-question"></i></div>
-                        {% endif %}
-                    </td>
-
-                    <td class="text-dark fw-medium">{{ p.categoria }}</td>
-
-                    <td>
-                        {% if p.pai_id %}
-                        <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">{{ p.pai or '---' }}</a>
-                        {% else %}
-                        <span class="text-muted">{{ p.pai or '---' }}</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if p.mae_id %}
-                        <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">{{ p.mae or '---' }}</a>
-                        {% else %}
-                        <span class="text-muted">{{ p.mae or '---' }}</span>
-                        {% endif %}
-                    </td>
-
-                    <td class="text-center pe-4">
-                        <div class="d-flex justify-content-center gap-2">
-                            <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                class="btn btn-sm btn-outline-primary fw-bold px-3">
-                                <i class="bi bi-pencil-square me-1"></i> Editar
-                            </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3"
-                                onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                <i class="bi bi-trash me-1"></i> Eliminar
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
+                <tbody>
+                    {% for p in pombos %}
+                    <tr class="pombo-row">
+                        <td class="ps-4">
+                            <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
+                        </td>
+                        <td>{{ p.ano }}</td>
+                        <td>{{ p.cor or '---' }}</td>
+                        <td>{{ p.nome or '---' }}</td>
+                        <td class="text-center">
+                            {% if p.sexo == 'Macho' %}
+                            <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
+                            {% elif p.sexo == 'Fêmea' %}
+                            <div class="sex-circle sex-f"><i class="bi bi-gender-female"></i></div>
+                            {% else %}
+                            <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
+                            {% endif %}
+                        </td>
+                        <td class="text-dark fw-medium">{{ p.categoria }}</td>
+                        <td>
+                            {% if p.pai_id %}
+                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">{{ p.pai or '---'
+                                }}</a>
+                            {% else %}
+                            <span class="text-muted">{{ p.pai or '---' }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.mae_id %}
+                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">{{ p.mae or '---'
+                                }}</a>
+                            {% else %}
+                            <span class="text-muted">{{ p.mae or '---' }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ url_for('editar_pombo', id=p.id) }}"
+                                    class="btn btn-sm btn-outline-primary fw-bold px-3">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3"
+                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
@@ -203,170 +225,10 @@
             row.style.display = row.innerText.toUpperCase().includes(filter) ? "" : "none";
         });
     }
-
     function confirmarEliminar(id, anilha) {
-        // Assume que tens o modal de eliminar no base.html ou pombos.html
         if (confirm("Deseja mesmo eliminar o pombo " + anilha + "?")) {
             window.location.href = "/eliminar_pombo/" + id;
         }
     }
 </script>
-
 {% endblock %}
-
-<div class="container py-4">
-
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
-        <div class="d-flex align-items-center gap-3">
-            <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
-            <div class="d-flex align-items-center gap-2">
-                <span class="count-box">{{ pombos|length }}</span>
-                <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
-                    <i class="bi bi-table me-1"></i> Tabela Geral
-                </a>
-            </div>
-        </div>
-        <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a href="{{ url_for('novo_pombo') }}" class="btn btn-adicionar shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i> ADICIONAR NOVO
-            </a>
-            <a href="{{ url_for('index') }}" class="btn btn-voltar shadow-sm">
-                <i class="bi bi-arrow-left me-2"></i> VOLTAR
-            </a>
-        </div>
-    </div>
-
-    <div class="row g-3 mb-4 no-print">
-        <div class="col-md-5">
-            <div class="search-container d-flex align-items-center">
-                <i class="bi bi-search text-primary me-2"></i>
-                <input type="text" id="pomboSearch" class="form-control border-0 p-0 shadow-none"
-                    placeholder="Pesquisar por anilha ou nome..." onkeyup="searchTable()">
-            </div>
-        </div>
-        <div class="col-md-7">
-            <div class="print-container shadow-sm no-print" onclick="window.print()">
-                <i class="bi bi-printer me-2"></i> Imprimir Lista
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0" style="border-radius: 10px;">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="pomboTable">
-                    <thead class="table-light">
-                        <tr class="text-uppercase small fw-bold text-muted">
-                            <th class="ps-4 py-3 border-0">Anilha</th>
-                            <th class="py-3 border-0">Ano</th>
-                            <th class="py-3 border-0">Cor</th>
-                            <th class="py-3 border-0">Nome</th>
-                            <th class="text-center py-3 border-0">Sexo</th>
-                            <th class="py-3 border-0">Categoria</th>
-                            <th class="d-print-none py-3 border-0">Pai</th>
-                            <th class="d-print-none py-3 border-0">Mãe</th>
-                            <th class="text-center d-print-none pe-4 py-3 border-0">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in pombos %}
-                        <tr class="pombo-row" {% if p.oculto %}style="opacity: 0.6; background-color: #fcfcfc;" {% endif
-                            %}>
-                            <td class="ps-4 fw-bold">
-                                <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">
-                                    {{ p.anilha }}
-                                </a>
-                            </td>
-                            <td>{{ p.ano }}</td>
-                            <td>{{ p.cor or '---' }}</td>
-                            <td>{{ p.nome or '---' }}</td>
-                            <td class="text-center">
-                                {% if p.sexo == 'Macho' %}
-                                <span class="text-primary fw-bold">M</span>
-                                {% elif p.sexo == 'Fêmea' %}
-                                <span class="text-danger fw-bold">F</span>
-                                {% else %}
-                                <span class="text-muted">?</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span
-                                    class="badge {% if p.categoria == 'Voador' %}bg-info text-dark{% elif p.categoria == 'Reprodutor' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill px-3">
-                                    {{ p.categoria }}
-                                </span>
-                            </td>
-                            <td class="d-print-none">{{ p.pai or '---' }}</td>
-                            <td class="d-print-none">{{ p.mae or '---' }}</td>
-                            <td class="text-center pe-4 d-print-none">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                        class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center">
-                                        <i class="bi bi-pencil-square me-2"></i> Editar
-                                    </a>
-                                    <button type="button"
-                                        class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center"
-                                        onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                        <i class="bi bi-trash me-2"></i> Eliminar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">Nenhum pombo encontrado nesta categoria.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-danger text-white border-0">
-                    <h5 class="modal-title fw-bold">Eliminar Pombo</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4 text-center">
-                    <h5>Tem a certeza que quer eliminar?</h5>
-                    <p class="text-muted">(Anilha: <strong id="anilhaConfirmar"></strong>)</p>
-                </div>
-                <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <form id="formEliminar" method="POST">
-                        <button type="submit" class="btn btn-danger px-4 fw-bold">Apagar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <button id="backToTop" onclick="scrollToTop()"><i class="bi bi-arrow-up fs-4"></i></button>
-
-    <script>
-        function confirmarEliminar(id, anilha) {
-            document.getElementById('anilhaConfirmar').innerText = anilha;
-            document.getElementById('formEliminar').action = "/eliminar_pombo/" + id;
-            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
-        }
-
-        function searchTable() {
-            let filter = document.getElementById("pomboSearch").value.toUpperCase();
-            let rows = document.querySelectorAll(".pombo-row");
-            rows.forEach(row => {
-                let text = row.innerText.toUpperCase();
-                row.style.display = text.includes(filter) ? "" : "none";
-            });
-        }
-
-        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-        window.onscroll = function () {
-            let btn = document.getElementById("backToTop");
-            btn.style.display = (window.scrollY > 300) ? "flex" : "none";
-        };
-    </script>
-    {% endblock %}
