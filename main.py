@@ -550,12 +550,17 @@ def eliminar_utilizador(user_id):
     if user_alvo:
         email_apagado = user_alvo.email
         try:
-            # Apaga primeiro os pombos do utilizador para não dar erro
+            # 1. Apaga os pombos do utilizador
             Pombo.query.filter_by(user_id=user_id).delete()
             
-            # Apaga a conta em si
+            # 2. NOVO: Apaga o perfil associado na tabela 'utilizadores_perfil'
+            from sqlalchemy import text
+            db.session.execute(text("DELETE FROM utilizadores_perfil WHERE user_id = :uid"), {"uid": user_id})
+            
+            # 3. Finalmente, apaga a conta do utilizador em si
             db.session.delete(user_alvo)
             db.session.commit()
+            
             flash(f"A conta {email_apagado} e todos os seus dados foram eliminados.", "success")
         except Exception as e:
             db.session.rollback()
