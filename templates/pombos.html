@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    /* Estilos recuperados do teu histórico */
+    /* Estilos recuperados e ajustados para o hover correto */
     .btn-voltar {
         background-color: #ffcc29 !important;
         color: #333 !important;
@@ -15,8 +15,10 @@
         align-items: center;
     }
 
+    /* Retrocesso: Letras brancas no hover */
     .btn-voltar:hover {
         background-color: #e6b800 !important;
+        color: white !important;
     }
 
     .btn-adicionar {
@@ -32,10 +34,13 @@
         align-items: center;
     }
 
+    /* Execução: Letras pretas no hover */
     .btn-adicionar:hover {
         background-color: #0044a8 !important;
+        color: black !important;
     }
 
+    /* Resto dos estilos permanecem iguais */
     .count-box {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6;
