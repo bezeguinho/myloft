@@ -177,8 +177,8 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="pomboTable">
                 <thead class="table-light text-uppercase small fw-bold">
-                    <tr>
-                        <th class="ps-4 py-3">Anilha</th>
+                    <tr class="align-middle">
+                        <th class="ps-4" style="height: 50px;">Anilha</th>
                         <th>Ano</th>
                         <th>Cor</th>
                         <th>Nome</th>
@@ -209,22 +209,24 @@
                         </td>
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td>
-                            {% if p.pai_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
-                                {{ p.pai or '---' }}
+                            {% if p.pai and p.pai != '---' %}
+                            <a href="{{ url_for('ver_pombo', id=p.pai_id) if p.pai_id else '#' }}"
+                                style="color: #0056d2 !important; font-weight: bold; text-decoration: none;">
+                                {{ p.pai }}
                             </a>
                             {% else %}
-                            <span class="text-muted">{{ p.pai or '---' }}</span>
+                            <span class="text-muted">---</span>
                             {% endif %}
                         </td>
 
                         <td>
-                            {% if p.mae_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
-                                {{ p.mae or '---' }}
+                            {% if p.mae and p.mae != '---' %}
+                            <a href="{{ url_for('ver_pombo', id=p.mae_id) if p.mae_id else '#' }}"
+                                style="color: #0056d2 !important; font-weight: bold; text-decoration: none;">
+                                {{ p.mae }}
                             </a>
                             {% else %}
-                            <span class="text-muted">{{ p.mae or '---' }}</span>
+                            <span class="text-muted">---</span>
                             {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
