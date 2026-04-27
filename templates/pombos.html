@@ -2,7 +2,7 @@
 {% block content %}
 
 <style>
-    /* Manter os teus estilos de botões e contagem */
+    /* Estilos de suporte */
     .count-box {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6;
@@ -10,103 +10,104 @@
         padding: 4px 12px;
         font-weight: bold;
         color: #0d6efd;
-        min-width: 50px;
-        text-align: center;
-        display: inline-block;
     }
 
-    .btn-tabela-geral {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6 !important;
-        color: #0d6efd !important;
+    .card-custom {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+    }
+
+    .search-container {
         border-radius: 8px;
-        padding: 4px 12px;
-        font-weight: bold;
-        transition: 0.3s;
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
     }
 
-    .btn-tabela-geral:hover {
-        background-color: #f0f7ff !important;
+    /* Cores para os sexos */
+    .sexo-m {
+        color: #0d6efd;
+        font-weight: bold;
+    }
+
+    .sexo-f {
+        color: #dc3545;
+        font-weight: bold;
     }
 </style>
 
 <div class="row justify-content-center">
-    <div class="col-12 col-xl-11">
+    <div class="col-12">
 
-        <div class="card shadow border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
+        <div class="card card-custom mb-5">
 
-            <div class="card-body p-4 p-md-5 bg-white border-bottom">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="card-body p-4 bg-white border-bottom">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                     <div>
                         <h2 class="fw-bold text-primary m-0 text-uppercase">Meus Pombos</h2>
-                        <p class="text-muted small mb-0">Gestão geral de todo o pombal</p>
                     </div>
 
                     <div class="d-flex gap-2 align-items-center">
                         <span class="count-box fs-5">{{ pombos|length }}</span>
-                        <a href="{{ url_for('novo_pombo') }}" class="btn btn-executar shadow-sm px-4 fw-bold">
+                        <a href="{{ url_for('novo_pombo') }}" class="btn btn-primary shadow-sm px-4 fw-bold">
                             <i class="bi bi-plus-lg me-2"></i>INSERIR NOVO
                         </a>
-                        <a href="{{ url_for('tabela_geral') }}"
-                            class="btn btn-outline-primary shadow-sm px-3 fw-bold border-2">
+                        <a href="{{ url_for('tabela_geral') }}" class="btn btn-outline-primary shadow-sm px-3 fw-bold">
                             <i class="bi bi-table me-2"></i>TABELA GERAL
                         </a>
                     </div>
                 </div>
 
-                <div class="mt-4 no-print">
-                    <input type="text" id="searchInput" class="form-control search-container shadow-sm"
-                        placeholder="🔎 Pesquisar por anilha, nome, cor ou linhagem...">
+                <div class="mt-4">
+                    <input type="text" id="searchInput" class="form-control search-container"
+                        placeholder="Pesquisar anilha, nome...">
                 </div>
             </div>
 
-            <div class="card-body p-0 bg-white">
+            <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="pomboTable">
-                        <thead class="table-light text-uppercase small fw-bold text-muted">
+                        <thead class="table-light text-uppercase small">
                             <tr>
-                                <th class="ps-4 py-3 border-0">Anilha</th>
-                                <th class="py-3 border-0">Ano</th>
-                                <th class="py-3 border-0">Cor</th>
-                                <th class="py-3 border-0">Nome</th>
-                                <th class="text-center py-3 border-0">Sexo</th>
-                                <th class="py-3 border-0">Categoria</th>
-                                <th class="d-print-none py-3 border-0">Pai</th>
-                                <th class="d-print-none py-3 border-0">Mãe</th>
-                                <th class="text-center d-print-none pe-4 py-3 border-0">Ações</th>
+                                <th class="ps-4 py-3">Anilha</th>
+                                <th>Ano</th>
+                                <th>Cor</th>
+                                <th>Nome</th>
+                                <th class="text-center">Sexo</th>
+                                <th>Categoria</th>
+                                <th class="text-center pe-4">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for p in pombos %}
-                            <tr {% if p.oculto %}class="opacity-50" style="background-color: #fcfcfc;" {% endif %}>
+                            <tr>
                                 <td class="ps-4 fw-bold text-primary">{{ p.anilha }}</td>
                                 <td>{{ p.ano }}</td>
                                 <td>{{ p.cor or '-' }}</td>
                                 <td>{{ p.nome or '-' }}</td>
                                 <td class="text-center">
                                     {% if p.sexo == 'Macho' %}
-                                    <span class="text-primary fw-bold">M</span>
+                                    <span class="sexo-m">M</span>
                                     {% elif p.sexo == 'Fêmea' %}
-                                    <span class="text-danger fw-bold">F</span>
+                                    <span class="sexo-f">F</span>
                                     {% else %}
-                                    <span class="text-muted">?</span>
+                                    <span>-</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     <span
-                                        class="badge {% if p.categoria == 'Voador' %}bg-info{% elif p.categoria == 'Reprodutor' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill px-3">
+                                        class="badge {% if p.categoria == 'Voador' %}bg-info{% else %}bg-primary{% endif %} rounded-pill px-3">
                                         {{ p.categoria }}
                                     </span>
                                 </td>
-                                <td class="d-print-none">{{ p.pai or '-' }}</td>
-                                <td class="d-print-none">{{ p.mae or '-' }}</td>
-                                <td class="text-center pe-4 d-print-none">
-                                    <div class="d-flex justify-content-center gap-1">
-                                        <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn-tabela-geral"
-                                            title="Editar">
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ url_for('editar_pombo', id=p.id) }}"
+                                            class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger border-0"
+                                        <button class="btn btn-sm btn-outline-danger"
                                             onclick="confirmarEliminarUser('{{ p.id }}', '{{ p.anilha }}')">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -119,15 +120,19 @@
                 </div>
             </div>
 
-            <div class="card-footer bg-white border-0 p-4 text-end no-print">
-                <button onclick="window.print()"
-                    class="print-container d-inline-flex border-primary text-primary bg-white px-4 py-2 rounded-pill fw-bold shadow-sm"
-                    style="border: 1px solid;">
-                    <i class="bi bi-printer me-2"></i> IMPRIMIR LISTA
-                </button>
-            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let filter = this.value.toUpperCase();
+        let rows = document.querySelector("#pomboTable tbody").rows;
+        for (let i = 0; i < rows.length; i++) {
+            let text = rows[i].textContent.toUpperCase();
+            rows[i].style.display = text.includes(filter) ? "" : "none";
+        }
+    });
+</script>
 
 {% endblock %}
