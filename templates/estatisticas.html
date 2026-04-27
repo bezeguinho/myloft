@@ -14,20 +14,28 @@
         border-bottom: 1px solid #dee2e6 !important;
         padding: 0.75rem 0.5rem !important;
         white-space: nowrap;
+        /* Garante que todas as linhas tenham a mesma altura */
+        height: 55px;
     }
 
-    /* ESTILO PARA AS LINHAS DE TOTAIS (VOADORES E GERAL) */
+    /* ==== LINHAS DE TOTAIS (Fundo sombreado e Texto Amarelo) ==== */
     .linha-destaque-total td {
         color: #d4a017 !important;
         background-color: #f8f9fa !important;
         font-weight: bold !important;
         border-bottom: none !important;
         text-transform: uppercase;
-        /* Esta linha abaixo cria a borda contínua que pediste */
         border-top: 1px solid #dee2e6 !important;
+        /* Linha contínua acima do total */
     }
 
-    /* Removemos a borda da célula Borrachos para não duplicar com a nova borda do Total */
+    /* ==== LINHA DOS REPRODUTORES (Correção da linha e altura) ==== */
+    .linha-reprodutores td {
+        border-top: 1px solid #dee2e6 !important;
+        /* Força a linha contínua acima dos reprodutores */
+        height: 55px !important;
+    }
+
     .linha-pre-total td {
         border-bottom: none !important;
     }
@@ -58,7 +66,8 @@
     }
 
     .spacer-row td {
-        height: 15px;
+        height: 20px;
+        /* Espaço entre blocos */
         border: none !important;
         padding: 0 !important;
         background-color: transparent !important;
@@ -76,6 +85,7 @@
         .table-stats td,
         .table-stats th {
             padding: 0.5rem 0.25rem !important;
+            height: auto;
         }
 
         .ps-inicio {
@@ -149,7 +159,7 @@
                                 <td colspan="6"></td>
                             </tr>
 
-                            <tr class="linha-pre-total">
+                            <tr class="linha-reprodutores">
                                 <td class="ps-inicio texto-principal">REPRODUTORES</td>
                                 <td class="text-start"></td>
                                 <td class="text-center fw-bold fs-5">{{ stats.reprodutores }}</td>
