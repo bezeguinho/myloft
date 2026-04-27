@@ -2,33 +2,33 @@
 
 {% block content %}
 <style>
-    /* Estilos preservados e ligeiramente afinados para o novo cartão */
     .table-stats {
         border-collapse: collapse !important;
         width: 100%;
         border: none !important;
     }
 
-    /* Reset total: removemos todas as bordas padrão */
     .table-stats td,
     .table-stats th {
         border: none !important;
         border-bottom: 1px solid #dee2e6 !important;
         padding: 0.75rem 0.5rem !important;
-        /* Um pouco mais de respiro na altura */
         white-space: nowrap;
     }
 
-    /* LINHA EM NEGRITO (Para Totais) */
+    /* ==== LINHAS DOS TOTAIS ==== */
     .linha-destaque-total td {
-        color: #2e7d32 !important;
-        font-weight: bold !important;
-        border-bottom: 2.5px solid #333 !important;
-        text-transform: uppercase;
-    }
+        /* Amarelo dourado para garantir que se lê bem no fundo claro */
+        color: #d4a017 !important;
 
-    .border-top-destaque {
-        border-top: 2.5px solid #333 !important;
+        /* Mesmo fundo sombreado da linha de cabeçalho */
+        background-color: #f8f9fa !important;
+
+        font-weight: bold !important;
+
+        /* Mantém apenas a linha cinzenta fininha normal, removendo o preto grosso */
+        border-bottom: 1px solid #dee2e6 !important;
+        text-transform: uppercase;
     }
 
     .texto-principal {
@@ -86,13 +86,13 @@
 
 <div class="row justify-content-center">
     <div class="col-12 col-xl-10">
+
         <div class="card shadow border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
 
             <div class="card-body p-4 p-md-5 bg-white border-bottom">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
                         <h2 class="fw-bold text-primary m-0 text-uppercase">Tabela Geral</h2>
-                        <p class="text-muted small mb-0">Resumo estatístico do teu pombal</p>
                     </div>
 
                     <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm px-4 fw-bold">
@@ -167,16 +167,12 @@
                             </tr>
 
                             <tr class="linha-destaque-total">
-                                <td class="ps-inicio py-3 texto-principal border-top-destaque">TOTAL GERAL</td>
-                                <td class="text-start border-top-destaque"></td>
-                                <td class="text-center fs-4 border-top-destaque">{{ stats.voadores + stats.reprodutores
-                                    }}</td>
-                                <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_f +
-                                    stats.reprodutores_f }}</td>
-                                <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_m +
-                                    stats.reprodutores_m }}</td>
-                                <td class="text-center fs-4 border-top-destaque">{{ stats.voadores_i +
-                                    stats.reprodutores_i }}</td>
+                                <td class="ps-inicio py-3 texto-principal">TOTAL GERAL</td>
+                                <td class="text-start"></td>
+                                <td class="text-center fs-4">{{ stats.voadores + stats.reprodutores }}</td>
+                                <td class="text-center fs-4">{{ stats.voadores_f + stats.reprodutores_f }}</td>
+                                <td class="text-center fs-4">{{ stats.voadores_m + stats.reprodutores_m }}</td>
+                                <td class="text-center fs-4">{{ stats.voadores_i + stats.reprodutores_i }}</td>
                             </tr>
                         </tbody>
                     </table>
