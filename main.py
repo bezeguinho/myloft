@@ -339,7 +339,7 @@ def editar_pombo(id):
             flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
-    
+
 @app.route("/ver_pombo/<int:id>")
 @login_required
 def ver_pombo(id):
@@ -573,5 +573,9 @@ def ganhar_poderes_secretos():
     db.session.commit()
     return "<h3>BOOOM! Agora és o Dono Disto Tudo!</h3><p><a href='/admin/dashboard'>Entrar no Painel Secreto</a></p>"
 
+@app.route("/fix-tabela")
+def tabela_geral():
+    return redirect(url_for('estatisticas'))
+    
 if __name__ == "__main__":
     app.run(debug=True)
