@@ -161,16 +161,20 @@
                                 </td>
                                 <td class="d-print-none">{{ p.pai or '-' }}</td>
                                 <td class="d-print-none">{{ p.mae or '-' }}</td>
-                                <td class="text-center pe-4 d-print-none">
+                                <td class="text-center pe-4">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ url_for('editar_pombo', id=p.id) }}" class="btn-acao-editar"
-                                            title="Editar">
-                                            <i class="bi bi-pencil me-1"></i> EDITAR
+
+                                        <a href="{{ url_for('editar_pombo', id=p.id) }}"
+                                            class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center">
+                                            <i class="bi bi-pencil-square me-2"></i> Editar
                                         </a>
-                                        <button type="button" class="btn-acao-eliminar"
-                                            onclick="confirmarEliminarUser('{{ p.id }}', '{{ p.anilha }}')">
-                                            <i class="bi bi-trash me-1"></i> ELIMINAR
+
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center"
+                                            onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                            <i class="bi bi-trash me-2"></i> Eliminar
                                         </button>
+
                                     </div>
                                 </td>
                             </tr>
