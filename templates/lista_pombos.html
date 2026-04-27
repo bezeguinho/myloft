@@ -2,65 +2,88 @@
 {% block content %}
 
 <style>
+    /* BOTÃO ADICIONAR (Execução) - Padrão: Azul/Branco | Hover: Azul/Preto */
+    .btn-adicionar {
+        background-color: #0056d2 !important;
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-adicionar:hover {
+        background-color: #0044a8 !important;
+        color: black !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* BOTÃO VOLTAR (Retrocesso) - Padrão: Amarelo/Preto | Hover: Amarelo/Branco */
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: black !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-voltar:hover {
+        background-color: #e6b800 !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* BOTÕES SECUNDÁRIOS (Tabela Geral e Imprimir) com Hover Ativo */
+    .btn-tabela-geral,
+    .print-container {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6 !important;
+        color: #0056d2 !important;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .btn-tabela-geral:hover,
+    .print-container:hover {
+        background-color: #0056d2 !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Outros estilos necessários */
     .count-box {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6;
         border-radius: 8px;
         padding: 4px 12px;
         font-weight: bold;
-        color: #0d6efd;
-        min-width: 50px;
-        text-align: center;
-        display: inline-block;
-    }
-
-    /* Estilo para os botões de ação com texto */
-    .btn-acao-editar {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        color: #0d6efd;
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-weight: bold;
-        font-size: 0.75rem;
-        text-decoration: none;
-        transition: 0.3s;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .btn-acao-editar:hover {
-        background-color: #0d6efd;
-        color: white !important;
-    }
-
-    .btn-acao-eliminar {
-        background-color: #fff5f5;
-        border: 1px solid #feb2b2;
-        color: #c53030;
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-weight: bold;
-        font-size: 0.75rem;
-        transition: 0.3s;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .btn-acao-eliminar:hover {
-        background-color: #c53030;
-        color: white !important;
+        color: #0056d2;
     }
 
     .anilha-link {
-        color: #0d6efd;
+        color: #0056d2;
+        font-weight: bold;
         text-decoration: none;
-        transition: 0.2s;
     }
 
     .anilha-link:hover {
         text-decoration: underline;
-        color: #004da8;
     }
 </style>
 

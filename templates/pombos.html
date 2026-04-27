@@ -1,51 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    /* ... teus estilos anteriores (btn-voltar, btn-adicionar, etc.) ... */
+    /* BOTÃO ADICIONAR (Execução) - Padrão: Azul/Branco | Hover: Azul/Preto */
+    .btn-adicionar {
+        background-color: #0056d2 !important;
+        color: white !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
 
-    /* Botão Tabela Geral - Melhorado o Hover */
-    .btn-tabela-geral {
+    .btn-adicionar:hover {
+        background-color: #0044a8 !important;
+        color: black !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* BOTÃO VOLTAR (Retrocesso) - Padrão: Amarelo/Preto | Hover: Amarelo/Branco */
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: black !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-voltar:hover {
+        background-color: #e6b800 !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* BOTÕES SECUNDÁRIOS (Tabela Geral e Imprimir) com Hover Ativo */
+    .btn-tabela-geral,
+    .print-container {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6 !important;
         color: #0056d2 !important;
         border-radius: 8px;
-        padding: 4px 15px;
+        padding: 8px 15px;
         font-weight: bold;
-        font-size: 0.9rem;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .btn-tabela-geral:hover,
+    .print-container:hover {
+        background-color: #0056d2 !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Outros estilos necessários */
+    .count-box {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-weight: bold;
+        color: #0056d2;
+    }
+
+    .anilha-link {
+        color: #0056d2;
+        font-weight: bold;
         text-decoration: none;
     }
 
-    .btn-tabela-geral:hover {
-        background-color: #0056d2 !important;
-        color: white !important;
-        box-shadow: 0 4px 8px rgba(0, 86, 210, 0.2);
-        transform: translateY(-1px);
+    .anilha-link:hover {
+        text-decoration: underline;
     }
-
-    /* Botão Imprimir Lista - Melhorado o Hover */
-    .print-container {
-        border: 1px solid #0056d2;
-        border-radius: 8px;
-        padding: 8px 15px;
-        background: white;
-        color: #0056d2;
-        cursor: pointer;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .print-container:hover {
-        background: #0056d2 !important;
-        color: white !important;
-        box-shadow: 0 4px 12px rgba(0, 86, 210, 0.2);
-        transform: translateY(-1px);
-    }
-
-    /* Resto do CSS mantém-se igual */
 </style>
 
 <div class="container py-4">
@@ -110,7 +148,7 @@
                                 </a>
                             </td>
                             <td>{{ p.ano }}</td>
-                            <td class="pombo-nome">{{ p.nome or '---' }}</td>
+                            <td>{{ p.nome or '---' }}</td>
                             <td class="text-center">
                                 {% if p.sexo == 'Macho' %}
                                 <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
@@ -121,7 +159,12 @@
                                 {% endif %}
                             </td>
                             <td>{{ p.cor or '---' }}</td>
-                            <td>{{ p.categoria }}</td>
+                            <td>
+                                <span
+                                    class="badge {% if p.categoria == 'Voador' %}bg-info text-dark{% else %}bg-primary{% endif %} rounded-pill">
+                                    {{ p.categoria }}
+                                </span>
+                            </td>
                             <td class="small">
                                 <div><span class="fw-bold text-muted">P:</span> {{ p.pai or '---' }}</div>
                                 <div><span class="fw-bold text-muted">M:</span> {{ p.mae or '---' }}</div>
@@ -129,13 +172,12 @@
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2 px-2">
                                     <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                        class="btn btn-sm btn-outline-primary fw-bold px-3 d-flex align-items-center">
-                                        <i class="bi bi-pencil-square me-2"></i> Editar
+                                        class="btn btn-sm btn-outline-primary fw-bold px-3">
+                                        <i class="bi bi-pencil-square me-1"></i> Editar
                                     </a>
-                                    <button type="button"
-                                        class="btn btn-sm btn-outline-danger fw-bold px-3 d-flex align-items-center"
+                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold px-3"
                                         onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                        <i class="bi bi-trash me-2"></i> Eliminar
+                                        <i class="bi bi-trash me-1"></i> Eliminar
                                     </button>
                                 </div>
                             </td>
