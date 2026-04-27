@@ -136,20 +136,19 @@
     }
 
 
-    <style>
-
-    /* Este código garante o azul, o negrito e o sublinhado */
-    a.anilha-link {
+    /* Forçar azul e negrito em qualquer elemento com esta classe */
+    .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
         cursor: pointer !important;
     }
 
-    a.anilha-link:hover {
+    .anilha-link:hover {
         text-decoration: underline !important;
         color: #0033a0 !important;
     }
+</style>
 </style>
 
 <div class="container py-4">
@@ -225,23 +224,15 @@
                         </td>
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
-                            {% if p.pai_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
-                                {{ p.pai }}
+                            <a href="/pombo/{{ p.pai_id }}" class="anilha-link">
+                                {{ p.pai if p.pai else '---' }}
                             </a>
-                            {% else %}
-                            <span class="text-muted">{{ p.pai or '---' }}</span>
-                            {% endif %}
                         </td>
 
                         <td class="align-middle">
-                            {% if p.mae_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
-                                {{ p.mae }}
+                            <a href="/pombo/{{ p.mae_id }}" class="anilha-link">
+                                {{ p.mae if p.mae else '---' }}
                             </a>
-                            {% else %}
-                            <span class="text-muted">{{ p.mae or '---' }}</span>
-                            {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
                             <div class="d-flex justify-content-center align-items-center gap-2">
