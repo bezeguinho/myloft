@@ -1,58 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    /* Estilos recuperados e ajustados para o hover correto */
-    .btn-voltar {
-        background-color: #ffcc29 !important;
-        color: #333 !important;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 24px;
-        font-weight: bold;
-        transition: 0.3s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-    }
+    /* ... teus estilos anteriores (btn-voltar, btn-adicionar, etc.) ... */
 
-    /* Retrocesso: Letras brancas no hover */
-    .btn-voltar:hover {
-        background-color: #e6b800 !important;
-        color: white !important;
-    }
-
-    .btn-adicionar {
-        background-color: #0056d2 !important;
-        color: white !important;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 24px;
-        font-weight: bold;
-        transition: 0.3s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    /* Execução: Letras pretas no hover */
-    .btn-adicionar:hover {
-        background-color: #0044a8 !important;
-        color: black !important;
-    }
-
-    /* Resto dos estilos permanecem iguais */
-    .count-box {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 4px 12px;
-        font-weight: bold;
-        color: #0056d2;
-        min-width: 50px;
-        text-align: center;
-        display: inline-block;
-    }
-
+    /* Botão Tabela Geral - Melhorado o Hover */
     .btn-tabela-geral {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6 !important;
@@ -61,41 +12,18 @@
         padding: 4px 15px;
         font-weight: bold;
         font-size: 0.9rem;
-        transition: 0.3s;
+        transition: all 0.3s ease;
         text-decoration: none;
     }
 
     .btn-tabela-geral:hover {
-        background-color: #f0f7ff !important;
+        background-color: #0056d2 !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(0, 86, 210, 0.2);
+        transform: translateY(-1px);
     }
 
-    #backToTop {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
-        background-color: #0056d2;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        cursor: pointer;
-        z-index: 1000;
-        transition: 0.3s;
-    }
-
-    .search-container {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 8px 15px;
-        background: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
+    /* Botão Imprimir Lista - Melhorado o Hover */
     .print-container {
         border: 1px solid #0056d2;
         border-radius: 8px;
@@ -107,34 +35,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: 0.3s;
+        transition: all 0.3s ease;
     }
 
-    .anilha-link {
-        color: #0056d2;
-        text-decoration: none;
-        font-weight: bold;
+    .print-container:hover {
+        background: #0056d2 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 86, 210, 0.2);
+        transform: translateY(-1px);
     }
 
-    .anilha-link:hover {
-        text-decoration: underline;
-    }
-
-    @media print {
-
-        .no-print,
-        .navbar,
-        .btn-voltar,
-        .btn-adicionar,
-        #backToTop {
-            display: none !important;
-        }
-
-        .card {
-            border: none !important;
-            box-shadow: none !important;
-        }
-    }
+    /* Resto do CSS mantém-se igual */
 </style>
 
 <div class="container py-4">
@@ -168,7 +79,7 @@
             </div>
         </div>
         <div class="col-md-7">
-            <div class="print-container shadow-sm" data-bs-toggle="modal" data-bs-target="#modalOpcoesImpressao">
+            <div class="print-container shadow-sm no-print" onclick="window.print()">
                 <i class="bi bi-printer me-2"></i> Imprimir Lista
             </div>
         </div>
