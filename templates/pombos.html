@@ -221,17 +221,15 @@
                             {% else %}
                             <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
                             {% endif %}
-                        </td>
-                        <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
                             <a href="{{ url_for('ver_pombo', id=p.pai_id) if p.pai_id else '#' }}" class="anilha-link">
-                                {{ p.pai or '---' }}
+                                {{ p.pai }} | ID: {{ p.pai_id }}
                             </a>
                         </td>
 
                         <td class="align-middle">
                             <a href="{{ url_for('ver_pombo', id=p.mae_id) if p.mae_id else '#' }}" class="anilha-link">
-                                {{ p.mae or '---' }}
+                                {{ p.mae }} | ID: {{ p.mae_id }}
                             </a>
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
