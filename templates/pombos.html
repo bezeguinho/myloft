@@ -136,18 +136,18 @@
     }
 
 
-    /* Estilo Base para Anilhas, Pais e Mães */
+    /* Estilo para os links e textos das anilhas */
     .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
-        display: inline-block;
     }
 
-    /* Forçar o sublinhado ao passar o rato */
+    /* Forçar sublinhado ao passar o rato */
     .anilha-link:hover {
         text-decoration: underline !important;
         cursor: pointer !important;
+        color: #0033a0 !important;
     }
 </style>
 
@@ -207,13 +207,17 @@
                     <tbody>
                         {% for p in pombos %}
                         <tr class="pombo-row">
-                            <td class="ps-4">
+                            <td class="ps-4 align-middle">
                                 <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
                             </td>
-                            <td>{{ p.ano }}</td>
-                            <td>{{ p.cor or '---' }}</td>
-                            <td>{{ p.nome or '---' }}</td>
-                            <td class="text-center">
+
+                            <td class="align-middle">{{ p.ano }}</td>
+
+                            <td class="align-middle">{{ p.cor or '---' }}</td>
+
+                            <td class="align-middle">{{ p.nome or '---' }}</td>
+
+                            <td class="text-center align-middle">
                                 {% if p.sexo == 'Macho' %}
                                 <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
                                 {% elif p.sexo == 'Fêmea' %}
@@ -221,32 +225,37 @@
                                 {% else %}
                                 <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
                                 {% endif %}
+                            </td>
+
+                            <td class="align-middle text-dark fw-medium">
+                                {{ p.categoria }}
+                            </td>
+
                             <td class="align-middle">
                                 {% if p.pai_id %}
-                                <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
-                                    {{ p.pai }}
-                                </a>
+                                <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">{{ p.pai }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default;">{{ p.pai or '---' }}</span>
+                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
+                                    p.pai or '---' }}</span>
                                 {% endif %}
                             </td>
 
                             <td class="align-middle">
                                 {% if p.mae_id %}
-                                <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
-                                    {{ p.mae }}
-                                </a>
+                                <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">{{ p.mae }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default;">{{ p.mae or '---' }}</span>
+                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
+                                    p.mae or '---' }}</span>
                                 {% endif %}
                             </td>
-                            <td class="text-center" style="width: 230px; min-width: 230px;">
+
+                            <td class="text-center align-middle" style="width: 230px;">
                                 <div class="d-flex justify-content-center align-items-center gap-2">
                                     <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                        class="btn btn-sm btn-outline-primary fw-bold btn-horizontal">
+                                        class="btn btn-sm btn-outline-primary fw-bold">
                                         <i class="bi bi-pencil-square"></i> Editar
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
+                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
                                         onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
                                         <i class="bi bi-trash"></i> Eliminar
                                     </button>
