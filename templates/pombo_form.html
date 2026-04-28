@@ -88,21 +88,23 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Pai</label>
-                                <select name="pai_id" id="pai_id" class="form-select">
+                                <select name="pai" id="pai" class="form-select">
                                     <option value="">-- Selecione o Pai --</option>
                                     {% for m in machos %}
-                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
-                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})</option>
+                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and
+                                        pombo.pai|string==m.id|string %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Mãe</label>
-                                <select name="mae_id" id="mae_id" class="form-select">
+                                <select name="mae" id="mae" class="form-select">
                                     <option value="">-- Selecione a Mãe --</option>
                                     {% for f in femeas %}
-                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
-                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})</option>
+                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and
+                                        pombo.mae|string==f.id|string %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -163,12 +165,12 @@
                                     <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
                                     <textarea name="obs" id="obs" class="form-control"
                                         style="width: 250px; height: 250px; resize: none; overflow: hidden;"
-                                        maxlength="100"
-                                        oninput="if(this.value.length > 100) this.value = this.value.substring(0, 100);">{{ pombo.obs if pombo else '' }}</textarea>
+                                        maxlength="200"
+                                        oninput="if(this.value.length > 200) this.value = this.value.substring(0, 200);">{{ pombo.obs if pombo else '' }}</textarea>
 
                                     <div class="text-muted mt-1 fw-bold"
                                         style="width: 250px; text-align: right; font-size: 0.8rem;">
-                                        <span id="char_count">0</span> / 100 carateres
+                                        <span id="char_count">0</span> / 200 carateres
                                     </div>
                                 </div>
 
@@ -192,6 +194,7 @@
 </div>
 
 <script>
+    // Mostrar/Esconder Cedido
     const selectCat = document.getElementById('categoria_select');
     const linhaCedido = document.getElementById('linha_cedido');
 
@@ -205,14 +208,33 @@
     // Filtro biológico: impede selecionar pais mais novos que o pombo
     document.getElementById('ano_select').addEventListener('change', function () {
         var anoFilho = parseInt(this.value);
-        ['pai_id', 'mae_id'].forEach(function (id) {
+        // Atualizado aqui: de 'pai_id'/'mae_id' para 'pai'/'mae'
+        ['pai', 'mae'].forEach(function (id) {
             var select = document.getElementById(id);
-            for (var i = 1; i < select.options.length; i++) {
-                var anoP = parseInt(select.options[i].getAttribute('data-ano'));
-                select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
+            if (select) {
+                for (var i = 1; i < select.options.length; i++) {
+                    var anoP = parseInt(select.options[i].getAttribute('data-ano'));
+                    select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
+                }
             }
         });
     });
+
+    // Contador de carateres da Descrição
+    const obsInput = document.getElementById('obs');
+    const charCount = document.getElementById('char_count');
+
+    function updateCounter() {
+        if (obsInput) {
+            charCount.textContent = obsInput.value.length;
+        }
+    }
+
+    if (obsInput) {
+        obsInput.addEventListener('input', updateCounter);
+        // Ao abrir a página de edição, o contador já soma as letras que lá estão
+        updateCounter();
+    }
 </script>
 
 {% endblock %}
