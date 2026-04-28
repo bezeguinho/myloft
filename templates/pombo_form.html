@@ -48,7 +48,11 @@
                 <div class="card-body p-4">
 
                     <h2 class="fw-bold text-primary mb-4 text-uppercase text-center">
-                        {% if pombo %}Editar Pombo: {{ pombo.anilha }}{% else %}Inserir Novo Pombo{% endif %}
+                        {% if pombo %}
+                        Editar Pombo: {{ pombo.anilha }}
+                        {% else %}
+                        Inserir Novo Pombo
+                        {% endif %}
                     </h2>
 
                     <form method="POST">
@@ -69,6 +73,9 @@
                                     </option>
                                     {% endfor %}
                                 </select>
+                                {% if pombo %}
+                                <input type="hidden" name="ano" value="{{ pombo.ano }}">
+                                {% endif %}
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Nome</label>
@@ -106,7 +113,7 @@
                         </div>
 
                         <div class="row align-items-end">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Sexo</label>
                                 <select name="sexo" class="form-select" required>
                                     <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
@@ -132,7 +139,7 @@
                                         %}>Cedido</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-5 mb-3">
                                 <div class="d-flex align-items-center justify-content-between border rounded px-2 bg-light"
                                     style="height: 38px;">
                                     <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
@@ -143,8 +150,8 @@
                         </div>
 
                         <div class="row" id="linha_cedido">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-5 mb-3">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6 mb-3">
                                 <div class="cedido-container">
                                     <label class="fw-bold small mb-0" style="color: black;">Cedido a:</label>
                                     <input type="text" name="cedido_a" class="form-control form-control-sm"
