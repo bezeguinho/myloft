@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} p-2 small text-center" role="alert">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 <style>
     /* Padrões de botões e hovers */
     .btn-gravar {
@@ -57,13 +63,17 @@
                                     style="background-color: #eee;" {% endif %}
                                     value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
                                     autofocus>
+                                style="background-color: #eee;" {% endif %}
+                                value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
+                                autofocus>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
                                 <select name="ano" class="form-select" id="ano_select" required {% if pombo %}disabled
                                     style="background-color: #eee;" {% endif %}>
-                                    <option value="" disabled hidden {% if not pombo and not sugerir_ano %}selected{%
-                                        endif %}>Escolha..</option>
+                                    <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
+                                        (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
+                                    endif %}>Escolha..</option>
                                     {% for a in anos_lista %}
                                     <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
                                         (sugerir_ano|string==a|string) %}selected{% endif %}>

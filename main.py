@@ -220,10 +220,10 @@ def api_pombo_existe(search):
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    # 1. Captura sugestões do URL (usado para o número seguinte +1)
+    # Captura sugestões (para o +1)
     sugerir_anilha = request.args.get('sugerir_anilha', '')
     sugerir_ano = request.args.get('sugerir_ano', '')
-
+    
     anos_lista = list(range(datetime.now().year, 1990, -1))
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
@@ -232,44 +232,34 @@ def novo_pombo():
         anilha = request.form.get('anilha')
         ano = int(request.form.get('ano') or 0)
 
-        # 2. VALIDAÇÃO: Bloquear duplicados (Anilha + Ano) para o mesmo utilizador
+        # VALIDAÇÃO: Bloqueia se já existir Anilha + Ano para este utilizador
         existe = Pombo.query.filter_by(anilha=anilha, ano=ano, user_id=current_user.id).first()
         if existe:
-            flash(f"Atenção! O pombo {anilha} de {ano} já está registado.", "danger")
-            # Devolvemos a página com os dados para não teres de escrever tudo de novo
-            return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None)
+            flash(f"Erro: O pombo {anilha}/{ano} já está registado!", "danger")
+            return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=anilha, sugerir_ano=ano)
 
-        # 3. GRAVAÇÃO
+        # GRAVAÇÃO
         novo = Pombo(
-            anilha=anilha,
-            nome=request.form.get('nome'),
-            ano=ano,
-            sexo=request.form.get('sexo'),
-            cor=request.form.get('cor'),
-            categoria=request.form.get('categoria'),
-            pai=request.form.get('pai') or None,
-            mae=request.form.get('mae') or None,
-            obs=request.form.get('obs'),
-            cedido_a=request.form.get('cedido_a'),
-            user_id=current_user.id,
+            anilha=anilha, nome=request.form.get('nome'), ano=ano,
+            sexo=request.form.get('sexo'), cor=request.form.get('cor'),
+            categoria=request.form.get('categoria'), pai=request.form.get('pai') or None,
+            mae=request.form.get('mae') or None, obs=request.form.get('obs'),
+            cedido_a=request.form.get('cedido_a'), user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
         db.session.add(novo)
         db.session.commit()
 
-        # 4. LÓGICA DO NÚMERO SEGUINTE
+        # PREPARAR PRÓXIMO NÚMERO
         try:
-            proxima_anilha = str(int(anilha) + 1)
+            proxima = str(int(anilha) + 1)
         except:
-            proxima_anilha = "" # Se a anilha tiver letras, não sugerimos nada
+            proxima = ""
 
-        flash("Pombo registado com sucesso!", "success")
-        # Redireciona para o "Novo" mas passa o próximo número e o mesmo ano pelo link
-        return redirect(url_for('novo_pombo', sugerir_anilha=proxima_anilha, sugerir_ano=ano))
+        flash("Pombo gravado!", "success")
+        return redirect(url_for('novo_pombo', sugerir_anilha=proxima, sugerir_ano=ano))
 
-    return render_template("pombo_form.html", 
-                           anos_lista=anos_lista, machos=machos, femeas=femeas, 
-                           pombo=None, sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
+    return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
