@@ -179,7 +179,7 @@
                                         </a>
                                         <button type="button"
                                             class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
-                                            onclick="if(confirm('Tem a certeza que deseja eliminar o pombo {{ p.anilha }}?')) { window.location.href='/eliminar_pombo/{{ p.id }}'; }">
+                                            onclick="if(confirm('Tem a certeza que deseja eliminar o pombo {{ p.anilha }}?')) { window.location.href='/eliminar_pombo/{{ p.id }}'; } else { event.preventDefault(); }">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </div>
