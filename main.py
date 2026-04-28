@@ -324,8 +324,8 @@ def editar_pombo(id):
         pombo.sexo = request.form.get('sexo')
         pombo.cor = request.form.get('cor')
         pombo.categoria = request.form.get('categoria')
-        pombo.pai = request.form.get('pai')
-        pombo.mae = request.form.get('mae')
+        pai_id = request.form.get('pai_id')
+        mae_id = request.form.get('mae_id')
         pombo.obs = request.form.get('obs')
         pombo.cedido_a = request.form.get('cedido_a')
         pombo.oculto = True if request.form.get('oculto') == 'on' else False
@@ -337,6 +337,12 @@ def editar_pombo(id):
         except Exception as e:
             db.session.rollback()
             flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
+            # 1. Colas estas duas linhas antes do return
+    machos = Pombo.query.filter_by(sexo='Macho').order_by(Pombo.anilha).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea').order_by(Pombo.anilha).all()
+
+    # 2. No teu return, tens de ADICIONAR o machos=machos e femeas=femeas
+    return render_template('pombo_form.html', pombo=pombo, machos=machos, femeas=femeas)
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
 

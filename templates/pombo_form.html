@@ -123,15 +123,30 @@
                     </div>
 
                     <div class="row g-3 mb-4 text-uppercase fw-bold small align-items-start">
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">Nº PAI</label>
-                            <input type="text" name="pai" class="form-control caixa-input w-md-140"
-                                value="{{ pombo.pai if modo_edicao else '' }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pai:</label>
+                            <select name="pai_id" id="pai_id" class="form-select">
+                                <option value="">-- Selecione o Pai (Machos) --</option>
+                                {% for m in machos %}
+                                <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
+                                    %}selected{% endif %}>
+                                    {{ m.anilha }} ({{ m.ano }})
+                                </option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label">Nº MÃE</label>
-                            <input type="text" name="mae" class="form-control caixa-input w-md-140"
-                                value="{{ pombo.mae if modo_edicao else '' }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mãe:</label>
+                            <select name="mae_id" id="mae_id" class="form-select">
+                                <option value="">-- Selecione a Mãe (Fêmeas) --</option>
+                                {% for f in femeas %}
+                                <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
+                                    %}selected{% endif %}>
+                                    {{ f.anilha }} ({{ f.ano }})
+                                </option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-12 col-md-auto">
                             <label class="form-label">SEXO</label>
