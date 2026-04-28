@@ -267,7 +267,6 @@ def novo_pombo():
                            machos=machos, 
                            femeas=femeas,
                            pombo=None)
-
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
 @login_required
 def editar_pombo(id):
