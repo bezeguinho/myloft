@@ -136,15 +136,15 @@
     }
 
 
-    /* Cor azul e negrito para todos */
+    /* Esta regra obriga TUDO o que for anilha-link a ser azul e negrito */
     .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
     }
 
-    /* FORÇAR o sublinhado especificamente nos links quando o rato passa */
-    a.anilha-link:hover {
+    /* Esta regra obriga a sublinhar quando o rato passa por cima */
+    .anilha-link:hover {
         text-decoration: underline !important;
         color: #0033a0 !important;
         cursor: pointer !important;
@@ -224,23 +224,15 @@
                         </td>
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
-                            {% if p.pai_id and p.pai_id != None and p.pai_id != '' %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
-                                {{ p.pai }}
+                            <a href="{{ url_for('ver_pombo', id=p.pai_id) if p.pai_id else '#' }}" class="anilha-link">
+                                {{ p.pai or '---' }}
                             </a>
-                            {% else %}
-                            <span class="text-muted">{{ p.pai or '---' }}</span>
-                            {% endif %}
                         </td>
 
                         <td class="align-middle">
-                            {% if p.mae_id and p.mae_id != None and p.mae_id != '' %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
-                                {{ p.mae }}
+                            <a href="{{ url_for('ver_pombo', id=p.mae_id) if p.mae_id else '#' }}" class="anilha-link">
+                                {{ p.mae or '---' }}
                             </a>
-                            {% else %}
-                            <span class="text-muted">{{ p.mae or '---' }}</span>
-                            {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
                             <div class="d-flex justify-content-center align-items-center gap-2">
