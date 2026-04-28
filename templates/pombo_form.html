@@ -61,8 +61,9 @@
                                     value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}" {%
                                     if pombo %}readonly{% endif %}
                                     style="{% if not pombo and sugerir_anilha %}color: gray;{% endif %} {% if pombo %}background-color: #eee;{% endif %}"
-                                    onfocus="if(!this.readOnly && this.value == '{{ sugerir_anilha }}') { this.value = ''; this.style.color = 'black'; }"
-                                    oninput="this.style.color='black';" required autofocus>
+                                    onclick="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                    onkeydown="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                    required autofocus>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
