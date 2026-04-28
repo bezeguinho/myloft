@@ -79,20 +79,15 @@
                                     style="background-color: #eee;" {% endif %}>
                                     <option value="" disabled hidden {% if not pombo and not sugerir_ano %}selected{%
                                         endif %}>Escolha..</option>
-
                                     {% for a in anos_lista %}
                                     <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
-                                        (sugerir_ano|string==a|string) %}selected{% endif %}>
-                                        {{ a }}
-                                    </option>
+                                        (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
                                     {% endfor %}
                                 </select>
-
                                 {% if pombo %}
                                 <input type="hidden" name="ano" value="{{ pombo.ano }}">
                                 {% endif %}
                             </div>
-
                             {% if pombo %}
                             <input type="hidden" name="ano" value="{{ pombo.ano }}">
                             {% endif %}
