@@ -211,6 +211,13 @@
             rows[i].style.display = text.includes(filter) ? "" : "none";
         }
     });
+    function confirmarEliminar(id, anilha) {
+        // Janela de confirmação nativa do navegador
+        if (confirm("Tem a certeza que deseja eliminar o pombo " + anilha + "?\n\nEsta ação pode falhar se o pombo tiver filhos registados.")) {
+            // Se clicar OK, redireciona para a rota de eliminar
+            window.location.href = "/eliminar_pombo/" + id;
+        }
+    }
 </script>
 
 {% endblock %}
