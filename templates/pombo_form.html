@@ -76,24 +76,22 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label fw-bold">Nº ANILHA</label>
-                            <input type="text" name="anilha" class="form-control"
-                                value="{{ pombo.anilha if pombo else '' }}" {% if pombo %}readonly
-                                style="background-color: #e9ecef;" {% endif %} required>
+                            <input type="text" name="anilha" id="anilha_input" class="form-control"
+                                value="{{ pombo.anilha if pombo else proxima_anilha }}" {% if pombo %}readonly
+                                style="background-color: #eee;" {% endif %}>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label fw-bold">ANO</label>
-                            {% if pombo %}
-                            <input type="text" name="ano" class="form-control" value="{{ pombo.ano }}" readonly
-                                style="background-color: #e9ecef;">
-                            {% else %}
-                            <select name="ano" class="form-select" id="ano_pombo" required>
-                                <option value="">Escolha..</option>
-                                {% for a in range(2010, 2027) %}
-                                <option value="{{ a }}">{{ a }}</option>
+                            <select name="ano" id="ano_select" class="form-select" {% if pombo %}disabled
+                                style="background-color: #eee;" {% endif %}>
+                                <option value="">Escolha...</option>
+                                {% for a in anos_lista %}
+                                <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (not pombo and
+                                    ultimo_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
                                 {% endfor %}
                             </select>
-                            {% endif %}
+                            {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
                         </div>
 
                         <div class="col-md-3 mb-3">
@@ -110,31 +108,45 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">PAI:</label>
+                            <label class="form-label fw-bold">PAI</label>
                             <select name="pai_id" id="pai_id" class="form-select">
-                                <option value="">-- Selecione o Pai (Machos) --</option>
+                                <option value="">-- Selecione o Pai --</option>
                                 {% for m in machos %}
                                 <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
                                     %}selected{% endif %}>
-                                    {{ m.anilha }} ({{ m.ano }}) {{ "- " + m.nome if m.nome else "" }}
+                                    {{ m.anilha }} ({{ m.ano }}) {{ m.nome if m.nome else '' }}
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">MÃE:</label>
+                            <label class="form-label fw-bold">MÃE</label>
                             <select name="mae_id" id="mae_id" class="form-select">
-                                <option value="">-- Selecione a Mãe (Fêmeas) --</option>
+                                <option value="">-- Selecione a Mãe --</option>
                                 {% for f in femeas %}
                                 <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
                                     %}selected{% endif %}>
-                                    {{ f.anilha }} ({{ f.ano }}) {{ "- " + f.nome if f.nome else "" }}
+                                    {{ f.anilha }} ({{ f.ano }}) {{ f.nome if f.nome else '' }}
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
+
+                    <script>
+                        // Lógica para filtrar pais mais velhos que o filho
+                        document.getElementById('ano_select').addEventListener('change', function () {
+                            var anoFilho = parseInt(this.value);
+                            ['pai_id', 'mae_id'].forEach(function (id) {
+                                var select = document.getElementById(id);
+                                for (var i = 1; i < select.options.length; i++) {
+                                    var anoProgenitor = parseInt(select.options[i].getAttribute('data-ano'));
+                                    select.options[i].style.display = (anoProgenitor > anoFilho) ? 'none' : 'block';
+                                }
+                            });
+                        });
+                    </script>
                     <div class="row g-3">
                         <div class="col-12 col-md-auto">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
