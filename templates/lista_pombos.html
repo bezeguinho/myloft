@@ -179,7 +179,7 @@
                                         </a>
                                         <button type="button"
                                             class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
-                                            onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                            onclick="if(confirm('Tem a certeza que deseja eliminar o pombo {{ p.anilha }}?')) { window.location.href='/eliminar_pombo/{{ p.id }}'; }">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </div>
@@ -211,13 +211,7 @@
             rows[i].style.display = text.includes(filter) ? "" : "none";
         }
     });
-    function confirmarEliminar(id, anilha) {
-        // Janela de confirmação nativa do navegador
-        if (confirm("Tem a certeza que deseja eliminar o pombo " + anilha + "?\n\nEsta ação pode falhar se o pombo tiver filhos registados.")) {
-            // Se clicar OK, redireciona para a rota de eliminar
-            window.location.href = "/eliminar_pombo/" + id;
-        }
-    }
+
 </script>
 
 {% endblock %}

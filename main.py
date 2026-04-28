@@ -336,19 +336,30 @@ def ver_pombo(id):
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
 
-@app.route("/eliminar_pombo/<int:id>", methods=['POST'])
+@app.route("/eliminar_pombo/<int:id>")
 @login_required
 def eliminar_pombo(id):
-    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
-    anilha = pombo.anilha
+    pombo = Pombo.query.get_or_404(id)
+    
+    # CIRURGIA: Procura filhos onde este pombo é pai ou mãe e limpa a ligação
+    # Isso evita o erro de base de dados (Integridade Referencial)
+    filhos_como_pai = Pombo.query.filter_by(pai=str(pombo.id)).all()
+    for filho in filhos_como_pai:
+        filho.pai = None
+        
+    filhos_como_mae = Pombo.query.filter_by(mae=str(pombo.id)).all()
+    for filho in filhos_como_mae:
+        filho.mae = None
+
     try:
         db.session.delete(pombo)
         db.session.commit()
-        flash(f"Pombo {anilha} eliminado com sucesso.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Erro ao eliminar pombo: {str(e)}", "danger")
-    return redirect(request.referrer or url_for('lista_pombos'))
+        print(f"Erro ao eliminar: {e}")
+        # Aqui podes adicionar uma mensagem de erro para o utilizador se quiseres
+        
+    return redirect(url_for('lista_pombos'))
 
 @app.route("/pombo_por_anilha/<anilha>")
 @login_required
