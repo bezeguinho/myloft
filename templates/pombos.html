@@ -136,22 +136,19 @@
     }
 
 
-    <style>
-
-    /* Regra para links de anilhas e pais */
-    a.anilha-link {
+    /* Cor azul e negrito para todos */
+    .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
     }
 
-    /* Regra para quando o rato passa por cima - FORÇAR */
+    /* FORÇAR o sublinhado especificamente nos links quando o rato passa */
     a.anilha-link:hover {
         text-decoration: underline !important;
         color: #0033a0 !important;
+        cursor: pointer !important;
     }
-</style>
-}
 </style>
 
 <div class="container py-4">
@@ -227,26 +224,22 @@
                         </td>
                         <td class="text-dark fw-medium">{{ p.categoria }}</td>
                         <td class="align-middle">
-                            {% if p.pai_id %}
+                            {% if p.pai_id and p.pai_id != None and p.pai_id != '' %}
                             <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
                                 {{ p.pai }}
                             </a>
                             {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
-                                {{ p.pai or '---' }}
-                            </span>
+                            <span class="text-muted">{{ p.pai or '---' }}</span>
                             {% endif %}
                         </td>
 
                         <td class="align-middle">
-                            {% if p.mae_id %}
+                            {% if p.mae_id and p.mae_id != None and p.mae_id != '' %}
                             <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
                                 {{ p.mae }}
                             </a>
                             {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
-                                {{ p.mae or '---' }}
-                            </span>
+                            <span class="text-muted">{{ p.mae or '---' }}</span>
                             {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
