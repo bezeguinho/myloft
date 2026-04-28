@@ -217,46 +217,56 @@ def api_pombo_existe(search):
         return {"existe": True, "anilha": pombo.anilha, "ano": pombo.ano}
     return {"existe": False}
 
-@app.route("/novo_pombo", methods=['GET', 'POST'])
+@app.route('/novo_pombo', methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    sugerir_anilha = request.args.get('sugerir_anilha', '')
-    sugerir_ano = request.args.get('sugerir_ano', '')
-    
+    # 1. Preparar as listas que o formulário precisa sempre
     anos_lista = list(range(datetime.now().year, 1990, -1))
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
 
+    # 2. Valores iniciais (quando entras na página a primeira vez, tudo vazio)
+    sugerir_anilha = ""
+    sugerir_ano = ""
+
     if request.method == 'POST':
         anilha = request.form.get('anilha')
-        ano = int(request.form.get('ano') or 0)
+        ano = request.form.get('ano')
+        # ... buscar o resto dos campos (nome, cor, etc) ...
 
-        # Validação de duplicado
-        existe = Pombo.query.filter_by(anilha=anilha, ano=ano, user_id=current_user.id).first()
-        if existe:
-            from flask import flash
-            flash(f"O pombo {anilha}/{ano} já existe!", "danger")
-            return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=anilha, sugerir_ano=ano)
-
-        novo = Pombo(
-            anilha=anilha, nome=request.form.get('nome'), ano=ano,
-            sexo=request.form.get('sexo'), cor=request.form.get('cor'),
-            categoria=request.form.get('categoria'), pai=request.form.get('pai') or None,
-            mae=request.form.get('mae') or None, obs=request.form.get('obs'),
-            cedido_a=request.form.get('cedido_a'), user_id=current_user.id,
-            oculto=True if request.form.get('oculto') == 'on' else False
-        )
+        # Criar e guardar o pombo
+        novo = Pombo(anilha=anilha, ano=ano, user_id=current_user.id, ...)
         db.session.add(novo)
         db.session.commit()
+        
+        flash("Pombo gravado com sucesso!", "success")
 
+        # --- AQUI É ONDE A MAGIA ACONTECE ---
+        # Depois de gravar, preparamos a sugestão para o próximo
         try:
-            proxima = str(int(anilha) + 1)
+            sugerir_anilha = int(anilha) + 1  # Pega na anilha que acabou de gravar e soma 1
         except:
-            proxima = ""
+            sugerir_anilha = anilha # Se não for número, repete apenas
+            
+        sugerir_ano = ano # Mantém o mesmo ano que acabaste de usar
+        
+        # Em vez de redirect, fazemos render_template para "ficar" na página com os novos valores
+        return render_template("pombo_form.html", 
+                               sugerir_anilha=sugerir_anilha, 
+                               sugerir_ano=sugerir_ano,
+                               anos_lista=anos_lista, 
+                               machos=machos, 
+                               femeas=femeas,
+                               pombo=None) # pombo=None porque é uma nova inserção
 
-        return redirect(url_for('novo_pombo', sugerir_anilha=proxima, sugerir_ano=ano))
-
-    return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
+    # Este return é para quando entras na página via GET (clique no botão Novo)
+    return render_template("pombo_form.html", 
+                           sugerir_anilha=sugerir_anilha, 
+                           sugerir_ano=sugerir_ano,
+                           anos_lista=anos_lista, 
+                           machos=machos, 
+                           femeas=femeas,
+                           pombo=None)
 
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
 @login_required
