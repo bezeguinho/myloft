@@ -136,16 +136,18 @@
     }
 
 
+    /* Estilo Base para Anilhas, Pais e Mães */
     .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
+        display: inline-block;
     }
 
-    /* Sublinha apenas quando passas o rato sobre um link real */
-    a.anilha-link:hover {
+    /* Forçar o sublinhado ao passar o rato */
+    .anilha-link:hover {
         text-decoration: underline !important;
-        color: #0033a0 !important;
+        cursor: pointer !important;
     }
 </style>
 
@@ -189,74 +191,70 @@
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="pomboTable">
-                <thead class="table-light text-uppercase small fw-bold">
-                    <tr class="align-middle">
-                        <th class="ps-4" style="height: 50px;">Anilha</th>
-                        <th>Ano</th>
-                        <th>Cor</th>
-                        <th>Nome</th>
-                        <th class="text-center">Sexo</th>
-                        <th>Categoria</th>
-                        <th>Pai</th>
-                        <th>Mãe</th>
-                        <th class="text-center pe-4">Ações</th>
+                <<thead class="table-light text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4 align-middle" style="height: 50px;">Anilha</th>
+                        <th class="align-middle">Ano</th>
+                        <th class="align-middle">Cor</th>
+                        <th class="align-middle">Nome</th>
+                        <th class="text-center align-middle">Sexo</th>
+                        <th class="align-middle">Categoria</th>
+                        <th class="align-middle">Pai</th>
+                        <th class="align-middle">Mãe</th>
+                        <th class="text-center pe-4 align-middle">Ações</th>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for p in pombos %}
-                    <tr class="pombo-row">
-                        <td class="ps-4">
-                            <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
-                        </td>
-                        <td>{{ p.ano }}</td>
-                        <td>{{ p.cor or '---' }}</td>
-                        <td>{{ p.nome or '---' }}</td>
-                        <td class="text-center">
-                            {% if p.sexo == 'Macho' %}
-                            <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
-                            {% elif p.sexo == 'Fêmea' %}
-                            <div class="sex-circle sex-f"><i class="bi bi-gender-female"></i></div>
-                            {% else %}
-                            <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
-                            {% endif %}
-                        <td class="align-middle">
-                            {% if p.pai_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
-                                {{ p.pai }}
-                            </a>
-                            {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
-                                {{ p.pai or '---' }}
-                            </span>
-                            {% endif %}
-                        </td>
-
-                        <td class="align-middle">
-                            {% if p.mae_id %}
-                            <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
-                                {{ p.mae }}
-                            </a>
-                            {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
-                                {{ p.mae or '---' }}
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center" style="width: 230px; min-width: 230px;">
-                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                    class="btn btn-sm btn-outline-primary fw-bold btn-horizontal">
-                                    <i class="bi bi-pencil-square"></i> Editar
+                    </thead>
+                    <tbody>
+                        {% for p in pombos %}
+                        <tr class="pombo-row">
+                            <td class="ps-4">
+                                <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
+                            </td>
+                            <td>{{ p.ano }}</td>
+                            <td>{{ p.cor or '---' }}</td>
+                            <td>{{ p.nome or '---' }}</td>
+                            <td class="text-center">
+                                {% if p.sexo == 'Macho' %}
+                                <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
+                                {% elif p.sexo == 'Fêmea' %}
+                                <div class="sex-circle sex-f"><i class="bi bi-gender-female"></i></div>
+                                {% else %}
+                                <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
+                                {% endif %}
+                            <td class="align-middle">
+                                {% if p.pai_id %}
+                                <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">
+                                    {{ p.pai }}
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
-                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                                {% else %}
+                                <span class="anilha-link" style="cursor: default;">{{ p.pai or '---' }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="align-middle">
+                                {% if p.mae_id %}
+                                <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">
+                                    {{ p.mae }}
+                                </a>
+                                {% else %}
+                                <span class="anilha-link" style="cursor: default;">{{ p.mae or '---' }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center" style="width: 230px; min-width: 230px;">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a href="{{ url_for('editar_pombo', id=p.id) }}"
+                                        class="btn btn-sm btn-outline-primary fw-bold btn-horizontal">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
+                                        onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
             </table>
         </div>
     </div>
