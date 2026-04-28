@@ -228,20 +228,40 @@
     </div>
 </div>
 <script>
-    function abrirModalEliminar(id, anilha) {
-        // 1. Coloca a anilha do pombo no texto do modal
-        document.getElementById('anilhaConfirmar').innerText = anilha;
-
-        // 2. Constrói o link real de eliminar com o ID correto
-        const linkEliminar = "/eliminar_pombo/" + id;
-
-        // 3. Coloca esse link no botão "ELIMINAR AGORA" do modal
-        document.getElementById('linkConfirmarEliminar').setAttribute('href', linkEliminar);
-
-        // 4. Abre o modal no ecrã
-        var meuModal = new bootstrap.Modal(document.getElementById('modalEliminarPombo'));
-        meuModal.show();
-    }
+    <div class="modal fade" id="modalEliminarPombo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Confirmar Eliminação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="fs-5 mb-1">Tens a certeza que queres eliminar o pombo:</p>
+                    <h4 class="text-danger fw-bold my-3" id="anilhaConfirmar"></h4>
+                    <p class="text-muted small mb-0">Esta ação não pode ser desfeita!</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <a href="#" id="linkConfirmarEliminar" class="btn btn-danger fw-bold">ELIMINAR AGORA</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>
+
+function abrirModalEliminar(id, anilha) {
+// 1. Escreve a anilha no h4 do modal
+const labelAnilha = document.getElementById('anilhaConfirmar');
+if(labelAnilha) labelAnilha.innerText = anilha;
+
+// 2. Prepara o link de eliminação
+const btnEliminar = document.getElementById('linkConfirmarEliminar');
+if(btnEliminar) btnEliminar.setAttribute('href', "/eliminar_pombo/" + id);
+
+// 3. Mostra a janela
+var modalElement = document.getElementById('modalEliminarPombo');
+var meuModal = new bootstrap.Modal(modalElement);
+meuModal.show();
+}
 
 {% endblock %}
