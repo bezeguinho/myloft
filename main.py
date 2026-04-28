@@ -222,34 +222,23 @@ def api_pombo_existe(search):
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     if request.method == 'POST':
-        # Captura os dados do formulário
-        anilha = request.form.get('anilha')
-        ano = request.form.get('ano')
-        
-        # Se o ano for vazio, evitamos erro de conversão
-        ano_final = int(ano) if ano else 0
-
         novo = Pombo(
-            anilha=anilha,
+            anilha=request.form.get('anilha'),
             nome=request.form.get('nome'),
-            ano=ano_final,
+            ano=int(request.form.get('ano') or 0),
             sexo=request.form.get('sexo'),
             cor=request.form.get('cor'),
             categoria=request.form.get('categoria'),
             pai_id=request.form.get('pai_id') or None,
             mae_id=request.form.get('mae_id') or None,
             obs=request.form.get('obs'),
+            cedido_a=request.form.get('cedido_a'),
             user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
-        try:
-            db.session.add(novo)
-            db.session.commit()
-            flash("Pombo gravado com sucesso!", "success")
-            return redirect(url_for('lista_pombos'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Erro ao gravar: {str(e)}", "danger")
+        db.session.add(novo)
+        db.session.commit()
+        return redirect(url_for('lista_pombos'))
 
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
@@ -269,20 +258,14 @@ def editar_pombo(id):
         pombo.pai_id = request.form.get('pai_id') or None
         pombo.mae_id = request.form.get('mae_id') or None
         pombo.obs = request.form.get('obs')
+        pombo.cedido_a = request.form.get('cedido_a')
         pombo.oculto = True if request.form.get('oculto') == 'on' else False
-        
-        try:
-            db.session.commit()
-            flash("Pombo atualizado!", "success")
-            return redirect(url_for('lista_pombos'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Erro ao atualizar: {str(e)}", "danger")
+        db.session.commit()
+        return redirect(url_for('lista_pombos'))
 
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, machos=machos, femeas=femeas)
-
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required
