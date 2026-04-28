@@ -154,6 +154,43 @@
                         /* Escondido por defeito */
                     </style>
 
+                    <style>
+                        /* Teus padrões de cores e hovers */
+                        .btn-gravar {
+                            background-color: #0d6efd !important;
+                            color: white !important;
+                            transition: 0.3s;
+                            border: none;
+                        }
+
+                        .btn-gravar:hover {
+                            color: black !important;
+                        }
+
+                        .btn-voltar {
+                            background-color: #ffc107 !important;
+                            color: black !important;
+                            transition: 0.3s;
+                            border: none;
+                        }
+
+                        .btn-voltar:hover {
+                            color: white !important;
+                        }
+
+                        /* Esconder o campo cedido por defeito */
+                        #linha_cedido {
+                            display: none;
+                        }
+
+                        /* Ajuste para o texto "Cedido a:" ficar na mesma linha da caixa */
+                        .cedido-container {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }
+                    </style>
+
                     <div class="container mt-4">
                         <h2 class="text-primary fw-bold mb-4 text-center">
                             {{ "EDITAR POMBO" if pombo else "INSERIR NOVO POMBO" }}
@@ -212,7 +249,7 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row align-items-end">
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-bold text-uppercase small">Sexo</label>
                                     <select name="sexo" class="form-select" required>
@@ -238,7 +275,6 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label style="visibility: hidden;" class="small d-block">Espaço</label>
                                     <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
                                         style="height: 38px;">
                                         <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
@@ -248,12 +284,16 @@
                                 </div>
                             </div>
 
-                            <div class="row campo-cedido" id="div_cedido">
-                                <div class="col-md-12 mb-3">
-                                    <label class="fw-bold text-uppercase small text-danger">A quem foi cedido?</label>
-                                    <input type="text" name="cedido_a" class="form-control"
-                                        value="{{ pombo.cedido_a if pombo else '' }}"
-                                        placeholder="Nome da pessoa ou local...">
+                            <div class="row" id="linha_cedido">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-8 mb-3">
+                                    <div class="cedido-container">
+                                        <label class="fw-bold text-uppercase small mb-0"
+                                            style="white-space: nowrap;">Cedido a:</label>
+                                        <input type="text" name="cedido_a" class="form-control"
+                                            value="{{ pombo.cedido_a if pombo else '' }}"
+                                            placeholder="Nome da pessoa ou local...">
+                                    </div>
                                 </div>
                             </div>
 
@@ -264,7 +304,8 @@
                                         style="height: 250px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
                                 </div>
                                 <div class="col-md-3">
-                                    <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                                    <label style="visibility: hidden;"
+                                        class="small d-block mb-2 text-uppercase">Espaço</label>
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
                                         <a href="{{ url_for('lista_pombos') }}"
@@ -274,6 +315,22 @@
                             </div>
                         </form>
                     </div>
+
+                    <script>
+                        const selectCat = document.getElementById('categoria_select');
+                        const linhaCedido = document.getElementById('linha_cedido');
+
+                        function toggleCedido() {
+                            if (selectCat.value === 'Cedido') {
+                                linhaCedido.style.display = 'flex';
+                            } else {
+                                linhaCedido.style.display = 'none';
+                            }
+                        }
+
+                        selectCat.addEventListener('change', toggleCedido);
+                        window.onload = toggleCedido;
+                    </script>
 
                     <script>
                         // Lógica para mostrar/esconder o campo "Cedido"
