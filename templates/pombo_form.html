@@ -31,13 +31,7 @@
 
     #linha_cedido {
         display: none;
-        margin-top: 10px;
-    }
-
-    .cedido-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        margin-top: 5px;
     }
 </style>
 
@@ -45,7 +39,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8">
             <div class="card shadow border-0" style="border-radius: 10px;">
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-md-5">
 
                     <h2 class="fw-bold text-primary mb-4 text-uppercase text-center">
                         {% if pombo %}
@@ -77,14 +71,14 @@
                                 <input type="hidden" name="ano" value="{{ pombo.ano }}">
                                 {% endif %}
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col mb-3">
                                 <label class="fw-bold text-uppercase small">Nome</label>
-                                <input type="text" name="nome" class="form-control"
+                                <input type="text" name="nome" class="form-control" maxlength="24"
                                     value="{{ pombo.nome if pombo else '' }}">
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col mb-3">
                                 <label class="fw-bold text-uppercase small">Cor</label>
-                                <input type="text" name="cor" class="form-control"
+                                <input type="text" name="cor" class="form-control" maxlength="24"
                                     value="{{ pombo.cor if pombo else '' }}">
                             </div>
                         </div>
@@ -113,7 +107,7 @@
                         </div>
 
                         <div class="row align-items-end">
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Sexo</label>
                                 <select name="sexo" class="form-select" required>
                                     <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
@@ -139,8 +133,8 @@
                                         %}>Cedido</option>
                                 </select>
                             </div>
-                            <div class="col-md-5 mb-3">
-                                <div class="d-flex align-items-center justify-content-between border rounded px-2 bg-light"
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
                                     style="height: 38px;">
                                     <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
                                     <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
@@ -150,10 +144,11 @@
                         </div>
 
                         <div class="row" id="linha_cedido">
-                            <div class="col-md-3"></div>
-                            <div class="col-md-6 mb-3">
-                                <div class="cedido-container">
-                                    <label class="fw-bold small mb-0" style="color: black;">Cedido a:</label>
+                            <div class="col-md-4"></div>
+                            <div class="col-md-5 mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="fw-bold small mb-0 text-nowrap" style="color: black;">Cedido
+                                        a:</label>
                                     <input type="text" name="cedido_a" class="form-control form-control-sm"
                                         value="{{ pombo.cedido_a if pombo else '' }}">
                                 </div>
@@ -161,10 +156,10 @@
                         </div>
 
                         <div class="row mt-2">
-                            <div class="col-md-5">
+                            <div class="col-md-6">
                                 <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
                                 <textarea name="obs" class="form-control"
-                                    style="height: 200px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
+                                    style="height: 180px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
                             </div>
                             <div class="col-md-4">
                                 <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
@@ -185,9 +180,11 @@
 <script>
     const selectCat = document.getElementById('categoria_select');
     const linhaCedido = document.getElementById('linha_cedido');
+
     function toggleCedido() {
         linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
     }
+
     selectCat.addEventListener('change', toggleCedido);
     window.onload = toggleCedido;
 
