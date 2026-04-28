@@ -128,4 +128,73 @@
                                         %}>Voador</option>
                                     <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
                                         %}selected{% endif %}>Reprodutor</option>
-                                    <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected
+                                    <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{% endif
+                                        %}>Cedido</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center justify-content-between border rounded px-2 bg-light"
+                                    style="height: 38px;">
+                                    <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
+                                    <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
+                                        pombo and pombo.oculto %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="linha_cedido">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-5 mb-3">
+                                <div class="cedido-container">
+                                    <label class="fw-bold small mb-0" style="color: black;">Cedido a:</label>
+                                    <input type="text" name="cedido_a" class="form-control form-control-sm"
+                                        value="{{ pombo.cedido_a if pombo else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-5">
+                                <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
+                                <textarea name="obs" class="form-control"
+                                    style="height: 200px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-gravar fw-bold py-2">GRAVAR</button>
+                                    <a href="{{ url_for('lista_pombos') }}"
+                                        class="btn btn-voltar fw-bold py-2">VOLTAR</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selectCat = document.getElementById('categoria_select');
+    const linhaCedido = document.getElementById('linha_cedido');
+    function toggleCedido() {
+        linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
+    }
+    selectCat.addEventListener('change', toggleCedido);
+    window.onload = toggleCedido;
+
+    // Filtro biológico: impede selecionar pais mais novos que o pombo
+    document.getElementById('ano_select').addEventListener('change', function () {
+        var anoFilho = parseInt(this.value);
+        ['pai_id', 'mae_id'].forEach(function (id) {
+            var select = document.getElementById(id);
+            for (var i = 1; i < select.options.length; i++) {
+                var anoP = parseInt(select.options[i].getAttribute('data-ano'));
+                select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
+            }
+        });
+    });
+</script>
+
+{% endblock %}
