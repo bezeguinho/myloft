@@ -287,6 +287,10 @@ def novo_pombo():
             return redirect(url_for('novo_pombo'))
 
     return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha, ultimo_ano=ultimo_ano)
+# No final da função inserir_pombo:
+machos = Pombo.query.filter_by(sexo='Macho').all()
+femeas = Pombo.query.filter_by(sexo='Fêmea').all()
+return render_template('pombo_form.html', machos=machos, femeas=femeas)
 
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
@@ -345,6 +349,11 @@ def editar_pombo(id):
     return render_template('pombo_form.html', pombo=pombo, machos=machos, femeas=femeas)
             
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
+# No final da função editar_pombo:
+pombo = Pombo.query.get_or_404(id)
+machos = Pombo.query.filter_by(sexo='Macho').all()
+femeas = Pombo.query.filter_by(sexo='Fêmea').all()
+return render_template('pombo_form.html', pombo=pombo, machos=machos, femeas=femeas)
 
 @app.route("/ver_pombo/<int:id>")
 @login_required
