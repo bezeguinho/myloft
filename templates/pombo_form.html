@@ -62,7 +62,8 @@
                             <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
                                 <select name="ano" class="form-select" id="ano_select" required>
-                                    <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                    <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
+                                    </option>
                                     {% for a in anos_lista %}
                                     <option value="{{ a }}" {% if pombo and pombo.ano==a %}selected{% endif %}>{{ a }}
                                     </option>
@@ -108,7 +109,8 @@
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Sexo</label>
                                 <select name="sexo" class="form-select" required>
-                                    <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                    <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
+                                    </option>
                                     <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
                                         Macho</option>
                                     <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
@@ -120,7 +122,8 @@
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Categoria</label>
                                 <select name="categoria" id="categoria_select" class="form-select" required>
-                                    <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                    <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
+                                    </option>
                                     <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif
                                         %}>Voador</option>
                                     <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
@@ -144,21 +147,20 @@
                             <div class="col-md-4 mb-3">
                                 <div class="cedido-container">
                                     <label class="fw-bold small mb-0" style="color: black;">Cedido a:</label>
-                                    <input type="text" name="cedido_a" class="form-control"
+                                    <input type="text" name="cedido_a" class="form-control form-control-sm"
                                         value="{{ pombo.cedido_a if pombo else '' }}">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row mt-3">
+                        <div class="row mt-2">
                             <div class="col-md-4">
                                 <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
                                 <textarea name="obs" class="form-control"
-                                    style="height: 200px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
+                                    style="height: 260px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
                             </div>
-                            <div class="col-md-3">
-                                <label style="visibility: hidden;"
-                                    class="fw-bold text-uppercase small d-block">Espaço</label>
+                            <div class="col-md-4 pt-4">
+                                <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
                                     <a href="{{ url_for('lista_pombos') }}"
