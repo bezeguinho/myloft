@@ -100,7 +100,9 @@
                                     <option value="">-- Selecione o Pai --</option>
                                     {% for m in machos %}
                                     <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
-                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})</option>
+                                        %}selected{% endif %}>
+                                        {{ m.anilha }} ({{ m.ano }}) {% if m.nome %}- {{ m.nome }}{% endif %}
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -110,12 +112,13 @@
                                     <option value="">-- Selecione a Mãe --</option>
                                     {% for f in femeas %}
                                     <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
-                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})</option>
+                                        %}selected{% endif %}>
+                                        {{ f.anilha }} ({{ f.ano }}) {% if f.nome %}- {{ f.nome }}{% endif %}
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
-
                         <div class="row align-items-end">
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Sexo</label>
@@ -194,6 +197,39 @@
 </div>
 
 <script>
+    const selectAno = document.getElementById('ano_select');
+    const selectPai = document.getElementById('pai_id');
+    const selectMae = document.getElementById('mae_id');
+
+    function filtrarProgenitores() {
+        const anoFilho = parseInt(selectAno.value);
+        if (!anoFilho) return; // Se não houver ano selecionado, não faz nada
+
+        // Função interna para filtrar cada select
+        const aplicarFiltro = (selectElement) => {
+            const options = selectElement.options;
+            for (let i = 1; i < options.length; i++) {
+                const anoProgenitor = parseInt(options[i].getAttribute('data-ano'));
+
+                // LÓGICA: Se o pai/mãe for mais novo que o filho, esconde
+                if (anoProgenitor > anoFilho) {
+                    options[i].style.display = 'none';
+                    // Se o que estava selecionado agora é inválido, volta ao padrão
+                    if (options[i].selected) selectElement.value = "";
+                } else {
+                    options[i].style.display = 'block';
+                }
+            }
+        };
+
+        aplicarFiltro(selectPai);
+        aplicarFiltro(selectMae);
+    }
+
+    // Executa quando mudas o ano
+    selectAno.addEventListener('change', filtrarProgenitores);
+
+    // Lógica para o campo "Cedido" e Contador de Caracteres que já tinhas
     const selectCat = document.getElementById('categoria_select');
     const linhaCedido = document.getElementById('linha_cedido');
 
@@ -204,32 +240,14 @@
     }
 
     function updateChars(obj) {
-        const maxLength = 200;
         const strLength = obj.value.length;
         document.getElementById('char_count').innerHTML = strLength;
-        if (strLength > maxLength) {
-            obj.value = obj.value.substring(0, maxLength);
-            document.getElementById('char_count').innerHTML = maxLength;
-        }
     }
 
-    document.getElementById('ano_select').addEventListener('change', function () {
-        var anoFilho = parseInt(this.value);
-        ['pai_id', 'mae_id'].forEach(function (id) {
-            var select = document.getElementById(id);
-            if (select) {
-                for (var i = 1; i < select.options.length; i++) {
-                    var anoP = parseInt(select.options[i].getAttribute('data-ano'));
-                    select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
-                }
-            }
-        });
-    });
-
-    selectCat.addEventListener('change', toggleCedido);
-
+    // Inicialização ao carregar a página
     window.onload = function () {
         toggleCedido();
+        filtrarProgenitores(); // Filtra logo se já houver ano (caso da sugestão +1)
         const textareaObs = document.getElementById('obs');
         if (textareaObs) updateChars(textareaObs);
     };
