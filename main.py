@@ -221,53 +221,39 @@ def api_pombo_existe(search):
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-    proxima_anilha = ""
-    ultimo_ano = ""
-    
-    if request.args.get('saved') == '1':
-        ultimo_pombo = Pombo.query.filter_by(user_id=current_user.id).order_by(Pombo.id.desc()).first()
-        if ultimo_pombo:
-            ultimo_ano = ultimo_pombo.ano
-            if ultimo_pombo.anilha:
-                match = re.search(r'(\d+)$', ultimo_pombo.anilha)
-                if match:
-                    try:
-                        numero_novo = int(match.group(1)) + 1
-                        tamanho = len(match.group(1))
-                        proxima_anilha = ultimo_pombo.anilha[:match.start()] + str(numero_novo).zfill(tamanho)
-                    except: proxima_anilha = ultimo_pombo.anilha
-    
     if request.method == 'POST':
-        anilha_form = request.form.get('anilha')
-        anilha_final = anilha_form if anilha_form and anilha_form.strip() else request.form.get('anilha_sugerida')
-        ano_final = int(request.form.get('ano') or request.form.get('ano_sugerido') or 0)
-
-        existe = Pombo.query.filter_by(anilha=anilha_final, ano=ano_final, user_id=current_user.id).first()
-        if existe:
-            flash("Pombo já existente!", "danger")
-            return redirect(url_for('novo_pombo'))
+        # Captura os dados do formulário
+        anilha = request.form.get('anilha')
+        ano = request.form.get('ano')
+        
+        # Se o ano for vazio, evitamos erro de conversão
+        ano_final = int(ano) if ano else 0
 
         novo = Pombo(
-            anilha=anilha_final, nome=request.form.get('nome'), ano=ano_final,
-            sexo=request.form.get('sexo'), cor=request.form.get('cor'), 
+            anilha=anilha,
+            nome=request.form.get('nome'),
+            ano=ano_final,
+            sexo=request.form.get('sexo'),
+            cor=request.form.get('cor'),
             categoria=request.form.get('categoria'),
-            pai_id=request.form.get('pai_id') or None, 
+            pai_id=request.form.get('pai_id') or None,
             mae_id=request.form.get('mae_id') or None,
-            obs=request.form.get('obs'), cedido_a=request.form.get('cedido_a'),
+            obs=request.form.get('obs'),
             user_id=current_user.id,
             oculto=True if request.form.get('oculto') == 'on' else False
         )
-        db.session.add(novo)
-        db.session.commit()
-        flash(f"Pombo {anilha_final} gravado!", "success")
-        return redirect(url_for('novo_pombo', saved='1'))
+        try:
+            db.session.add(novo)
+            db.session.commit()
+            flash("Pombo gravado com sucesso!", "success")
+            return redirect(url_for('lista_pombos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao gravar: {str(e)}", "danger")
 
-    # BUSCA OS PAIS E MÃES DO UTILIZADOR ATUAL
-    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.anilha).all()
-    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.anilha).all()
-    
-    return render_template("pombo_form.html", anos_lista=anos_lista, proxima_anilha=proxima_anilha, 
-                           ultimo_ano=ultimo_ano, machos=machos, femeas=femeas, pombo=None)
+    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
+    return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None)
 
 @app.route("/editar_pombo/<int:id>", methods=['GET', 'POST'])
 @login_required
@@ -283,18 +269,19 @@ def editar_pombo(id):
         pombo.pai_id = request.form.get('pai_id') or None
         pombo.mae_id = request.form.get('mae_id') or None
         pombo.obs = request.form.get('obs')
-        pombo.cedido_a = request.form.get('cedido_a')
         pombo.oculto = True if request.form.get('oculto') == 'on' else False
         
-        db.session.commit()
-        flash(f"Pombo {pombo.anilha} atualizado!", "success")
-        return redirect(url_for('lista_pombos'))
+        try:
+            db.session.commit()
+            flash("Pombo atualizado!", "success")
+            return redirect(url_for('lista_pombos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar: {str(e)}", "danger")
 
-    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.anilha).all()
-    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.anilha).all()
-    
-    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, 
-                           machos=machos, femeas=femeas, modo_edicao=True)
+    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
+    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, machos=machos, femeas=femeas)
 
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")

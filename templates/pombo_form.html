@@ -95,6 +95,30 @@
                     }
                 </style>
 
+                <style>
+                    .btn-gravar {
+                        background-color: #0d6efd !important;
+                        color: white !important;
+                        transition: 0.3s;
+                        border: none;
+                    }
+
+                    .btn-gravar:hover {
+                        color: black !important;
+                    }
+
+                    .btn-voltar {
+                        background-color: #ffc107 !important;
+                        color: black !important;
+                        transition: 0.3s;
+                        border: none;
+                    }
+
+                    .btn-voltar:hover {
+                        color: white !important;
+                    }
+                </style>
+
                 <div class="container mt-4">
                     <h2 class="text-primary fw-bold mb-4 text-center">
                         {{ "EDITAR POMBO" if pombo else "INSERIR NOVO POMBO" }}
@@ -105,16 +129,17 @@
                             <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Nº Anilha</label>
                                 <input type="text" name="anilha" class="form-control"
-                                    value="{{ pombo.anilha if pombo else proxima_anilha }}" {% if pombo %}readonly
-                                    style="background-color: #eee;" {% endif %}>
+                                    value="{{ pombo.anilha if pombo else '' }}" {% if pombo %}readonly
+                                    style="background-color: #eee;" {% endif %} required>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
                                 <select name="ano" class="form-select" id="ano_select" {% if pombo %}disabled
-                                    style="background-color: #eee;" {% endif %}>
+                                    style="background-color: #eee;" {% endif %} required>
+                                    <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
                                     {% for a in anos_lista %}
-                                    <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (not pombo and
-                                        ultimo_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
+                                    <option value="{{ a }}" {% if pombo and pombo.ano==a %}selected{% endif %}>{{ a }}
+                                    </option>
                                     {% endfor %}
                                 </select>
                                 {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
@@ -138,8 +163,7 @@
                                     <option value="">-- Selecione o Pai --</option>
                                     {% for m in machos %}
                                     <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
-                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }}) {{ m.nome if m.nome else ''
-                                        }}</option>
+                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -149,8 +173,7 @@
                                     <option value="">-- Selecione a Mãe --</option>
                                     {% for f in femeas %}
                                     <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
-                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }}) {{ f.nome if f.nome else ''
-                                        }}</option>
+                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -160,6 +183,8 @@
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Sexo</label>
                                 <select name="sexo" class="form-select">
+                                    <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{%
+                                        endif %}>Indefinido</option>
                                     <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
                                         Macho</option>
                                     <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
@@ -169,6 +194,8 @@
                             <div class="col-md-4 mb-3">
                                 <label class="fw-bold text-uppercase small">Categoria</label>
                                 <select name="categoria" class="form-select">
+                                    <option value="Indefinido" {% if pombo and pombo.categoria=='Indefinido'
+                                        %}selected{% endif %}>Indefinido</option>
                                     <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
                                         %}selected{% endif %}>Reprodutor</option>
                                     <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif
@@ -178,7 +205,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="fw-bold text-uppercase small" style="visibility: hidden;">Ocultar</label>
+                                <label style="visibility: hidden;" class="small d-block">Espaço</label>
                                 <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
                                     style="height: 38px;">
                                     <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
@@ -194,17 +221,12 @@
                                 <textarea name="obs" class="form-control"
                                     style="height: 250px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
                             </div>
-
                             <div class="col-md-3">
                                 <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-gravar fw-bold py-3">
-                                        <i class="bi bi-check-lg"></i> GRAVAR
-                                    </button>
+                                    <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
                                     <a href="{{ url_for('lista_pombos') }}"
-                                        class="btn btn-voltar fw-bold py-3 text-decoration-none text-center">
-                                        <i class="bi bi-arrow-left"></i> VOLTAR
-                                    </a>
+                                        class="btn btn-voltar fw-bold py-3 text-center text-decoration-none">VOLTAR</a>
                                 </div>
                             </div>
                         </div>
@@ -212,14 +234,13 @@
                 </div>
 
                 <script>
-                    // Filtro biológico de ano
                     document.getElementById('ano_select').addEventListener('change', function () {
                         var anoFilho = parseInt(this.value);
                         ['pai_id', 'mae_id'].forEach(function (id) {
                             var select = document.getElementById(id);
                             for (var i = 1; i < select.options.length; i++) {
                                 var anoP = parseInt(select.options[i].getAttribute('data-ano'));
-                                select.options[i].style.display = (anoP > anoFilho) ? 'none' : 'block';
+                                select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
                             }
                         });
                     });
