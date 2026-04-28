@@ -2,7 +2,7 @@
 {% block content %}
 
 <style>
-    /* Teus padrões de botões e hovers */
+    /* Padrões de botões e hovers */
     .btn-gravar {
         background-color: #0d6efd !important;
         color: white !important;
@@ -185,7 +185,7 @@
     selectCat.addEventListener('change', toggleCedido);
     window.onload = toggleCedido;
 
-    // Filtro biológico de ano
+    // Filtro biológico: impede selecionar pais mais novos que o pombo
     document.getElementById('ano_select').addEventListener('change', function () {
         var anoFilho = parseInt(this.value);
         ['pai_id', 'mae_id'].forEach(function (id) {
