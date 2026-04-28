@@ -220,20 +220,28 @@
                 <h5 class="modal-title fw-bold">Confirmar Eliminação</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center p-4">
-                <p class="fs-5 mb-1">Tens a certeza que queres eliminar o pombo:</p>
-                <h4 class="text-danger fw-bold my-3" id="anilhaConfirmar"></h4>
-                <p class="text-muted small mb-0">
-                    A árvore genealógica dos filhos será mantida, mas este registo desaparecerá.
-                    <br><b>Esta ação não pode ser desfeita!</b>
-                </p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">CANCELAR</button>
-                <a href="#" id="linkConfirmarEliminar" class="btn btn-danger fw-bold">ELIMINAR AGORA</a>
-            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger fw-bold btn-horizontal"
+                onclick="abrirModalEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
         </div>
     </div>
 </div>
+<script>
+    function abrirModalEliminar(id, anilha) {
+        // 1. Coloca a anilha do pombo no texto do modal
+        document.getElementById('anilhaConfirmar').innerText = anilha;
+
+        // 2. Constrói o link real de eliminar com o ID correto
+        const linkEliminar = "/eliminar_pombo/" + id;
+
+        // 3. Coloca esse link no botão "ELIMINAR AGORA" do modal
+        document.getElementById('linkConfirmarEliminar').setAttribute('href', linkEliminar);
+
+        // 4. Abre o modal no ecrã
+        var meuModal = new bootstrap.Modal(document.getElementById('modalEliminarPombo'));
+        meuModal.show();
+    }
+</script>
 
 {% endblock %}
