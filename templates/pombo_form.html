@@ -157,11 +157,13 @@
                         <div class="row mt-2">
                             <div class="col-md-6">
                                 <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
+
                                 <textarea name="obs" id="obs" class="form-control"
-                                    style="aspect-ratio: 1 / 1; resize: none; overflow: hidden;" maxlength="100"
+                                    style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="100"
                                     oninput="if(this.value.length > 100) this.value = this.value.substring(0, 100);">{{ pombo.obs if pombo else '' }}</textarea>
 
-                                <div class="text-end small text-muted mt-1 fw-bold">
+                                <div class="text-muted mt-1 fw-bold"
+                                    style="width: 250px; text-align: right; font-size: 0.8rem;">
                                     <span id="char_count">0</span> / 100 carateres
                                 </div>
                             </div>
