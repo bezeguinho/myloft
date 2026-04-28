@@ -134,46 +134,63 @@
                         </div>
                     </div>
 
-                    <script>
-                        // Lógica para filtrar pais mais velhos que o filho
-                        document.getElementById('ano_select').addEventListener('change', function () {
-                            var anoFilho = parseInt(this.value);
-                            ['pai_id', 'mae_id'].forEach(function (id) {
-                                var select = document.getElementById(id);
-                                for (var i = 1; i < select.options.length; i++) {
-                                    var anoProgenitor = parseInt(select.options[i].getAttribute('data-ano'));
-                                    select.options[i].style.display = (anoProgenitor > anoFilho) ? 'none' : 'block';
-                                }
-                            });
-                        });
-                    </script>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-auto">
-                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
-                            <textarea name="obs" class="form-control caixa-input w-md-250"
-                                style="height: 250px; resize: none; overflow: hidden;"
-                                maxlength="400">{{ pombo.obs if modo_edicao else '' }}</textarea>
+                    <div class="row align-items-end">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">SEXO</label>
+                            <select name="sexo" class="form-select" required>
+                                <option value="">Escolha..</option>
+                                <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>Macho
+                                </option>
+                                <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>Fêmea
+                                </option>
+                            </select>
                         </div>
 
-                        <div
-                            class="col-12 col-md-auto d-flex flex-column justify-content-start gap-3 pt-md-4 caixa-botoes">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">CATEGORIA</label>
+                            <select name="categoria" class="form-select" required>
+                                <option value="">Escolha..</option>
+                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
+                                    endif %}>Reprodutor</option>
+                                <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
+                                    Voador</option>
+                                <option value="Excluído" {% if pombo and pombo.categoria=='Excluído' %}selected{% endif
+                                    %}>Excluído</option>
+                            </select>
+                        </div>
 
-                            <button type="submit" class="btn btn-executar shadow" style="min-width: 160px;">
-                                <i class="bi bi-check-lg me-2"></i>
-                                {% if modo_edicao %}ATUALIZAR{% else %}GRAVAR{% endif %}
-                            </button>
-
-                            <a href="{{ url_for('lista_pombos') }}" class="btn btn-retroceder shadow-sm"
-                                style="min-width: 160px;">
-                                <i class="bi bi-arrow-left me-2"></i> VOLTAR
-                            </a>
-
+                        <div class="col-md-4 mb-4">
+                            <div class="form-check border p-2 rounded shadow-sm bg-light">
+                                <input class="form-check-input ms-1" type="checkbox" name="oculto" id="oculto" {% if
+                                    pombo and pombo.oculto %}checked{% endif %}>
+                                <label class="form-check-input-label ms-2 fw-bold" for="oculto">
+                                    OCULTAR POMBO?
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </form>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">DESCRIÇÃO PARA O PEDIGREE...</label>
+                            <textarea name="obs" class="form-control"
+                                rows="5">{{ pombo.obs if pombo else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-4">
+                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                            <i class="bi bi-check-lg"></i> GRAVAR
+                        </button>
+                        <a href="{{ url_for('lista_pombos') }}" class="btn btn-warning fw-bold px-4">
+                            <i class="bi bi-arrow-left"></i> VOLTAR
+                        </a>
+                    </div>
             </div>
+            </form>
         </div>
     </div>
+</div>
 </div>
 
 <script>
