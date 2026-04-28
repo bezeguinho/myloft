@@ -1,3 +1,6 @@
+{% extends "layout.html" %}
+{% block content %}
+
 <style>
     /* Teus padrões de botões e hovers */
     .btn-gravar {
@@ -16,6 +19,10 @@
         color: black !important;
         transition: 0.3s;
         border: none;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-voltar:hover {
@@ -36,7 +43,7 @@
 
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
+        <div class="col-12 col-lg-11">
             <div class="card shadow border-0" style="border-radius: 10px;">
                 <div class="card-body p-4 p-md-5">
 
@@ -54,7 +61,7 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
-                                <select name="ano" class="form-select" required>
+                                <select name="ano" class="form-select" id="ano_select" required>
                                     <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
                                     {% for a in anos_lista %}
                                     <option value="{{ a }}" {% if pombo and pombo.ano==a %}selected{% endif %}>{{ a }}
@@ -77,21 +84,21 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Pai</label>
-                                <select name="pai_id" class="form-select">
+                                <select name="pai_id" id="pai_id" class="form-select">
                                     <option value="">-- Selecione o Pai --</option>
                                     {% for m in machos %}
-                                    <option value="{{ m.id }}" {% if pombo and pombo.pai_id==m.id %}selected{% endif %}>
-                                        {{ m.anilha }} ({{ m.ano }})</option>
+                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
+                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Mãe</label>
-                                <select name="mae_id" class="form-select">
+                                <select name="mae_id" id="mae_id" class="form-select">
                                     <option value="">-- Selecione a Mãe --</option>
                                     {% for f in femeas %}
-                                    <option value="{{ f.id }}" {% if pombo and pombo.mae_id==f.id %}selected{% endif %}>
-                                        {{ f.anilha }} ({{ f.ano }})</option>
+                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
+                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -121,6 +128,13 @@
                                     <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{% endif
                                         %}>Cedido</option>
                                 </select>
+
+                                <div id="linha_cedido" class="cedido-container">
+                                    <label class="fw-bold small mb-0" style="white-space: nowrap; color: black;">Cedido
+                                        a:</label>
+                                    <input type="text" name="cedido_a" class="form-control form-control-sm"
+                                        value="{{ pombo.cedido_a if pombo else '' }}">
+                                </div>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
@@ -128,17 +142,6 @@
                                     <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
                                     <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
                                         pombo and pombo.oculto %}checked{% endif %}>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row" id="linha_cedido">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-8 mb-3">
-                                <div class="cedido-container">
-                                    <label class="fw-bold small mb-0" style="color: black;">Cedido a:</label>
-                                    <input type="text" name="cedido_a" class="form-control"
-                                        value="{{ pombo.cedido_a if pombo else '' }}">
                                 </div>
                             </div>
                         </div>
@@ -151,9 +154,12 @@
                             </div>
                             <div class="col-md-4 pt-4">
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
-                                    <a href="{{ url_for('lista_pombos') }}"
-                                        class="btn btn-voltar fw-bold py-3 text-center text-decoration-none">VOLTAR</a>
+                                    <button type="submit" class="btn btn-gravar fw-bold py-3">
+                                        <i class="bi bi-check-lg"></i> GRAVAR
+                                    </button>
+                                    <a href="{{ url_for('lista_pombos') }}" class="btn btn-voltar fw-bold py-3">
+                                        <i class="bi bi-arrow-left"></i> VOLTAR
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -167,9 +173,29 @@
 <script>
     const selectCat = document.getElementById('categoria_select');
     const linhaCedido = document.getElementById('linha_cedido');
+
     function toggleCedido() {
-        linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
+        if (selectCat.value === 'Cedido') {
+            linhaCedido.style.display = 'flex';
+        } else {
+            linhaCedido.style.display = 'none';
+        }
     }
+
     selectCat.addEventListener('change', toggleCedido);
     window.onload = toggleCedido;
+
+    // Filtro biológico de ano
+    document.getElementById('ano_select').addEventListener('change', function () {
+        var anoFilho = parseInt(this.value);
+        ['pai_id', 'mae_id'].forEach(function (id) {
+            var select = document.getElementById(id);
+            for (var i = 1; i < select.options.length; i++) {
+                var anoP = parseInt(select.options[i].getAttribute('data-ano'));
+                select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
+            }
+        });
+    });
 </script>
+
+{% endblock %}
