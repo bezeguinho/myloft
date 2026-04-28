@@ -96,22 +96,31 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Pai</label>
+                                <input type="text" id="search_pai" class="form-control form-control-sm mb-1"
+                                    placeholder="🔍 Digite a anilha ou nome do pai...">
+
                                 <select name="pai_id" id="pai_id" class="form-select">
-                                    <option value="">-- Selecione o Pai --</option>
+                                    <option value="">-- Escolha o pai --</option>
                                     {% for m in machos %}
-                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
+                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
+                                        data-nome="{{ m.nome|lower or '' }}" {% if pombo and pombo.pai_id==m.id
                                         %}selected{% endif %}>
                                         {{ m.anilha }} ({{ m.ano }}) {% if m.nome %}- {{ m.nome }}{% endif %}
                                     </option>
                                     {% endfor %}
                                 </select>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="fw-bold text-uppercase small">Mãe</label>
+                                <input type="text" id="search_mae" class="form-control form-control-sm mb-1"
+                                    placeholder="🔍 Digite a anilha ou nome da mãe...">
+
                                 <select name="mae_id" id="mae_id" class="form-select">
-                                    <option value="">-- Selecione a Mãe --</option>
+                                    <option value="">-- Escolha a mãe --</option>
                                     {% for f in femeas %}
-                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
+                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
+                                        data-nome="{{ f.nome|lower or '' }}" {% if pombo and pombo.mae_id==f.id
                                         %}selected{% endif %}>
                                         {{ f.anilha }} ({{ f.ano }}) {% if f.nome %}- {{ f.nome }}{% endif %}
                                     </option>
@@ -197,58 +206,73 @@
 </div>
 
 <script>
+    // 1. DEFINIÇÃO DE VARIÁVEIS (Elementos do ecrã)
     const selectAno = document.getElementById('ano_select');
     const selectPai = document.getElementById('pai_id');
     const selectMae = document.getElementById('mae_id');
-
-    function filtrarProgenitores() {
-        const anoFilho = parseInt(selectAno.value);
-        if (!anoFilho) return; // Se não houver ano selecionado, não faz nada
-
-        // Função interna para filtrar cada select
-        const aplicarFiltro = (selectElement) => {
-            const options = selectElement.options;
-            for (let i = 1; i < options.length; i++) {
-                const anoProgenitor = parseInt(options[i].getAttribute('data-ano'));
-
-                // LÓGICA: Se o pai/mãe for mais novo que o filho, esconde
-                if (anoProgenitor > anoFilho) {
-                    options[i].style.display = 'none';
-                    // Se o que estava selecionado agora é inválido, volta ao padrão
-                    if (options[i].selected) selectElement.value = "";
-                } else {
-                    options[i].style.display = 'block';
-                }
-            }
-        };
-
-        aplicarFiltro(selectPai);
-        aplicarFiltro(selectMae);
-    }
-
-    // Executa quando mudas o ano
-    selectAno.addEventListener('change', filtrarProgenitores);
-
-    // Lógica para o campo "Cedido" e Contador de Caracteres que já tinhas
+    const searchPai = document.getElementById('search_pai');
+    const searchMae = document.getElementById('search_mae');
     const selectCat = document.getElementById('categoria_select');
     const linhaCedido = document.getElementById('linha_cedido');
+    const textareaObs = document.getElementById('obs');
 
+    // 2. FUNÇÃO: FILTRO DUPLO (Ano + Pesquisa de Texto)
+    function filtrarProgenitores() {
+        const anoFilho = parseInt(selectAno.value);
+        const textoPai = searchPai.value.toLowerCase();
+        const textoMae = searchMae.value.toLowerCase();
+
+        // Filtrar Pai
+        Array.from(selectPai.options).forEach((opt, index) => {
+            if (index === 0) return; // Ignora o "Escolha o pai"
+            const anoP = parseInt(opt.getAttribute('data-ano'));
+            const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+            const nomeP = opt.getAttribute('data-nome').toLowerCase();
+
+            const bateAno = !anoFilho || anoP <= anoFilho;
+            const bateBusca = anilhaP.includes(textoPai) || nomeP.includes(textoPai);
+
+            opt.style.display = (bateAno && bateBusca) ? 'block' : 'none';
+        });
+
+        // Filtrar Mãe
+        Array.from(selectMae.options).forEach((opt, index) => {
+            if (index === 0) return; // Ignora o "Escolha a mãe"
+            const anoM = parseInt(opt.getAttribute('data-ano'));
+            const anilhaM = opt.getAttribute('data-anilha').toLowerCase();
+            const nomeM = opt.getAttribute('data-nome').toLowerCase();
+
+            const bateAno = !anoFilho || anoM <= anoFilho;
+            const bateBusca = anilhaM.includes(textoMae) || nomeM.includes(textoMae);
+
+            opt.style.display = (bateAno && bateBusca) ? 'block' : 'none';
+        });
+    }
+
+    // 3. FUNÇÃO: MOSTRAR/ESCONDER CAMPO CEDIDO
     function toggleCedido() {
         if (selectCat && linhaCedido) {
             linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
         }
     }
 
+    // 4. FUNÇÃO: CONTADOR DE CARACTERES (A tua box quadrada)
     function updateChars(obj) {
         const strLength = obj.value.length;
-        document.getElementById('char_count').innerHTML = strLength;
+        const display = document.getElementById('char_count');
+        if (display) display.innerHTML = strLength;
     }
 
-    // Inicialização ao carregar a página
+    // 5. EVENTOS (O que ativa as funções)
+    if (selectAno) selectAno.addEventListener('change', filtrarProgenitores);
+    if (searchPai) searchPai.addEventListener('input', filtrarProgenitores);
+    if (searchMae) searchMae.addEventListener('input', filtrarProgenitores);
+    if (selectCat) selectCat.addEventListener('change', toggleCedido);
+
+    // 6. AO CARREGAR A PÁGINA (Estado inicial)
     window.onload = function () {
         toggleCedido();
-        filtrarProgenitores(); // Filtra logo se já houver ano (caso da sugestão +1)
-        const textareaObs = document.getElementById('obs');
+        filtrarProgenitores();
         if (textareaObs) updateChars(textareaObs);
     };
 </script>
