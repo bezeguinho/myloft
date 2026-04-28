@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
+
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
-<div class="alert alert-{{ category }} p-2 small text-center" role="alert">{{ message }}</div>
+<div class="alert alert-{{ category }} p-2 small text-center" style="max-width: 500px; margin: 10px auto;" role="alert">
+    {{ message }}
+</div>
 {% endfor %}
 {% endif %}
 {% endwith %}
@@ -63,6 +66,9 @@
                                     style="background-color: #eee;" {% endif %}
                                     value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
                                     autofocus>
+                                style="background-color: #eee;" {% endif %}
+                                value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
+                                autofocus>
                                 style="background-color: #eee;" {% endif %}
                                 value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
                                 autofocus>

@@ -220,7 +220,6 @@ def api_pombo_existe(search):
 @app.route("/novo_pombo", methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    # Captura sugestões (para o +1)
     sugerir_anilha = request.args.get('sugerir_anilha', '')
     sugerir_ano = request.args.get('sugerir_ano', '')
     
@@ -232,13 +231,13 @@ def novo_pombo():
         anilha = request.form.get('anilha')
         ano = int(request.form.get('ano') or 0)
 
-        # VALIDAÇÃO: Bloqueia se já existir Anilha + Ano para este utilizador
+        # Validação de duplicado
         existe = Pombo.query.filter_by(anilha=anilha, ano=ano, user_id=current_user.id).first()
         if existe:
-            flash(f"Erro: O pombo {anilha}/{ano} já está registado!", "danger")
+            from flask import flash
+            flash(f"O pombo {anilha}/{ano} já existe!", "danger")
             return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=anilha, sugerir_ano=ano)
 
-        # GRAVAÇÃO
         novo = Pombo(
             anilha=anilha, nome=request.form.get('nome'), ano=ano,
             sexo=request.form.get('sexo'), cor=request.form.get('cor'),
@@ -250,16 +249,15 @@ def novo_pombo():
         db.session.add(novo)
         db.session.commit()
 
-        # PREPARAR PRÓXIMO NÚMERO
         try:
             proxima = str(int(anilha) + 1)
         except:
             proxima = ""
 
-        flash("Pombo gravado!", "success")
         return redirect(url_for('novo_pombo', sugerir_anilha=proxima, sugerir_ano=ano))
 
     return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
+
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
