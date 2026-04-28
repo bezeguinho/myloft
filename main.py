@@ -220,53 +220,64 @@ def api_pombo_existe(search):
 @app.route('/novo_pombo', methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    # 1. Preparar as listas que o formulário precisa sempre
+    # 1. Listas que o formulário precisa sempre (independente de ser GET ou POST)
     anos_lista = list(range(datetime.now().year, 1990, -1))
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
 
-    # 2. Valores iniciais (quando entras na página a primeira vez, tudo vazio)
+    # 2. Valores padrão (vazios para quando entras na página a primeira vez)
     sugerir_anilha = ""
     sugerir_ano = ""
 
     if request.method == 'POST':
-        anilha = request.form.get('anilha')
-        ano = request.form.get('ano')
-        # ... buscar o resto dos campos (nome, cor, etc) ...
+        # Capturar dados do formulário
+        anilha_inserida = request.form.get('anilha')
+        ano_inserido = request.form.get('ano')
 
-        # Criar e guardar o pombo
-        novo = Pombo(anilha=anilha, ano=ano, user_id=current_user.id, ...)
-        db.session.add(novo)
-        db.session.commit()
-        
-        flash("Pombo gravado com sucesso!", "success")
+        # Criar o objeto Pombo (verifica se os nomes dos campos batem com o teu Banco de Dados)
+        novo = Pombo(
+            anilha=anilha_inserida,
+            ano=ano_inserido,
+            nome=request.form.get('nome'),
+            cor=request.form.get('cor'),
+            sexo=request.form.get('sexo'),
+            categoria=request.form.get('categoria'),
+            pai_id=request.form.get('pai_id') or None,
+            mae_id=request.form.get('mae_id') or None,
+            obs=request.form.get('obs'),
+            cedido_a=request.form.get('cedido_a'),
+            oculto=True if request.form.get('oculto') == 'on' else False,
+            user_id=current_user.id
+        )
 
-        # --- AQUI É ONDE A MAGIA ACONTECE ---
-        # Depois de gravar, preparamos a sugestão para o próximo
         try:
-            sugerir_anilha = int(anilha) + 1  # Pega na anilha que acabou de gravar e soma 1
-        except:
-            sugerir_anilha = anilha # Se não for número, repete apenas
-            
-        sugerir_ano = ano # Mantém o mesmo ano que acabaste de usar
-        
-        # Em vez de redirect, fazemos render_template para "ficar" na página com os novos valores
-        return render_template("pombo_form.html", 
-                               sugerir_anilha=sugerir_anilha, 
-                               sugerir_ano=sugerir_ano,
-                               anos_lista=anos_lista, 
-                               machos=machos, 
-                               femeas=femeas,
-                               pombo=None) # pombo=None porque é uma nova inserção
+            db.session.add(novo)
+            db.session.commit()
+            flash("Pombo gravado com sucesso!", "success")
 
-    # Este return é para quando entras na página via GET (clique no botão Novo)
+            # --- LOGICA DE SUGESTÃO APÓS GRAVAR ---
+            try:
+                sugerir_anilha = int(anilha_inserida) + 1
+            except:
+                sugerir_anilha = anilha_inserida # Se não for número, mantém igual
+            
+            sugerir_ano = ano_inserido
+
+        except Exception as e:
+            db.session.rollback()
+            flash("Erro ao gravar: Talvez esta anilha já exista.", "danger")
+            # Se der erro, limpamos as sugestões para não confundir
+            sugerir_anilha = ""
+            sugerir_ano = ""
+
+    # 3. O retorno final (serve para o GET inicial e para o refresh após o POST)
     return render_template("pombo_form.html", 
+                           pombo=None, 
                            sugerir_anilha=sugerir_anilha, 
                            sugerir_ano=sugerir_ano,
                            anos_lista=anos_lista, 
                            machos=machos, 
-                           femeas=femeas,
-                           pombo=None)
+                           femeas=femeas)
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
 @login_required
 def editar_pombo(id):
