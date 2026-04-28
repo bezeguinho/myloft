@@ -258,28 +258,29 @@ def novo_pombo():
 
     return render_template("pombo_form.html", anos_lista=anos_lista, machos=machos, femeas=femeas, pombo=None, sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
 
+@app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
+    # Adicionamos estas duas linhas para o formulário não dar erro de "variável indefinida"
+    sugerir_anilha = ""
+    sugerir_ano = ""
+
     if request.method == 'POST':
         pombo.nome = request.form.get('nome')
-        pombo.sexo = request.form.get('sexo')
-        pombo.cor = request.form.get('cor')
-        pombo.categoria = request.form.get('categoria')
-        pombo.pai_id = request.form.get('pai_id') or None
-        pombo.mae_id = request.form.get('mae_id') or None
-        pombo.obs = request.form.get('obs')
-        pombo.cedido_a = request.form.get('cedido_a')
-        pombo.oculto = True if request.form.get('oculto') == 'on' else False
+        # ... resto do teu código de gravação ...
         db.session.commit()
         return redirect(url_for('lista_pombos'))
 
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
-    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, machos=machos, femeas=femeas)
-
+    
+    # IMPORTANTE: Adiciona sugerir_anilha e sugerir_ano no final
+    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, 
+                           machos=machos, femeas=femeas, 
+                           sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required
