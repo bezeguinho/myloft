@@ -155,31 +155,45 @@
                         </div>
 
                         <div class="row mt-2">
-                            <div class="col-md-6">
-                                <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
-                                <textarea name="obs" id="obs" class="form-control"
-                                    style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="200"
-                                    oninput="if(this.value.length > 200) this.value = this.value.substring(0, 200);">{{ pombo.obs if pombo else '' }}</textarea>
+                            <div class="col-12 d-flex flex-wrap gap-3 align-items-start">
 
-                                <div class="text-muted mt-1 fw-bold"
-                                    style="width: 250px; text-align: right; font-size: 0.8rem;">
-                                    <span id="char_count">0</span> / 200 carateres
+                                <div>
+                                    <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
+                                    <textarea name="obs" id="obs" class="form-control"
+                                        style="width: 250px; height: 250px; resize: none; overflow: hidden;"
+                                        maxlength="100"
+                                        oninput="if(this.value.length > 100) this.value = this.value.substring(0, 100);">{{ pombo.obs if pombo else '' }}</textarea>
+
+                                    <div class="text-muted mt-1 fw-bold"
+                                        style="width: 250px; text-align: right; font-size: 0.8rem;">
+                                        <span id="char_count">0</span> / 100 carateres
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-gravar fw-bold py-2">GRAVAR</button>
-                                    <a href="{{ url_for('lista_pombos') }}"
-                                        class="btn btn-voltar fw-bold py-2">VOLTAR</a>
+
+                                <div style="width: 160px;">
+                                    <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-gravar fw-bold py-2">GRAVAR</button>
+                                        <a href="{{ url_for('lista_pombos') }}"
+                                            class="btn btn-voltar fw-bold py-2">VOLTAR</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+
+                        <div class="col-md-4">
+                            <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-gravar fw-bold py-2">GRAVAR</button>
+                                <a href="{{ url_for('lista_pombos') }}" class="btn btn-voltar fw-bold py-2">VOLTAR</a>
+                            </div>
+                        </div>
                 </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script>
