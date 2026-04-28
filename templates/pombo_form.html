@@ -4,7 +4,7 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
-<div class="alert alert-{{ category }} p-2 small text-center" style="max-width: 600px; margin: 10px auto;">{{ message }}
+<div class="alert alert-{{ category }} p-2 small text-center" style="max-width: 700px; margin: 10px auto;">{{ message }}
 </div>
 {% endfor %}
 {% endif %}
@@ -13,119 +13,127 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10">
-            <div class="card shadow-sm border-0 p-4" style="border-radius: 15px;">
+            <div class="card shadow border-0" style="border-radius: 10px;">
+                <div class="card-body p-4">
 
-                <h2 class="text-primary fw-bold text-center text-uppercase mb-4">
-                    {% if pombo %}Editar Pombo: {{ pombo.anilha }}{% else %}Inserir Novo Pombo{% endif %}
-                </h2>
+                    <h2 class="fw-bold text-primary mb-4 text-uppercase text-center">
+                        {% if pombo %} Editar Pombo: {{ pombo.anilha }} {% else %} Inserir Novo Pombo {% endif %}
+                    </h2>
 
-                <form method="POST">
-                    <div class="row g-2">
-                        <div class="col-md-3 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Nº Anilha</label>
-                            <input type="text" name="anilha" class="form-control" required {% if pombo %}readonly
-                                style="background-color: #f8f9fa;" {% endif %}
-                                value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
-                                autofocus>
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="fw-bold text-uppercase small">Nº Anilha</label>
+                                <input type="text" name="anilha" class="form-control" required {% if pombo %}readonly
+                                    style="background-color: #eee;" {% endif %}
+                                    value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}"
+                                    autofocus>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="fw-bold text-uppercase small">Ano</label>
+                                <select name="ano" class="form-select" required {% if pombo %}disabled
+                                    style="background-color: #eee;" {% endif %}>
+                                    <option value="" disabled hidden {% if not pombo and not sugerir_ano %}selected{%
+                                        endif %}>Escolha..</option>
+                                    {% for a in anos_lista %}
+                                    <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
+                                        (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="fw-bold text-uppercase small">Nome</label>
+                                <input type="text" name="nome" class="form-control"
+                                    value="{{ pombo.nome if pombo else '' }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="fw-bold text-uppercase small">Cor</label>
+                                <input type="text" name="cor" class="form-control"
+                                    value="{{ pombo.cor if pombo else '' }}">
+                            </div>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Ano</label>
-                            <select name="ano" class="form-select" required {% if pombo %}disabled{% endif %}>
-                                <option value="" disabled hidden {% if not pombo and not sugerir_ano %}selected{% endif
-                                    %}>Escolha..</option>
-                                {% for a in anos_lista %}
-                                <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (sugerir_ano|string==a|string)
-                                    %}selected{% endif %}>{{ a }}</option>
-                                {% endfor %}
-                            </select>
-                            {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Nome</label>
-                            <input type="text" name="nome" class="form-control"
-                                value="{{ pombo.nome if pombo else '' }}">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Cor</label>
-                            <input type="text" name="cor" class="form-control" value="{{ pombo.cor if pombo else '' }}">
-                        </div>
-                    </div>
 
-                    <div class="row g-2">
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Pai</label>
-                            <select name="pai" class="form-select">
-                                <option value="">-- Selecione o Pai --</option>
-                                {% for m in machos %}<option value="{{ m.id }}" {% if pombo and pombo.pai==m.id
-                                    %}selected{% endif %}>{{ m.anilha }}{% if m.nome %} - {{ m.nome }}{% endif %}
-                                </option>{% endfor %}
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-bold text-uppercase small">Pai</label>
+                                <select name="pai" class="form-select">
+                                    <option value="">-- Selecione o Pai --</option>
+                                    {% for m in machos %}
+                                    <option value="{{ m.id }}" {% if pombo and pombo.pai==m.id %}selected{% endif %}>{{
+                                        m.anilha }} - {{ m.nome or '' }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-bold text-uppercase small">Mãe</label>
+                                <select name="mae" class="form-select">
+                                    <option value="">-- Selecione a Mãe --</option>
+                                    {% for f in femeas %}
+                                    <option value="{{ f.id }}" {% if pombo and pombo.mae==f.id %}selected{% endif %}>{{
+                                        f.anilha }} - {{ f.nome or '' }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Mãe</label>
-                            <select name="mae" class="form-select">
-                                <option value="">-- Selecione a Mãe --</option>
-                                {% for f in femeas %}<option value="{{ f.id }}" {% if pombo and pombo.mae==f.id
-                                    %}selected{% endif %}>{{ f.anilha }}{% if f.nome %} - {{ f.nome }}{% endif %}
-                                </option>{% endfor %}
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-3 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Sexo</label>
-                            <select name="sexo" class="form-select" required>
-                                <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
-                                <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>Macho
-                                </option>
-                                <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>Fêmea
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Categoria</label>
-                            <select name="categoria" class="form-select">
-                                <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
-                                <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
-                                    Voador</option>
-                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
-                                    endif %}>Reprodutor</option>
-                                <option value="Outro" {% if pombo and pombo.categoria=='Outro' %}selected{% endif %}>
-                                    Outro</option>
-                            </select>
-                        </div>
-                        <div class="col-md-5 mb-3">
-                            <div class="bg-light p-2 rounded border d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-uppercase small">Ocultar Pombo?</span>
-                                <div class="form-check form-switch m-0">
-                                    <input class="form-check-input" type="checkbox" name="oculto" {% if pombo and
-                                        pombo.oculto %}checked{% endif %}>
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label class="fw-bold text-uppercase small">Sexo</label>
+                                <select name="sexo" class="form-select" required>
+                                    <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                    <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
+                                        Macho</option>
+                                    <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
+                                        Fêmea</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="fw-bold text-uppercase small">Categoria</label>
+                                <select name="categoria" class="form-select">
+                                    <option value="" disabled {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                    <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif
+                                        %}>Voador</option>
+                                    <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
+                                        %}selected{% endif %}>Reprodutor</option>
+                                    <option value="Outro" {% if pombo and pombo.categoria=='Outro' %}selected{% endif
+                                        %}>Outro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <div
+                                    class="bg-light p-2 rounded border d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-uppercase small">Ocultar Pombo?</span>
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input" type="checkbox" name="oculto" {% if pombo and
+                                            pombo.oculto %}checked{% endif %}>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row mt-2">
-                        <div class="col-12 mb-3">
-                            <label class="fw-bold text-uppercase small d-block">Descrição para o Pedigree /
-                                Observações</label>
-                            <textarea name="obs" class="form-control" rows="4"
-                                placeholder="Escreva detalhes aqui...">{{ pombo.obs if pombo else '' }}</textarea>
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <label class="fw-bold text-uppercase small">Descrição para o Pedigree /
+                                    Observações</label>
+                                <textarea name="obs" class="form-control" style="height: 180px; resize: none;"
+                                    placeholder="Escreva aqui os detalhes...">{{ pombo.obs if pombo else '' }}</textarea>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row g-2 mt-2">
-                        <div class="col-md-6">
-                            <button type="submit"
-                                class="btn btn-primary btn-lg w-100 fw-bold text-uppercase">Gravar</button>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="submit"
+                                    class="btn btn-primary btn-lg w-100 fw-bold text-uppercase">Gravar</button>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{ url_for('lista_pombos') }}"
+                                    class="btn btn-warning btn-lg w-100 fw-bold text-uppercase">Voltar</a>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-warning btn-lg w-100 fw-bold text-uppercase">Voltar</a>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
