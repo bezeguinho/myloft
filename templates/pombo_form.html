@@ -161,12 +161,12 @@
                             <div class="col-md-6">
                                 <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
                                 <textarea name="obs" id="obs" class="form-control"
-                                    style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="190"
+                                    style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="200"
                                     oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
 
                                 <div class="text-muted mt-1 fw-bold"
                                     style="width: 250px; text-align: right; font-size: 0.8rem;">
-                                    <span id="char_count">0</span> / 190 carateres
+                                    <span id="char_count">0</span> / 200 carateres
                                 </div>
                             </div>
 
@@ -197,7 +197,7 @@
     }
 
     function updateChars(obj) {
-        const maxLength = 190;
+        const maxLength = 200;
         const strLength = obj.value.length;
         document.getElementById('char_count').innerHTML = strLength;
         if (strLength > maxLength) {
