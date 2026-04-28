@@ -213,5 +213,27 @@
     });
 
 </script>
+<div class="modal fade" id="modalEliminarPombo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Confirmar Eliminação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="fs-5 mb-1">Tens a certeza que queres eliminar o pombo:</p>
+                <h4 class="text-danger fw-bold my-3" id="anilhaConfirmar"></h4>
+                <p class="text-muted small mb-0">
+                    A árvore genealógica dos filhos será mantida, mas este registo desaparecerá.
+                    <br><b>Esta ação não pode ser desfeita!</b>
+                </p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                <a href="#" id="linkConfirmarEliminar" class="btn btn-danger fw-bold">ELIMINAR AGORA</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
