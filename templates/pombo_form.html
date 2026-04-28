@@ -124,171 +124,230 @@
                         {{ "EDITAR POMBO" if pombo else "INSERIR NOVO POMBO" }}
                     </h2>
 
-                    <form method="POST">
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label class="fw-bold text-uppercase small">Nº Anilha</label>
-                                <input type="text" name="anilha" class="form-control"
-                                    value="{{ pombo.anilha if pombo else '' }}" {% if pombo %}readonly
-                                    style="background-color: #eee;" {% endif %} required>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="fw-bold text-uppercase small">Ano</label>
-                                <select name="ano" class="form-select" id="ano_select" {% if pombo %}disabled
-                                    style="background-color: #eee;" {% endif %} required>
-                                    <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
-                                    {% for a in anos_lista %}
-                                    <option value="{{ a }}" {% if pombo and pombo.ano==a %}selected{% endif %}>{{ a }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="fw-bold text-uppercase small">Nome</label>
-                                <input type="text" name="nome" class="form-control"
-                                    value="{{ pombo.nome if pombo else '' }}">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="fw-bold text-uppercase small">Cor</label>
-                                <input type="text" name="cor" class="form-control"
-                                    value="{{ pombo.cor if pombo else '' }}">
-                            </div>
-                        </div>
+                    <style>
+                        .btn-gravar {
+                            background-color: #0d6efd !important;
+                            color: white !important;
+                            transition: 0.3s;
+                            border: none;
+                        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="fw-bold text-uppercase small">Pai</label>
-                                <select name="pai_id" id="pai_id" class="form-select">
-                                    <option value="">-- Selecione o Pai --</option>
-                                    {% for m in machos %}
-                                    <option value="{{ m.id }}" data-ano="{{ m.ano }}" {% if pombo and pombo.pai_id==m.id
-                                        %}selected{% endif %}>{{ m.anilha }} ({{ m.ano }})</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="fw-bold text-uppercase small">Mãe</label>
-                                <select name="mae_id" id="mae_id" class="form-select">
-                                    <option value="">-- Selecione a Mãe --</option>
-                                    {% for f in femeas %}
-                                    <option value="{{ f.id }}" data-ano="{{ f.ano }}" {% if pombo and pombo.mae_id==f.id
-                                        %}selected{% endif %}>{{ f.anilha }} ({{ f.ano }})</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                        .btn-gravar:hover {
+                            color: black !important;
+                        }
 
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="fw-bold text-uppercase small">Sexo</label>
-                                <select name="sexo" class="form-select">
-                                    <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{%
-                                        endif %}>Indefinido</option>
-                                    <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
-                                        Macho</option>
-                                    <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
-                                        Fêmea</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="fw-bold text-uppercase small">Categoria</label>
-                                <select name="categoria" class="form-select">
-                                    <option value="Indefinido" {% if pombo and pombo.categoria=='Indefinido'
-                                        %}selected{% endif %}>Indefinido</option>
-                                    <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
-                                        %}selected{% endif %}>Reprodutor</option>
-                                    <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif
-                                        %}>Voador</option>
-                                    <option value="Excluído" {% if pombo and pombo.categoria=='Excluído' %}selected{%
-                                        endif %}>Excluído</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label style="visibility: hidden;" class="small d-block">Espaço</label>
-                                <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
-                                    style="height: 38px;">
-                                    <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
-                                    <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
-                                        pombo and pombo.oculto %}checked{% endif %}>
+                        .btn-voltar {
+                            background-color: #ffc107 !important;
+                            color: black !important;
+                            transition: 0.3s;
+                            border: none;
+                        }
+
+                        .btn-voltar:hover {
+                            color: white !important;
+                        }
+
+                        .campo-cedido {
+                            display: none;
+                        }
+
+                        /* Escondido por defeito */
+                    </style>
+
+                    <div class="container mt-4">
+                        <h2 class="text-primary fw-bold mb-4 text-center">
+                            {{ "EDITAR POMBO" if pombo else "INSERIR NOVO POMBO" }}
+                        </h2>
+
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label class="fw-bold text-uppercase small">Nº Anilha</label>
+                                    <input type="text" name="anilha" class="form-control"
+                                        value="{{ pombo.anilha if pombo else '' }}" {% if pombo %}readonly
+                                        style="background-color: #eee;" {% endif %} required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="fw-bold text-uppercase small">Ano</label>
+                                    <select name="ano" class="form-select" required>
+                                        <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                        {% for a in anos_lista %}
+                                        <option value="{{ a }}" {% if pombo and pombo.ano==a %}selected{% endif %}>{{ a
+                                            }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="fw-bold text-uppercase small">Nome</label>
+                                    <input type="text" name="nome" class="form-control"
+                                        value="{{ pombo.nome if pombo else '' }}">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="fw-bold text-uppercase small">Cor</label>
+                                    <input type="text" name="cor" class="form-control"
+                                        value="{{ pombo.cor if pombo else '' }}">
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row mt-2">
-                            <div class="col-md-4">
-                                <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
-                                <textarea name="obs" class="form-control"
-                                    style="height: 250px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
-                            </div>
-                            <div class="col-md-3">
-                                <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
-                                    <a href="{{ url_for('lista_pombos') }}"
-                                        class="btn btn-voltar fw-bold py-3 text-center text-decoration-none">VOLTAR</a>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-uppercase small">Pai</label>
+                                    <select name="pai_id" class="form-select">
+                                        <option value="">-- Selecione o Pai --</option>
+                                        {% for m in machos %}
+                                        <option value="{{ m.id }}" {% if pombo and pombo.pai_id==m.id %}selected{% endif
+                                            %}>{{ m.anilha }} ({{ m.ano }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-uppercase small">Mãe</label>
+                                    <select name="mae_id" class="form-select">
+                                        <option value="">-- Selecione a Mãe --</option>
+                                        {% for f in femeas %}
+                                        <option value="{{ f.id }}" {% if pombo and pombo.mae_id==f.id %}selected{% endif
+                                            %}>{{ f.anilha }} ({{ f.ano }})</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
 
-                <script>
-                    document.getElementById('ano_select').addEventListener('change', function () {
-                        var anoFilho = parseInt(this.value);
-                        ['pai_id', 'mae_id'].forEach(function (id) {
-                            var select = document.getElementById(id);
-                            for (var i = 1; i < select.options.length; i++) {
-                                var anoP = parseInt(select.options[i].getAttribute('data-ano'));
-                                select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold text-uppercase small">Sexo</label>
+                                    <select name="sexo" class="form-select" required>
+                                        <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                        <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
+                                            Macho</option>
+                                        <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
+                                            Fêmea</option>
+                                        <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{%
+                                            endif %}>Indefinido</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold text-uppercase small">Categoria</label>
+                                    <select name="categoria" id="categoria_select" class="form-select" required>
+                                        <option value="" {% if not pombo %}selected{% endif %}>Escolha..</option>
+                                        <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{%
+                                            endif %}>Voador</option>
+                                        <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
+                                            %}selected{% endif %}>Reprodutor</option>
+                                        <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{%
+                                            endif %}>Cedido</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label style="visibility: hidden;" class="small d-block">Espaço</label>
+                                    <div class="d-flex align-items-center justify-content-between border rounded px-3 bg-light"
+                                        style="height: 38px;">
+                                        <label class="fw-bold mb-0 small" for="oculto">OCULTAR POMBO?</label>
+                                        <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0"
+                                            {% if pombo and pombo.oculto %}checked{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row campo-cedido" id="div_cedido">
+                                <div class="col-md-12 mb-3">
+                                    <label class="fw-bold text-uppercase small text-danger">A quem foi cedido?</label>
+                                    <input type="text" name="cedido_a" class="form-control"
+                                        value="{{ pombo.cedido_a if pombo else '' }}"
+                                        placeholder="Nome da pessoa ou local...">
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-4">
+                                    <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
+                                    <textarea name="obs" class="form-control"
+                                        style="height: 250px; resize: none;">{{ pombo.obs if pombo else '' }}</textarea>
+                                </div>
+                                <div class="col-md-3">
+                                    <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-gravar fw-bold py-3">GRAVAR</button>
+                                        <a href="{{ url_for('lista_pombos') }}"
+                                            class="btn btn-voltar fw-bold py-3 text-center text-decoration-none">VOLTAR</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <script>
+                        // Lógica para mostrar/esconder o campo "Cedido"
+                        const selectCategoria = document.getElementById('categoria_select');
+                        const divCedido = document.getElementById('div_cedido');
+
+                        function verificarCedido() {
+                            if (selectCategoria.value === 'Cedido') {
+                                divCedido.style.display = 'block';
+                            } else {
+                                divCedido.style.display = 'none';
                             }
-                        });
-                    });
-                </script>
+                        }
 
-                <script>
-                    document.getElementById('ano_pombo').addEventListener('change', function () {
-                        var anoFilho = this.value;
-                        ['pai_id', 'mae_id'].forEach(function (id) {
-                            var select = document.getElementById(id);
-                            var options = select.options;
+                        selectCategoria.addEventListener('change', verificarCedido);
+                        window.onload = verificarCedido; // Verifica ao carregar se for edição
+                    </script>
 
-                            for (var i = 1; i < options.length; i++) {
-                                var anoProgenitor = options[i].getAttribute('data-ano');
-                                // Só mostra se o progenitor for do mesmo ano ou mais velho
-                                if (anoFilho && anoProgenitor > anoFilho) {
-                                    options[i].style.display = 'none';
-                                } else {
-                                    options[i].style.display = 'block';
+                    <script>
+                        document.getElementById('ano_select').addEventListener('change', function () {
+                            var anoFilho = parseInt(this.value);
+                            ['pai_id', 'mae_id'].forEach(function (id) {
+                                var select = document.getElementById(id);
+                                for (var i = 1; i < select.options.length; i++) {
+                                    var anoP = parseInt(select.options[i].getAttribute('data-ano'));
+                                    select.options[i].style.display = (anoFilho && anoP > anoFilho) ? 'none' : 'block';
                                 }
-                            }
+                            });
                         });
-                    });
-                </script>
+                    </script>
 
-                <script>
-                    function verificarCategoria() {
-                        var dropdown = document.getElementById("categoriaSelect");
-                        var caixa = document.getElementById("caixaCedidoA");
-                        var input = document.getElementById("inputCedidoA");
+                    <script>
+                        document.getElementById('ano_pombo').addEventListener('change', function () {
+                            var anoFilho = this.value;
+                            ['pai_id', 'mae_id'].forEach(function (id) {
+                                var select = document.getElementById(id);
+                                var options = select.options;
 
-                        if (dropdown.value === "Cedido") {
-                            caixa.classList.remove("d-none");
-                            caixa.style.display = "block";
-                            setTimeout(function () { input.focus(); }, 50);
-                        } else {
-                            caixa.classList.add("d-none");
-                            caixa.style.display = "none";
-                            input.value = "";
+                                for (var i = 1; i < options.length; i++) {
+                                    var anoProgenitor = options[i].getAttribute('data-ano');
+                                    // Só mostra se o progenitor for do mesmo ano ou mais velho
+                                    if (anoFilho && anoProgenitor > anoFilho) {
+                                        options[i].style.display = 'none';
+                                    } else {
+                                        options[i].style.display = 'block';
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+
+                    <script>
+                        function verificarCategoria() {
+                            var dropdown = document.getElementById("categoriaSelect");
+                            var caixa = document.getElementById("caixaCedidoA");
+                            var input = document.getElementById("inputCedidoA");
+
+                            if (dropdown.value === "Cedido") {
+                                caixa.classList.remove("d-none");
+                                caixa.style.display = "block";
+                                setTimeout(function () { input.focus(); }, 50);
+                            } else {
+                                caixa.classList.add("d-none");
+                                caixa.style.display = "none";
+                                input.value = "";
+                            }
                         }
-                    }
 
-                    function assumirSugestoes() {
-                        var anilhaInput = document.getElementById("inputAnilha");
-                        if (anilhaInput.value.trim() === "" && anilhaInput.placeholder !== "") {
-                            anilhaInput.value = anilhaInput.placeholder;
+                        function assumirSugestoes() {
+                            var anilhaInput = document.getElementById("inputAnilha");
+                            if (anilhaInput.value.trim() === "" && anilhaInput.placeholder !== "") {
+                                anilhaInput.value = anilhaInput.placeholder;
+                            }
+                            return true;
                         }
-                        return true;
-                    }
-                </script>
-                {% endblock %}
+                    </script>
+                    {% endblock %}
