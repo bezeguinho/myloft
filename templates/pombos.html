@@ -136,17 +136,21 @@
     }
 
 
-    /* Forçar azul e negrito em qualquer elemento com esta classe */
+    /* 1. Cor azul e negrito para as anilhas e pais */
     .anilha-link {
         color: #0056d2 !important;
         font-weight: bold !important;
         text-decoration: none !important;
+        /* Sem sublinhado por padrão */
         cursor: pointer !important;
     }
 
+    /* 2. O que acontece quando passas o rato (HOVER) */
     .anilha-link:hover {
         text-decoration: underline !important;
-        color: #0033a0 !important;
+        /* Aqui ativa o sublinhado */
+        color: #0044a8 !important;
+        /* Um azul um pouco mais escuro */
     }
 </style>
 
@@ -228,8 +232,9 @@
                                 {{ p.pai }}
                             </a>
                             {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                p.pai or '---' }}</span>
+                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
+                                {{ p.pai or '---' }}
+                            </span>
                             {% endif %}
                         </td>
 
@@ -239,8 +244,9 @@
                                 {{ p.mae }}
                             </a>
                             {% else %}
-                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                p.mae or '---' }}</span>
+                            <span class="anilha-link" style="cursor: default; text-decoration: none !important;">
+                                {{ p.mae or '---' }}
+                            </span>
                             {% endif %}
                         </td>
                         <td class="text-center" style="width: 230px; min-width: 230px;">
