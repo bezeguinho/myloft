@@ -158,16 +158,6 @@
                             <div class="col-md-6">
                                 <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
                                 <textarea name="obs" id="obs" class="form-control"
-                                    style="aspect-ratio: 1 / 1; resize: none; overflow: hidden;"
-                                    maxlength="100">{{ pombo.obs if pombo else '' }}</textarea>
-
-                                <div class="text-end small text-muted mt-1 fw-bold">
-                                    <span id="char_count">0</span> / 100 carateres
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
-                                <textarea name="obs" id="obs" class="form-control"
                                     style="aspect-ratio: 1 / 1; resize: none; overflow: hidden;" maxlength="100"
                                     oninput="if(this.value.length > 100) this.value = this.value.substring(0, 100);">{{ pombo.obs if pombo else '' }}</textarea>
 
