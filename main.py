@@ -220,57 +220,49 @@ def api_pombo_existe(search):
 @app.route('/novo_pombo', methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
-    # 1. Listas que o formulário precisa sempre (independente de ser GET ou POST)
     anos_lista = list(range(datetime.now().year, 1990, -1))
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
-
-    # 2. Valores padrão (vazios para quando entras na página a primeira vez)
+    
     sugerir_anilha = ""
     sugerir_ano = ""
 
     if request.method == 'POST':
-        # Capturar dados do formulário
-        anilha_inserida = request.form.get('anilha')
-        ano_inserido = request.form.get('ano')
-
-        # Criar o objeto Pombo (verifica se os nomes dos campos batem com o teu Banco de Dados)
-        novo = Pombo(
-            anilha=anilha_inserida,
-            ano=ano_inserido,
-            nome=request.form.get('nome'),
-            cor=request.form.get('cor'),
-            sexo=request.form.get('sexo'),
-            categoria=request.form.get('categoria'),
-            pai_id=request.form.get('pai_id') or None,
-            mae_id=request.form.get('mae_id') or None,
-            obs=request.form.get('obs'),
-            cedido_a=request.form.get('cedido_a'),
-            oculto=True if request.form.get('oculto') == 'on' else False,
-            user_id=current_user.id
-        )
+        # Criamos o objeto vazio primeiro para evitar o erro de 'invalid keyword'
+        novo = Pombo()
+        novo.user_id = current_user.id
+        novo.anilha = request.form.get('anilha')
+        novo.ano = request.form.get('ano')
+        novo.nome = request.form.get('nome')
+        novo.cor = request.form.get('cor')
+        novo.sexo = request.form.get('sexo')
+        novo.categoria = request.form.get('categoria')
+        
+        # ATENÇÃO: Se o erro persistir, confirma se o nome no teu Banco de Dados 
+        # é 'pai_id' ou apenas 'pai'. Usa o mesmo que tens na função editar_pombo.
+        novo.pai_id = request.form.get('pai_id') or None
+        novo.mae_id = request.form.get('mae_id') or None
+        
+        novo.obs = request.form.get('obs')
+        novo.cedido_a = request.form.get('cedido_a')
+        novo.oculto = True if request.form.get('oculto') == 'on' else False
 
         try:
             db.session.add(novo)
             db.session.commit()
             flash("Pombo gravado com sucesso!", "success")
 
-            # --- LOGICA DE SUGESTÃO APÓS GRAVAR ---
+            # Lógica do número +1
             try:
-                sugerir_anilha = int(anilha_inserida) + 1
+                sugerir_anilha = int(novo.anilha) + 1
             except:
-                sugerir_anilha = anilha_inserida # Se não for número, mantém igual
-            
-            sugerir_ano = ano_inserido
+                sugerir_anilha = novo.anilha
+            sugerir_ano = novo.ano
 
         except Exception as e:
             db.session.rollback()
-            flash("Erro ao gravar: Talvez esta anilha já exista.", "danger")
-            # Se der erro, limpamos as sugestões para não confundir
-            sugerir_anilha = ""
-            sugerir_ano = ""
+            flash(f"Erro ao gravar: {str(e)}", "danger")
 
-    # 3. O retorno final (serve para o GET inicial e para o refresh após o POST)
     return render_template("pombo_form.html", 
                            pombo=None, 
                            sugerir_anilha=sugerir_anilha, 
@@ -301,6 +293,8 @@ def editar_pombo(id):
     return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, 
                            machos=machos, femeas=femeas, 
                            sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
+                           
+
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required
