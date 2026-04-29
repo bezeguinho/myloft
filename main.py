@@ -357,44 +357,36 @@ def lista_pombos(categoria=None):
 def ver_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     
-    # Vamos pesquisar o Pai na base de dados
+    # O nosso mapa mágico para o HTML saber os números das anilhas em vez de IDs
+    todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
+
+    # Vamos pesquisar o Pai na base de dados (Agora sabe ler IDs e Anilhas antigas)
     nome_pai = "---"
     if pombo.pai:
-        pai_obj = Pombo.query.filter_by(anilha=pombo.pai, user_id=current_user.id).first()
+        pai_str = str(pombo.pai)
+        if pai_str.isdigit():
+            pai_obj = Pombo.query.filter_by(id=int(pombo.pai), user_id=current_user.id).first()
+        else:
+            pai_obj = Pombo.query.filter_by(anilha=pombo.pai, user_id=current_user.id).first()
+        
         if pai_obj and pai_obj.nome:
             nome_pai = pai_obj.nome
 
-    # Vamos pesquisar a Mãe na base de dados
+    # Vamos pesquisar a Mãe na base de dados (Agora sabe ler IDs e Anilhas antigas)
     nome_mae = "---"
     if pombo.mae:
-        mae_obj = Pombo.query.filter_by(anilha=pombo.mae, user_id=current_user.id).first()
+        mae_str = str(pombo.mae)
+        if mae_str.isdigit():
+            mae_obj = Pombo.query.filter_by(id=int(pombo.mae), user_id=current_user.id).first()
+        else:
+            mae_obj = Pombo.query.filter_by(anilha=pombo.mae, user_id=current_user.id).first()
+            
         if mae_obj and mae_obj.nome:
             nome_mae = mae_obj.nome
 
-    return render_template("ver_pombo.html", pombo=pombo, nome_pai=nome_pai, nome_mae=nome_mae)
-    
-    if request.method == 'POST':
-        pombo.anilha = request.form.get('anilha')
-        pombo.nome = request.form.get('nome')
-        pombo.ano = int(request.form.get('ano') or 0)
-        pombo.sexo = request.form.get('sexo')
-        pombo.cor = request.form.get('cor')
-        pombo.categoria = request.form.get('categoria')
-        pombo.pai = request.form.get('pai')
-        pombo.mae = request.form.get('mae')
-        pombo.obs = request.form.get('obs')
-        pombo.cedido_a = request.form.get('cedido_a')
-        pombo.oculto = True if request.form.get('oculto') == 'on' else False
-        
-        try:
-            db.session.commit()
-            flash(f"Pombo {pombo.anilha} atualizado com sucesso!", "success")
-            return redirect(url_for('lista_pombos'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Erro ao atualizar pombo: {str(e)}", "danger")
-            
-    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, modo_edicao=True)
+    # Mandamos tudo direitinho para o HTML (sem código extra no fim)
+    return render_template("ver_pombo.html", pombo=pombo, nome_pai=nome_pai, nome_mae=nome_mae, mapa_pombos=mapa_pombos)
 
 @app.route("/eliminar_pombo/<int:id>")
 @login_required
