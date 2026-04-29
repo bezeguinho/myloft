@@ -221,9 +221,10 @@ def api_pombo_existe(search):
 @login_required
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
-   # No main.py, dentro da rota novo_pombo:
-machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano.asc(), Pombo.anilha.asc()).all()
-femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano.asc(), Pombo.anilha.asc()).all()
+    
+    # Busca com ordenação simplificada e segura (Ano e Anilha em ordem crescente)
+    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
     
     sugerir_anilha = ""
     sugerir_ano = ""
