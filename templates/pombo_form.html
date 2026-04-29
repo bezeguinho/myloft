@@ -304,7 +304,9 @@
 
             listaOpcoes.forEach(opt => {
                 const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
-                if (anilhaLista === termoDigitado) {
+                const textoCompleto = opt.innerText.trim().toLowerCase();
+
+                if (anilhaLista === termoDigitado || textoCompleto === termoDigitado) {
                     idEncontrado = opt.getAttribute('data-id');
                 }
             });
