@@ -218,13 +218,17 @@
 </div>
 
 <script>
+    // 1. FILTRO COM PESQUISA INTEGRADA
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
-        const termo = input.value.toLowerCase();
-        const anoFilho = parseInt(document.getElementById('ano_select').value);
+        if (!input || !lista) return;
 
-        lista.classList.add('show'); // Mostra a lista enquanto digitas
+        const termo = input.value.toLowerCase();
+        const anoFilhoSelect = document.getElementById('ano_select');
+        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
+
+        lista.classList.add('show');
 
         let visiveis = 0;
         const options = lista.querySelectorAll('.pombo-opt');
@@ -232,7 +236,7 @@
         options.forEach(opt => {
             const anoP = parseInt(opt.getAttribute('data-ano'));
             const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-            const nomeP = opt.getAttribute('data-nome');
+            const nomeP = opt.getAttribute('data-nome').toLowerCase();
 
             const bateAno = !anoFilho || anoP <= anoFilho;
             const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
@@ -244,7 +248,6 @@
                 opt.style.display = 'none';
             }
 
-            // Quando clicas num pombo da lista
             opt.onclick = function () {
                 input.value = opt.innerText.trim();
                 document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
@@ -255,15 +258,17 @@
         if (visiveis === 0) lista.classList.remove('show');
     }
 
-    // Fecha a lista se clicares fora
+    // Fechar lista se clicar fora
     document.addEventListener('click', function (e) {
         if (!e.target.id.includes('search')) {
-            document.getElementById('list_pai').classList.remove('show');
-            document.getElementById('list_mae').classList.remove('show');
+            const listPai = document.getElementById('list_pai');
+            const listMae = document.getElementById('list_mae');
+            if (listPai) listPai.classList.remove('show');
+            if (listMae) listMae.classList.remove('show');
         }
     });
 
-    // Funções de Cedido e Caracteres que já estavam bem
+    // 2. FUNÇÃO: MOSTRAR/ESCONDER CEDIDO
     function toggleCedido() {
         const selectCat = document.getElementById('categoria_select');
         const linhaCedido = document.getElementById('linha_cedido');
@@ -271,15 +276,22 @@
             linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
         }
     }
+    const selCat = document.getElementById('categoria_select');
+    if (selCat) selCat.addEventListener('change', toggleCedido);
 
+    // 3. FUNÇÃO: CONTADOR DE CARACTERES
     function updateChars(obj) {
         const display = document.getElementById('char_count');
         if (display) display.innerHTML = obj.value.length;
     }
+
+    // 4. FUNÇÃO: VALIDAR GRAVAÇÃO (Verificar se os pais existem)
     function validarGravação(event) {
         const verificarProgenitor = (tipo, nomeTipo) => {
             const inputPesquisa = document.getElementById('search_' + tipo);
             const inputOcultoId = document.getElementById(tipo + '_id');
+            if (!inputPesquisa || !inputOcultoId) return true;
+
             const termoDigitado = inputPesquisa.value.trim().toLowerCase();
 
             if (termoDigitado === "") {
@@ -290,7 +302,6 @@
             const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
             let idEncontrado = null;
 
-            // Procura se a anilha digitada existe na lista
             listaOpcoes.forEach(opt => {
                 const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
                 if (anilhaLista === termoDigitado) {
@@ -299,16 +310,14 @@
             });
 
             if (idEncontrado) {
-                // Se encontrou, preenche o ID (caso o user tenha digitado e não clicado)
                 inputOcultoId.value = idEncontrado;
                 return true;
             } else {
-                // Se NÃO encontrou, pergunta se quer inserir
                 const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na sua base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
                 if (querInserir) {
                     window.open('/novo_pombo', '_blank');
                 }
-                return false; // Bloqueia a gravação para o user decidir
+                return false;
             }
         };
 
@@ -317,6 +326,13 @@
 
         return true;
     }
+
+    // 5. INICIALIZAÇÃO AO ABRIR A PÁGINA
+    window.onload = function () {
+        toggleCedido();
+        const obs = document.getElementById('obs');
+        if (obs) updateChars(obs);
+    };
 </script>
 
 {% endblock %}
