@@ -43,28 +43,23 @@
 
             <div class="col-6">
                 <h6 class="text-muted fw-bold small text-uppercase mb-1">Pai</h6>
-                {% if pombo.pai %}
-                {% set pai_str = pombo.pai | string %}
-                {% if pai_str.isdigit() %}
-                <a href="{{ url_for('ver_pombo', id=pombo.pai|int) }}"
-                    class="text-primary fw-bold text-decoration-none">{{ mapa_pombos.get(pai_str, pombo.pai) }}</a>
-                {% else %}
-                <span class="text-dark fw-bold">{{ mapa_pombos.get(pai_str, pombo.pai) }}</span>
-                {% endif %}
+                {% if pai_id_real %}
+                <a href="{{ url_for('ver_pombo', id=pai_id_real) }}"
+                    class="text-primary fw-bold text-decoration-none">{{ mapa_pombos.get(pai_id_real|string) }}</a>
+                {% elif pombo.pai %}
+                <span class="text-dark fw-bold">{{ pombo.pai }}</span>
                 {% else %}
                 <span class="text-muted">---</span>
                 {% endif %}
             </div>
+
             <div class="col-6 border-start">
                 <h6 class="text-muted fw-bold small text-uppercase mb-1">Mãe</h6>
-                {% if pombo.mae %}
-                {% set mae_str = pombo.mae | string %}
-                {% if mae_str.isdigit() %}
-                <a href="{{ url_for('ver_pombo', id=pombo.mae|int) }}"
-                    class="text-primary fw-bold text-decoration-none">{{ mapa_pombos.get(mae_str, pombo.mae) }}</a>
-                {% else %}
-                <span class="text-dark fw-bold">{{ mapa_pombos.get(mae_str, pombo.mae) }}</span>
-                {% endif %}
+                {% if mae_id_real %}
+                <a href="{{ url_for('ver_pombo', id=mae_id_real) }}"
+                    class="text-primary fw-bold text-decoration-none">{{ mapa_pombos.get(mae_id_real|string) }}</a>
+                {% elif pombo.mae %}
+                <span class="text-dark fw-bold">{{ pombo.mae }}</span>
                 {% else %}
                 <span class="text-muted">---</span>
                 {% endif %}

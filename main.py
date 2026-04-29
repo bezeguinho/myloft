@@ -357,36 +357,48 @@ def lista_pombos(categoria=None):
 def ver_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     
-    # O nosso mapa mágico para o HTML saber os números das anilhas em vez de IDs
     todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
     mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
 
-    # Vamos pesquisar o Pai na base de dados (Agora sabe ler IDs e Anilhas antigas)
+    # PESQUISA DO PAI (Devolve o ID real se existir)
     nome_pai = "---"
+    pai_id_real = None
     if pombo.pai:
         pai_str = str(pombo.pai)
+        pai_obj = None
+        # Tenta ver se é um ID válido
         if pai_str.isdigit():
-            pai_obj = Pombo.query.filter_by(id=int(pombo.pai), user_id=current_user.id).first()
-        else:
-            pai_obj = Pombo.query.filter_by(anilha=pombo.pai, user_id=current_user.id).first()
+            pai_obj = Pombo.query.filter_by(id=int(pai_str), user_id=current_user.id).first()
+        # Se não for ID, procura pela anilha antiga
+        if not pai_obj:
+            pai_obj = Pombo.query.filter_by(anilha=pai_str, user_id=current_user.id).first()
         
-        if pai_obj and pai_obj.nome:
+        if pai_obj:
             nome_pai = pai_obj.nome
+            pai_id_real = pai_obj.id
 
-    # Vamos pesquisar a Mãe na base de dados (Agora sabe ler IDs e Anilhas antigas)
+    # PESQUISA DA MÃE (Devolve o ID real se existir)
     nome_mae = "---"
+    mae_id_real = None
     if pombo.mae:
         mae_str = str(pombo.mae)
+        mae_obj = None
         if mae_str.isdigit():
-            mae_obj = Pombo.query.filter_by(id=int(pombo.mae), user_id=current_user.id).first()
-        else:
-            mae_obj = Pombo.query.filter_by(anilha=pombo.mae, user_id=current_user.id).first()
+            mae_obj = Pombo.query.filter_by(id=int(mae_str), user_id=current_user.id).first()
+        if not mae_obj:
+            mae_obj = Pombo.query.filter_by(anilha=mae_str, user_id=current_user.id).first()
             
-        if mae_obj and mae_obj.nome:
+        if mae_obj:
             nome_mae = mae_obj.nome
+            mae_id_real = mae_obj.id
 
-    # Mandamos tudo direitinho para o HTML (sem código extra no fim)
-    return render_template("ver_pombo.html", pombo=pombo, nome_pai=nome_pai, nome_mae=nome_mae, mapa_pombos=mapa_pombos)
+    return render_template("ver_pombo.html", 
+                           pombo=pombo, 
+                           nome_pai=nome_pai, 
+                           nome_mae=nome_mae, 
+                           mapa_pombos=mapa_pombos,
+                           pai_id_real=pai_id_real, 
+                           mae_id_real=mae_id_real)
 
 @app.route("/eliminar_pombo/<int:id>")
 @login_required
