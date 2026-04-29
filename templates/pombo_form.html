@@ -55,46 +55,43 @@
 
                     <form method="POST" id="form_pombo" onsubmit="return validarGravação(event)">
                         <div class="row">
-                            <div class="row">
-                                <div class="row gx-2">
-                                    <div class="col-md-3 mb-3">
-                                        <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
-                                        <input type="text" name="anilha" id="anilha" class="form-control" maxlength="12"
-                                            autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}"
-                                            style="{% if not pombo and sugerir_anilha %}color: gray;{% endif %} {% if pombo %}background-color: #eee;{% endif %}"
-                                            onclick="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
-                                            onkeydown="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
-                                            {% if pombo %}readonly{% endif %} required autofocus>
-                                    </div>
+                            <div class="row gx-2">
+                                <div class="mb-3" style="width: 18%;">
+                                    <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
+                                    <input type="text" name="anilha" id="anilha" class="form-control" maxlength="12"
+                                        autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}"
+                                        style="{% if not pombo and sugerir_anilha %}color: gray;{% endif %} {% if pombo %}background-color: #eee;{% endif %}"
+                                        onclick="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                        onkeydown="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                        {% if pombo %}readonly{% endif %} required autofocus>
+                                </div>
 
-                                    <div class="col-md-2 mb-3">
-                                        <label class="form-label fw-bold small text-uppercase">Ano</label>
-                                        <select name="ano" class="form-select" id="ano_select" required
-                                            style="{% if not pombo and sugerir_ano %}color: gray;{% endif %}{% if pombo %}background-color: #eee;{% endif %}"
-                                            onfocus="if(!this.disabled && this.style.color == 'gray') { this.selectedIndex = 0; this.style.color = 'black'; }"
-                                            onchange="this.style.color='black';">
-                                            <option value="" disabled hidden {% if not pombo and not sugerir_ano
-                                                %}selected{% endif %}>Escolha..</option>
-                                            {% for a in anos_lista %}
-                                            <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
-                                                (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif
-                                        %}
-                                    </div>
+                                <div class="mb-3" style="width: 12%;">
+                                    <label class="form-label fw-bold small text-uppercase">Ano</label>
+                                    <select name="ano" class="form-select" id="ano_select" required
+                                        style="{% if not pombo and sugerir_ano %}color: gray;{% endif %}{% if pombo %}background-color: #eee;{% endif %}"
+                                        onfocus="if(!this.disabled && this.style.color == 'gray') { this.selectedIndex = 0; this.style.color = 'black'; }"
+                                        onchange="this.style.color='black';">
+                                        <option value="" disabled hidden {% if not pombo and not sugerir_ano
+                                            %}selected{% endif %}>Escolha..</option>
+                                        {% for a in anos_lista %}
+                                        <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
+                                            (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
+                                </div>
 
-                                    <div class="col mb-3">
-                                        <label class="form-label fw-bold small text-uppercase">Nome</label>
-                                        <input type="text" name="nome" id="nome" class="form-control" autocomplete="off"
-                                            maxlength="24" value="{{ pombo.nome if pombo else '' }}">
-                                    </div>
+                                <div class="mb-3" style="width: 35%;">
+                                    <label class="form-label fw-bold small text-uppercase">Nome</label>
+                                    <input type="text" name="nome" id="nome" class="form-control" autocomplete="off"
+                                        maxlength="24" value="{{ pombo.nome if pombo else '' }}">
+                                </div>
 
-                                    <div class="col mb-3">
-                                        <label class="form-label fw-bold small text-uppercase">Cor</label>
-                                        <input type="text" name="cor" class="form-control" autocomplete="off"
-                                            maxlength="24" value="{{ pombo.cor if pombo else '' }}">
-                                    </div>
+                                <div class="mb-3" style="width: 35%;">
+                                    <label class="form-label fw-bold small text-uppercase">Cor</label>
+                                    <input type="text" name="cor" class="form-control" autocomplete="off" maxlength="24"
+                                        value="{{ pombo.cor if pombo else '' }}">
                                 </div>
                             </div>
                             <div class="row">
