@@ -232,20 +232,22 @@
                             </td>
 
                             <td class="align-middle">
-                                {% if p.pai_id %}
-                                <a href="{{ url_for('ver_pombo', id=p.pai_id) }}" class="anilha-link">{{ p.pai }}</a>
+                                {% if p.pai %}
+                                <a href="{{ url_for('ver_pombo', id=p.pai) }}" class="anilha-link">{{
+                                    mapa_pombos.get(p.pai|string, p.pai) }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                    p.pai or '---' }}</span>
+                                <span class="anilha-link"
+                                    style="cursor: default; text-decoration: none !important;">---</span>
                                 {% endif %}
                             </td>
 
                             <td class="align-middle">
-                                {% if p.mae_id %}
-                                <a href="{{ url_for('ver_pombo', id=p.mae_id) }}" class="anilha-link">{{ p.mae }}</a>
+                                {% if p.mae %}
+                                <a href="{{ url_for('ver_pombo', id=p.mae) }}" class="anilha-link">{{
+                                    mapa_pombos.get(p.mae|string, p.mae) }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                    p.mae or '---' }}</span>
+                                <span class="anilha-link"
+                                    style="cursor: default; text-decoration: none !important;">---</span>
                                 {% endif %}
                             </td>
 

@@ -273,39 +273,59 @@ def novo_pombo():
                            machos=machos, 
                            femeas=femeas)
 
-@app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
+@app.route('/editar_pombo/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    # Adicionamos estas duas linhas para o formulário não dar erro de "variável indefinida"
+    # Variáveis para o formulário não dar erro (na edição não sugerimos +1)
     sugerir_anilha = ""
     sugerir_ano = ""
 
     if request.method == 'POST':
+        # Aqui atualizamos TODOS os campos com o que vem do formulário
+        pombo.anilha = request.form.get('anilha')
+        pombo.ano = int(request.form.get('ano'))
         pombo.nome = request.form.get('nome')
-        # ... resto do teu código de gravação ...
-        db.session.commit()
-        return redirect(url_for('lista_pombos'))
+        pombo.cor = request.form.get('cor')
+        pombo.sexo = request.form.get('sexo')
+        pombo.categoria = request.form.get('categoria')
+        
+        # Lembra-te: na tua BD é 'pai' e 'mae', mas no formulário é 'pai_id' e 'mae_id'
+        pombo.pai = request.form.get('pai_id') or None
+        pombo.mae = request.form.get('mae_id') or None
+        
+        pombo.obs = request.form.get('obs')
+        pombo.cedido_a = request.form.get('cedido_a')
+        pombo.oculto = True if request.form.get('oculto') == 'on' else False
 
-    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).all()
-    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).all()
+        try:
+            db.session.commit()
+            flash("Pombo atualizado com sucesso!", "success")
+            return redirect(url_for('lista_pombos'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar: {str(e)}", "danger")
+
+    # Busca machos e fêmeas ordenados para as listas de seleção
+    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
     
-    # IMPORTANTE: Adiciona sugerir_anilha e sugerir_ano no final
-    return render_template("pombo_form.html", pombo=pombo, anos_lista=anos_lista, 
-                           machos=machos, femeas=femeas, 
-                           sugerir_anilha=sugerir_anilha, sugerir_ano=sugerir_ano)
-                           
+    return render_template("pombo_form.html", 
+                           pombo=pombo, 
+                           anos_lista=anos_lista, 
+                           machos=machos, 
+                           femeas=femeas, 
+                           sugerir_anilha=sugerir_anilha, 
+                           sugerir_ano=sugerir_ano)
 
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required
 def lista_pombos(categoria=None):
-    # Filtro base
     query = Pombo.query.filter_by(user_id=current_user.id)
 
-    # Lógica de Categorias
     if categoria == 'Oculto':
         query = query.filter_by(oculto=True)
         titulo = "POMBOS OCULTOS"
@@ -317,14 +337,20 @@ def lista_pombos(categoria=None):
         query = query.filter_by(oculto=False)
         titulo = "TODOS OS POMBOS"
 
-    # AQUI ESTÁ A MUDANÇA CIRÚRGICA:
-    # Ordena 1º pelo ano (crescente: do mais velho para o mais novo) e 2º pela anilha (crescente)
     pombos = query.order_by(Pombo.ano, Pombo.anilha).all()
     
-    anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
+    # CRIAMOS ESTA LINHA NOVA: Um mapa para converter ID em Anilha
+    # Isto cria uma lista onde o computador consulta: "O ID 1 corresponde à Anilha X"
+    todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
+    mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
     
-    # Voltamos a usar o TEU ficheiro original: pombos.html
-    return render_template("pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
+    anilhas_registadas = {p.anilha for p in todos_os_meus_pombos}
+    
+    return render_template("pombos.html", 
+                           pombos=pombos, 
+                           titulo=titulo, 
+                           anilhas_registadas=anilhas_registadas,
+                           mapa_pombos=mapa_pombos) # Enviamos o mapa para o HTML
 
 @app.route("/ver_pombo/<int:id>")
 @login_required
