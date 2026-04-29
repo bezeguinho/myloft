@@ -233,8 +233,14 @@
 
                             <td class="align-middle">
                                 {% if p.pai %}
-                                <a href="{{ url_for('ver_pombo', id=p.pai) }}" class="anilha-link">{{
-                                    mapa_pombos.get(p.pai|string, p.pai) }}</a>
+                                {% set pai_str = p.pai | string %}
+                                {% if pai_str.isdigit() %}
+                                <a href="{{ url_for('ver_pombo', id=p.pai|int) }}" class="anilha-link">{{
+                                    mapa_pombos.get(pai_str, p.pai) }}</a>
+                                {% else %}
+                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
+                                    mapa_pombos.get(pai_str, p.pai) }}</span>
+                                {% endif %}
                                 {% else %}
                                 <span class="anilha-link"
                                     style="cursor: default; text-decoration: none !important;">---</span>
@@ -243,8 +249,14 @@
 
                             <td class="align-middle">
                                 {% if p.mae %}
-                                <a href="{{ url_for('ver_pombo', id=p.mae) }}" class="anilha-link">{{
-                                    mapa_pombos.get(p.mae|string, p.mae) }}</a>
+                                {% set mae_str = p.mae | string %}
+                                {% if mae_str.isdigit() %}
+                                <a href="{{ url_for('ver_pombo', id=p.mae|int) }}" class="anilha-link">{{
+                                    mapa_pombos.get(mae_str, p.mae) }}</a>
+                                {% else %}
+                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
+                                    mapa_pombos.get(mae_str, p.mae) }}</span>
+                                {% endif %}
                                 {% else %}
                                 <span class="anilha-link"
                                     style="cursor: default; text-decoration: none !important;">---</span>
