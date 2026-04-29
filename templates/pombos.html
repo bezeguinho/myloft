@@ -149,6 +149,14 @@
         cursor: pointer !important;
         color: #0033a0 !important;
     }
+
+    /* Esta classe simula o efeito de hover/sombreado quando voltamos à página */
+    .pombo-destaque {
+        background-color: rgba(0, 123, 255, 0.1) !important;
+        /* Um azul muito clarinho */
+        transition: background-color 2s ease;
+        /* Desvanece suavemente após 2 segundos */
+    }
 </style>
 
 <div class="container py-4">
@@ -206,13 +214,12 @@
                     </thead>
                     <tbody>
                         {% for p in pombos %}
-                        <tr class="pombo-row">
+                        <tr id="pombo-{{ p.id }}" class="pombo-row">
                             <td class="ps-4 align-middle">
                                 <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
                             </td>
 
                             <td class="align-middle">{{ p.ano }}</td>
-
                             <td class="align-middle">{{ p.cor or '---' }}</td>
 
                             <td class="align-middle">{{ p.nome or '---' }}</td>
@@ -296,5 +303,38 @@
             window.location.href = "/eliminar_pombo/" + id;
         }
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. MEMORIZAR: Quando clicas em qualquer link de anilha, pai ou mãe
+        const links = document.querySelectorAll('.anilha-link');
+        links.forEach(link => {
+            link.addEventListener('click', function () {
+                const row = this.closest('tr');
+                if (row) {
+                    sessionStorage.setItem('ultimoPomboClicado', row.id);
+                }
+            });
+        });
+
+        // 2. RESTAURAR: Quando a página carrega, verifica se viemos de um "Voltar"
+        const ultimoId = sessionStorage.getItem('ultimoPomboClicado');
+        if (ultimoId) {
+            const elemento = document.getElementById(ultimoId);
+            if (elemento) {
+                // Faz scroll suave até ao pombo
+                elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Adiciona o sombreado
+                elemento.classList.add('pombo-destaque');
+
+                // Remove o sombreado suavemente após 3 segundos para não ficar "preso"
+                setTimeout(() => {
+                    elemento.classList.remove('pombo-destaque');
+                    sessionStorage.removeItem('ultimoPomboClicado'); // Limpa a memória
+                }, 3000);
+            }
+        }
+    });
 </script>
 {% endblock %}
