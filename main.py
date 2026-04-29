@@ -355,21 +355,27 @@ def lista_pombos(categoria=None):
 @app.route("/ver_pombo/<int:id>")
 @login_required
 def ver_pombo(id):
-    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    # --- A MÁGICA ESTÁ AQUI ---
+    # 1º Tenta procurar pelo ID interno
+    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first()
     
+    # 2º Se não encontrou pelo ID, procura pela Anilha antes de dar erro 404!
+    if not pombo:
+        pombo = Pombo.query.filter_by(anilha=str(id), user_id=current_user.id).first_or_404()
+    # --------------------------
+
+    # O resto do código mantém-se igualzinho e seguro
     todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
     mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
 
-    # PESQUISA DO PAI (Devolve o ID real se existir)
+    # PESQUISA DO PAI 
     nome_pai = "---"
     pai_id_real = None
     if pombo.pai:
         pai_str = str(pombo.pai)
         pai_obj = None
-        # Tenta ver se é um ID válido
         if pai_str.isdigit():
             pai_obj = Pombo.query.filter_by(id=int(pai_str), user_id=current_user.id).first()
-        # Se não for ID, procura pela anilha antiga
         if not pai_obj:
             pai_obj = Pombo.query.filter_by(anilha=pai_str, user_id=current_user.id).first()
         
@@ -377,7 +383,7 @@ def ver_pombo(id):
             nome_pai = pai_obj.nome
             pai_id_real = pai_obj.id
 
-    # PESQUISA DA MÃE (Devolve o ID real se existir)
+    # PESQUISA DA MÃE
     nome_mae = "---"
     mae_id_real = None
     if pombo.mae:
