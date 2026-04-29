@@ -316,12 +316,14 @@ def lista_pombos(categoria=None):
         query = query.filter_by(oculto=False)
         titulo = "TODOS OS POMBOS"
 
-    pombos = query.order_by(Pombo.anilha).all()
+    # AQUI ESTÁ A MUDANÇA CIRÚRGICA:
+    # Ordena 1º pelo ano (crescente: do mais velho para o mais novo) e 2º pela anilha (crescente)
+    pombos = query.order_by(Pombo.ano, Pombo.anilha).all()
+    
     anilhas_registadas = {p.anilha for p in Pombo.query.filter_by(user_id=current_user.id).all()}
     
     # Voltamos a usar o TEU ficheiro original: pombos.html
     return render_template("pombos.html", pombos=pombos, titulo=titulo, anilhas_registadas=anilhas_registadas)
-
 
 @app.route("/ver_pombo/<int:id>")
 @login_required
