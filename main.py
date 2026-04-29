@@ -230,7 +230,7 @@ def novo_pombo():
     sugerir_ano = ""
 
     if request.method == 'POST':
-        # Criamos o objeto vazio primeiro para evitar o erro de 'invalid keyword'
+        # Criamos o objeto vazio primeiro
         novo = Pombo()
         novo.user_id = current_user.id
         novo.anilha = request.form.get('anilha')
@@ -240,10 +240,10 @@ def novo_pombo():
         novo.sexo = request.form.get('sexo')
         novo.categoria = request.form.get('categoria')
         
-        # ATENÇÃO: Se o erro persistir, confirma se o nome no teu Banco de Dados 
-        # é 'pai_id' ou apenas 'pai'. Usa o mesmo que tens na função editar_pombo.
-        novo.pai_id = request.form.get('pai_id') or None
-        novo.mae_id = request.form.get('mae_id') or None
+        # --- A CORREÇÃO ESTÁ AQUI ---
+        # Agora estamos a enviar a informação para as colunas certas do teu Banco de Dados!
+        novo.pai = request.form.get('pai_id') or None
+        novo.mae = request.form.get('mae_id') or None
         
         novo.obs = request.form.get('obs')
         novo.cedido_a = request.form.get('cedido_a')
@@ -272,6 +272,7 @@ def novo_pombo():
                            anos_lista=anos_lista, 
                            machos=machos, 
                            femeas=femeas)
+
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST']) # Garante que tem o <int:id>
 @login_required
 def editar_pombo(id):
