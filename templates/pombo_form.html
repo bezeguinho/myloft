@@ -53,7 +53,7 @@
                         {% if pombo %} Editar Pombo: {{ pombo.anilha }} {% else %} Inserir Novo Pombo {% endif %}
                     </h2>
 
-                    <form method="POST">
+                    <form method="POST" id="form_pombo" onsubmit="return validarGravação(event)">
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <label class="fw-bold text-uppercase small">Nº Anilha</label>
@@ -275,6 +275,52 @@
     function updateChars(obj) {
         const display = document.getElementById('char_count');
         if (display) display.innerHTML = obj.value.length;
+    }
+    // 5. FUNÇÃO NOVA: VALIDAR SE OS PAIS EXISTEM ANTES DE GRAVAR
+    function validarGravação(event) {
+        const verificarProgenitor = (tipo, nomeTipo) => {
+            const inputPesquisa = document.getElementById('search_' + tipo);
+            const inputOcultoId = document.getElementById(tipo + '_id');
+            const termoDigitado = inputPesquisa.value.trim().toLowerCase();
+
+            // Se o campo estiver vazio, está tudo bem (pode não ter pai/mãe)
+            if (termoDigitado === "") {
+                inputOcultoId.value = "";
+                return true;
+            }
+
+            // Vamos ver se o que ele escreveu bate certo com alguma anilha da lista
+            const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
+            let encontrou = false;
+
+            listaOpcoes.forEach(opt => {
+                const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
+                // Se for igual, garantimos que o ID oculto está preenchido
+                if (anilhaLista === termoDigitado || opt.innerText.trim().toLowerCase() === termoDigitado) {
+                    inputOcultoId.value = opt.getAttribute('data-id');
+                    encontrou = true;
+                }
+            });
+
+            // Se escreveu algo que não existe na lista
+            if (!encontrou) {
+                const querInserir = confirm(`O Pombo ${nomeTipo} "${inputPesquisa.value}" não existe na sua lista.\n\nDeseja abrir uma nova janela para o inserir agora?`);
+                if (querInserir) {
+                    window.open('/novo_pombo', '_blank'); // Abre num separador novo
+                }
+                return false; // Bloqueia a gravação do filho
+            }
+            return true;
+        };
+
+        // Verifica o Pai e depois a Mãe
+        const paiValido = verificarProgenitor('pai', 'Pai');
+        if (!paiValido) return false;
+
+        const maeValida = verificarProgenitor('mae', 'Mãe');
+        if (!maeValida) return false;
+
+        return true; // Se passar nos dois, grava normalmente!
     }
 
     window.onload = function () {
