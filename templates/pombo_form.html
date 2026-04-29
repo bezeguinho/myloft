@@ -218,7 +218,6 @@
 </div>
 
 <script>
-   <script>
     // 1. FILTRO COM PESQUISA INTEGRADA
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
@@ -228,8 +227,8 @@
         // --- A CIRURGIA ENTRA AQUI (Estas 4 linhas) ---
         const listPai = document.getElementById('list_pai');
         const listMae = document.getElementById('list_mae');
-        if(listPai) listPai.classList.remove('show');
-        if(listMae) listMae.classList.remove('show');
+        if (listPai) listPai.classList.remove('show');
+        if (listMae) listMae.classList.remove('show');
         // ----------------------------------------------
 
         const termo = input.value.toLowerCase();
