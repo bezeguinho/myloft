@@ -312,8 +312,8 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 1. MEMORIZAR: Captura o ID sempre que clicas num link que sai da página
-        const linksEntrada = document.querySelectorAll('.anilha-link, .btn-acao');
+        // 1. MEMORIZAR: Captura o ID sempre que clicas num link ou botão na tabela
+        const linksEntrada = document.querySelectorAll('.anilha-link, .btn-acao, .btn-sm, td a');
         linksEntrada.forEach(link => {
             link.addEventListener('click', function () {
                 const row = this.closest('tr');

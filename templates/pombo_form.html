@@ -352,5 +352,30 @@
         if (obs) updateChars(obs);
     };
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formulario = document.querySelector('form');
+
+        if (formulario) {
+            formulario.addEventListener('submit', function () {
+                // Se tivermos um pombo (modo edição), guardamos o ID
+                {% if pombo %}
+                sessionStorage.setItem('ultimoPomboClicado', 'pombo-{{ pombo.id }}');
+                {% endif %}
+            });
+        }
+
+        // Se tiveres um botão "Voltar" personalizado no formulário, 
+        // ele também deve garantir que a memória não se perde
+        const btnVoltar = document.querySelector('.btn-voltar'); // Ajusta a classe se necessário
+        if (btnVoltar) {
+            btnVoltar.addEventListener('click', function () {
+                {% if pombo %}
+                sessionStorage.setItem('ultimoPomboClicado', 'pombo-{{ pombo.id }}');
+                {% endif %}
+            });
+        }
+    });
+</script>
 
 {% endblock %}
