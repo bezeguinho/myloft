@@ -56,22 +56,13 @@
                     <form method="POST" id="form_pombo" onsubmit="return validarGravação(event)">
                         <div class="row">
                             <div class="col-md-3 mb-3">
-                                <label class="fw-bold text-uppercase small">Nº Anilha</label>
                                 <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
                                 <input type="text" name="anilha" id="anilha" class="form-control" maxlength="12"
-                                    autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}" autofocus
-                                    required {% if pombo %}readonly{% endif %}>
-                                autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}" autofocus
-                                required {% if pombo %}readonly{% endif %}>
-                                value="{% if pombo %}{{ pombo.anilha }}{% else %}{{ sugerir_anilha }}{% endif %}" {%
-                                if pombo %}readonly{% endif %}
-                                style="{% if not pombo and sugerir_anilha %}color: gray;{% endif %} {% if pombo
-                                %}background-color: #eee;{% endif %}"
-                                onclick="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black';
-                                }"
-                                onkeydown="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black';
-                                }"
-                                required autofocus>
+                                    autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}"
+                                    style="{% if not pombo and sugerir_anilha %}color: gray;{% endif %} {% if pombo %}background-color: #eee;{% endif %}"
+                                    onclick="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                    onkeydown="if(this.style.color == 'gray') { this.value = ''; this.style.color = 'black'; }"
+                                    {% if pombo %}readonly{% endif %} required autofocus>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label class="fw-bold text-uppercase small">Ano</label>
@@ -89,13 +80,10 @@
                                 </select>
                                 {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
                             </div>
-                            <div class="col mb-3">
-                                <label class="fw-bold text-uppercase small">Nome</label>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label fw-bold small text-uppercase">Nome</label>
                                 <input type="text" name="nome" id="nome" class="form-control" autocomplete="off"
                                     value="{{ pombo.nome if pombo else '' }}">
-                                value="{{ pombo.nome if pombo else '' }}">
-                                value="{{ pombo.nome if pombo else '' }}">
                             </div>
                             <div class="col mb-3">
                                 <label class="fw-bold text-uppercase small">Cor</label>
