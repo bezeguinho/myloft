@@ -222,7 +222,6 @@ def api_pombo_existe(search):
 def novo_pombo():
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    # Busca com ordenação simplificada e segura (Ano e Anilha em ordem crescente)
     machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
     femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
     
@@ -230,18 +229,24 @@ def novo_pombo():
     sugerir_ano = ""
 
     if request.method == 'POST':
-        # Criamos o objeto vazio primeiro
+        anilha_input = request.form.get('anilha')
+        ano_input = int(request.form.get('ano') or 0)
+        
+        # CIRURGIA: VERIFICAÇÃO DE DUPLICADOS AO INSERIR
+        existente = Pombo.query.filter_by(anilha=anilha_input, ano=ano_input, user_id=current_user.id).first()
+        if existente:
+            flash(f"Atenção: Já existe um pombo com a anilha {anilha_input} do ano {ano_input}!", "danger")
+            return redirect(url_for('novo_pombo'))
+
         novo = Pombo()
         novo.user_id = current_user.id
-        novo.anilha = request.form.get('anilha')
-        novo.ano = request.form.get('ano')
+        novo.anilha = anilha_input
+        novo.ano = ano_input
         novo.nome = request.form.get('nome')
         novo.cor = request.form.get('cor')
         novo.sexo = request.form.get('sexo')
         novo.categoria = request.form.get('categoria')
         
-        # --- A CORREÇÃO ESTÁ AQUI ---
-        # Agora estamos a enviar a informação para as colunas certas do teu Banco de Dados!
         novo.pai = request.form.get('pai_id') or None
         novo.mae = request.form.get('mae_id') or None
         
@@ -254,7 +259,6 @@ def novo_pombo():
             db.session.commit()
             flash("Pombo gravado com sucesso!", "success")
 
-            # Lógica do número +1
             try:
                 sugerir_anilha = int(novo.anilha) + 1
             except:
@@ -272,27 +276,35 @@ def novo_pombo():
                            anos_lista=anos_lista, 
                            machos=machos, 
                            femeas=femeas)
-
+                           
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_pombo(id):
     pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    # Variáveis para o formulário não dar erro (na edição não sugerimos +1)
     sugerir_anilha = ""
     sugerir_ano = ""
 
     if request.method == 'POST':
-        # Aqui atualizamos TODOS os campos com o que vem do formulário
-        pombo.anilha = request.form.get('anilha')
-        pombo.ano = int(request.form.get('ano'))
+        nova_anilha = request.form.get('anilha')
+        novo_ano = int(request.form.get('ano') or 0)
+        
+        # CIRURGIA: VERIFICAÇÃO DE DUPLICADOS
+        # Vê se já existe outro pombo (com ID diferente) com esta anilha e ano
+        existente = Pombo.query.filter_by(anilha=nova_anilha, ano=novo_ano, user_id=current_user.id).first()
+        if existente and existente.id != pombo.id:
+            flash(f"Atenção: Já existe um pombo com a anilha {nova_anilha} do ano {novo_ano}!", "danger")
+            return redirect(url_for('editar_pombo', id=id))
+
+        # Se passou a verificação, atualiza os dados
+        pombo.anilha = nova_anilha
+        pombo.ano = novo_ano
         pombo.nome = request.form.get('nome')
         pombo.cor = request.form.get('cor')
         pombo.sexo = request.form.get('sexo')
         pombo.categoria = request.form.get('categoria')
         
-        # Lembra-te: na tua BD é 'pai' e 'mae', mas no formulário é 'pai_id' e 'mae_id'
         pombo.pai = request.form.get('pai_id') or None
         pombo.mae = request.form.get('mae_id') or None
         
@@ -308,9 +320,9 @@ def editar_pombo(id):
             db.session.rollback()
             flash(f"Erro ao atualizar: {str(e)}", "danger")
 
-    # Busca machos e fêmeas ordenados para as listas de seleção
-    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
-    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
+    # CIRURGIA: EXCLUIR O PRÓPRIO POMBO DAS LISTAS DE PAIS (Pombo.id != id)
+    machos = Pombo.query.filter(Pombo.sexo=='Macho', Pombo.user_id==current_user.id, Pombo.id != id).order_by(Pombo.ano, Pombo.anilha).all()
+    femeas = Pombo.query.filter(Pombo.sexo=='Fêmea', Pombo.user_id==current_user.id, Pombo.id != id).order_by(Pombo.ano, Pombo.anilha).all()
     
     return render_template("pombo_form.html", 
                            pombo=pombo, 

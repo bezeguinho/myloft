@@ -218,11 +218,19 @@
 </div>
 
 <script>
+   <script>
     // 1. FILTRO COM PESQUISA INTEGRADA
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
         if (!input || !lista) return;
+
+        // --- A CIRURGIA ENTRA AQUI (Estas 4 linhas) ---
+        const listPai = document.getElementById('list_pai');
+        const listMae = document.getElementById('list_mae');
+        if(listPai) listPai.classList.remove('show');
+        if(listMae) listMae.classList.remove('show');
+        // ----------------------------------------------
 
         const termo = input.value.toLowerCase();
         const anoFilhoSelect = document.getElementById('ano_select');
@@ -232,7 +240,6 @@
 
         let visiveis = 0;
         const options = lista.querySelectorAll('.pombo-opt');
-
         options.forEach(opt => {
             const anoP = parseInt(opt.getAttribute('data-ano'));
             const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
