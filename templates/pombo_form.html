@@ -97,6 +97,9 @@
                                 <div class="col-6 col-md-2">
                                     <label class="form-label fw-bold small text-uppercase">Ano</label>
                                     <select name="ano" id="ano_select" class="form-select" required>
+                                        <!-- Nota: Opção padrão 'Escolha' que só aparece se não houver valor prévio -->
+                                        <option value="" disabled {% if not pombo and not sugerir_ano %}selected{% endif
+                                            %}>Escolha</option>
                                         {% for a in anos_lista %}
                                         <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
                                             (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
@@ -215,26 +218,42 @@
                                             endif %}>Indefinido</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="fw-bold text-uppercase small">Categoria</label>
-                                    <select name="categoria" id="categoria_select" class="form-select" required>
-                                        <option value="" disabled hidden {% if not pombo %}selected{% endif %}>
-                                            Escolha..
-                                        </option>
-                                        <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{%
-                                            endif %}>Voador</option>
-                                        <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
-                                            %}selected{% endif %}>Reprodutor</option>
-                                        <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{%
-                                            endif %}>Cedido</option>
-                                    </select>
+                                <div class="row g-2 mb-3 align-items-center">
+                                    <!-- Categoria -->
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label fw-bold small text-uppercase">Categoria</label>
+                                        <select name="categoria" id="categoria_select" class="form-select"
+                                            onchange="toggleCedido()">
+                                            <option value="">Escolha..</option>
+                                            <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
+                                                %}selected{% endif %}>Reprodutor</option>
+                                            <option value="Voador" {% if pombo and pombo.categoria=='Voador'
+                                                %}selected{% endif %}>Voador</option>
+                                            <option value="Cedido" {% if pombo and pombo.categoria=='Cedido'
+                                                %}selected{% endif %}>Cedido</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Pombo Oculto: Estilo Clássico (Pergunta depois Caixa) -->
+                                    <div class="col-12 col-md-4 d-flex align-items-center mt-md-4">
+                                        <span class="fw-bold small text-uppercase me-2">Pombo Oculto?</span>
+                                        <input type="checkbox" name="oculto" id="oculto" value="on" {% if pombo and
+                                            pombo.oculto %}checked{% endif %}
+                                            style="width: 20px; height: 20px; cursor: pointer;">
+                                    </div>
                                 </div>
                                 <!-- Nota: O ID 'linha_cedido' é obrigatório para o JavaScript funcionar -->
                                 <div class="row mb-3" id="linha_cedido" style="display:none;">
-                                    <div class="col-12">
-                                        <label class="form-label fw-bold small text-uppercase">Cedido a:</label>
-                                        <input type="text" name="cedido_a" id="cedido_a" class="form-control"
-                                            autocomplete="off" value="{{ pombo.cedido_a if pombo else '' }}">
+                                    <div id="linha_cedido" class="row mb-3"
+                                        style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %};">
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center">
+                                                <label class="fw-bold small text-uppercase me-2 mb-0"
+                                                    style="min-width: 90px;">Cedido A:</label>
+                                                <input type="text" name="cedido_a" id="cedido_a" class="form-control"
+                                                    autocomplete="off" value="{{ pombo.cedido_a if pombo else '' }}">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -354,16 +373,20 @@
         }
     });
 
-    // 3. FUNÇÃO: MOSTRAR/ESCONDER CEDIDO
     function toggleCedido() {
         const selectCat = document.getElementById('categoria_select');
         const linhaCedido = document.getElementById('linha_cedido');
-        if (selectCat && linhaCedido) {
-            linhaCedido.style.display = (selectCat.value === 'Cedido') ? 'flex' : 'none';
+        const inputCedido = document.getElementById('cedido_a');
+
+        if (selectCat.value === 'Cedido') {
+            linhaCedido.style.display = 'flex';
+            // Nota: Timeout de 100ms para garantir que o elemento está visível antes do foco
+            setTimeout(() => { inputCedido.focus(); }, 100);
+        } else {
+            linhaCedido.style.display = 'none';
+            inputCedido.value = '';
         }
     }
-    const selCat = document.getElementById('categoria_select');
-    if (selCat) selCat.addEventListener('change', toggleCedido);
 
     // 4. FUNÇÃO: CONTADOR DE CARACTERES
     function updateChars(obj) {
