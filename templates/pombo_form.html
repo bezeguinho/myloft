@@ -54,8 +54,10 @@
                     </h2>
 
                     <form method="POST" id="form_pombo" onsubmit="return validarGravação(event)">
-                        <div class="row gx-2">
-                            <div class="mb-3" style="width: 17%;">
+                        <!-- Substituir a linha dos primeiros 4 campos por esta estrutura -->
+                        <div class="row g-2 mb-3">
+                            <!-- Anilha: 6 colunas no mobile (50%), 2 colunas no desktop -->
+                            <div class="col-6 col-md-2">
                                 <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
                                 <input type="text" name="anilha" id="anilha" class="form-control" maxlength="12"
                                     autocomplete="off" value="{{ pombo.anilha if pombo else sugerir_anilha }}"
@@ -65,7 +67,8 @@
                                     {% if pombo %}readonly{% endif %} required autofocus>
                             </div>
 
-                            <div class="mb-3" style="width: 15%;">
+                            <!-- Ano: 6 colunas no mobile (50%), 2 colunas no desktop -->
+                            <div class="col-6 col-md-2">
                                 <label class="form-label fw-bold small text-uppercase">Ano</label>
                                 <select name="ano" class="form-select" id="ano_select" required
                                     style="{% if not pombo and sugerir_ano %}color: gray;{% endif %}{% if pombo %}background-color: #eee;{% endif %}"
@@ -81,13 +84,15 @@
                                 {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
                             </div>
 
-                            <div class="mb-3" style="width: 34%;">
+                            <!-- Nome: 12 colunas no mobile (100%), 4 colunas no desktop -->
+                            <div class="col-12 col-md-4">
                                 <label class="form-label fw-bold small text-uppercase">Nome</label>
                                 <input type="text" name="nome" id="nome" class="form-control" autocomplete="off"
                                     maxlength="24" value="{{ pombo.nome if pombo else '' }}">
                             </div>
 
-                            <div class="mb-3" style="width: 34%;">
+                            <!-- Cor: 12 colunas no mobile (100%), 4 colunas no desktop -->
+                            <div class="col-12 col-md-4">
                                 <label class="form-label fw-bold small text-uppercase">Cor</label>
                                 <input type="text" name="cor" class="form-control" autocomplete="off" maxlength="24"
                                     value="{{ pombo.cor if pombo else '' }}">
