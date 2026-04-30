@@ -121,8 +121,24 @@
                             <!-- Cor: 12 colunas no mobile (100%), 4 colunas no desktop -->
                             <div class="col-12 col-md-4">
                                 <label class="form-label fw-bold small text-uppercase">Cor</label>
+                                <!-- Nota: O atributo list="cores_sugestoes" liga este input à lista nativa abaixo -->
                                 <input type="text" name="cor" class="form-control" autocomplete="off" maxlength="24"
-                                    value="{{ pombo.cor if pombo else '' }}">
+                                    value="{{ pombo.cor if pombo else '' }}" list="cores_sugestoes">
+
+                                <!-- Lista nativa HTML5 de sugestões rápidas (Mobile-friendly e leve) -->
+                                <datalist id="cores_sugestoes">
+                                    <option value="Azul">
+                                    <option value="Pedrez">
+                                    <option value="Borracho">
+                                    <option value="Vermelho">
+                                    <option value="Preto">
+                                    <option value="Branco">
+                                    <option value="Escama">
+                                    <option value="Grizalho">
+                                    <option value="Salgado">
+                                    <option value="Pigarro">
+                                    <option value="Mosaico">
+                                </datalist>
                             </div>
                         </div>
                         <div class="row">
@@ -314,19 +330,13 @@
             }
 
             // CORREÇÃO DO BUG: Usar onmousedown em vez de onclick
-            // Isto regista o clique antes de o campo perder o foco
             opt.onmousedown = function (e) {
-                e.preventDefault(); // Evita a perda de foco prematura
+                e.preventDefault();
                 const anoCompleto = opt.getAttribute('data-ano');
-                const anoCurto = "-" + anoCompleto.slice(-2);
                 const anilha = opt.getAttribute('data-anilha');
 
-                // Formatamos como pediste: Anilha -YY • Cor Nome (Sem parênteses)
-                let textoCaixa = anilha + " " + anoCurto;
-                if (opt.getAttribute('data-cor')) textoCaixa += " • " + opt.getAttribute('data-cor').toUpperCase();
-                if (opt.getAttribute('data-nome')) textoCaixa += " " + opt.getAttribute('data-nome').toUpperCase();
-
-                input.value = textoCaixa;
+                // Nota: Agora coloca apenas a Anilha e o Ano Completo na caixa, como sugeriste
+                input.value = anilha + " (" + anoCompleto + ")";
                 document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
                 lista.classList.remove('show');
             };
@@ -384,12 +394,15 @@
                 return true;
             }
 
+            // Nota: Extrai a anilha (tudo antes do primeiro espaço) para garantir validação correta
+            const anilhaDigitada = termoDigitado.split(' ')[0];
+
             const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
             let idEncontrado = null;
             listaOpcoes.forEach(opt => {
                 const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
-                const textoCompleto = opt.innerText.trim().toLowerCase();
-                if (anilhaLista === termoDigitado || textoCompleto === termoDigitado) {
+                // Compara a anilha isolada com a anilha da lista
+                if (anilhaLista === anilhaDigitada) {
                     idEncontrado = opt.getAttribute('data-id');
                 }
             });
@@ -398,7 +411,7 @@
                 inputOcultoId.value = idEncontrado;
                 return true;
             } else {
-                const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na sua base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
+                const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
                 if (querInserir) {
                     window.open('/novo_pombo', '_blank');
                 }
