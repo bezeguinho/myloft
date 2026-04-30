@@ -5,3 +5,5 @@ psycopg2-binary
 Werkzeug
 Pillow
 pg8000
+python-dotenv
+SQLAlchemy
