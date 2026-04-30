@@ -111,26 +111,24 @@
                                     value="{{ pombo.pai_id if pombo else '' }}">
 
 
+                                <!-- Nota: Atualização da lista do PAI - Formato compactado e fonte 0.75rem para mobile -->
                                 <ul id="list_pai" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for m in machos %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ m.id }}"
                                         data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
                                         data-nome="{{ m.nome|lower or '' }}" data-cor="{{ m.cor|lower or '' }}"
-                                        style="cursor: pointer; font-size: 0.85rem;"> {# Nota: Fonte base reduzida para
-                                        poupar espaço no mobile #}
+                                        style="cursor: pointer; font-size: 0.75rem;">
 
                                         <span class="fw-bold text-primary">{{ m.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ m.ano|string|slice(-2:) }}</span> {# Nota:
-                                        Extrai apenas os últimos 2 dígitos do ano #}
+                                        <span class="text-muted ms-1">-{{ m.ano|string|slice(-2:) }}</span>
 
                                         {% if m.cor %}
-                                        <span class="ms-2 text-dark text-truncate" style="max-width: 80px;">• {{ m.cor
-                                            }}</span> {# Nota: Cor com limite de largura para não quebrar a linha #}
+                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ m.cor
+                                            }}</span>
                                         {% endif %}
 
                                         {% if m.nome %}
                                         <span class="ms-2 text-secondary fst-italic text-truncate">({{ m.nome }})</span>
-                                        {# Nota: Nome em itálico e com redução visual #}
                                         {% endif %}
                                     </li>
                                     {% endfor %}
@@ -149,26 +147,24 @@
                                     value="{{ pombo.mae_id if pombo else '' }}">
 
 
+                                <!-- Nota: Atualização da lista da MÃE - Mesma lógica de otimização de espaço -->
                                 <ul id="list_mae" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for f in femeas %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ f.id }}"
                                         data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
                                         data-nome="{{ f.nome|lower or '' }}" data-cor="{{ f.cor|lower or '' }}"
-                                        style="cursor: pointer; font-size: 0.85rem;"> {# Nota: Fonte base reduzida para
-                                        poupar espaço no mobile #}
+                                        style="cursor: pointer; font-size: 0.75rem;">
 
                                         <span class="fw-bold text-primary">{{ f.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ f.ano|string|slice(-2:) }}</span> {# Nota:
-                                        Extrai apenas os últimos 2 dígitos do ano #}
+                                        <span class="text-muted ms-1">-{{ f.ano|string|slice(-2:) }}</span>
 
                                         {% if f.cor %}
-                                        <span class="ms-2 text-dark text-truncate" style="max-width: 80px;">• {{ f.cor
-                                            }}</span> {# Nota: Cor com limite de largura para não quebrar a linha #}
+                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ f.cor
+                                            }}</span>
                                         {% endif %}
 
                                         {% if f.nome %}
                                         <span class="ms-2 text-secondary fst-italic text-truncate">({{ f.nome }})</span>
-                                        {# Nota: Nome em itálico e com redução visual #}
                                         {% endif %}
                                     </li>
                                     {% endfor %}
