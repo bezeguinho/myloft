@@ -41,6 +41,39 @@
         display: none;
         margin-top: 5px;
     }
+
+    /* Nota: Seletor reforçado para garantir fundo branco e letras pretas no MYLOFT */
+    #list_pai.dropdown-menu,
+    #list_mae.dropdown-menu {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 5px 0 !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        display: none;
+        /* Nota: Mantém escondido por padrão */
+    }
+
+    /* Nota: Estilo dos itens da lista */
+    #list_pai .dropdown-item,
+    #list_mae .dropdown-item {
+        background-color: #ffffff !important;
+        color: #1e293b !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        padding: 10px 15px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Nota: Hover Suave - Azul MyLoft clarinho */
+    #list_pai .dropdown-item:hover,
+    #list_mae .dropdown-item:hover {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+    }
+
+    /* Nota: Classe utilitária para mostrar o menu via JS */
+    .custom-dropdown.show {
+        display: block !important;
+    }
 </style>
 
 <div class="container mt-4">
@@ -297,14 +330,30 @@
         if (visiveis === 0) lista.classList.remove('show');
     }
 
-    // Fechar lista se clicar fora
+    // Nota: Função para fechar as listas de sugestões se clicarmos fora delas
     document.addEventListener('click', function (e) {
-        if (!e.target.id.includes('search')) {
-            const listPai = document.getElementById('list_pai');
-            const listMae = document.getElementById('list_mae');
-            if (listPai) listPai.classList.remove('show');
-            if (listMae) listMae.classList.remove('show');
+        const listPai = document.getElementById('list_pai');
+        const listMae = document.getElementById('list_mae');
+        const searchPai = document.getElementById('search_pai');
+        const searchMae = document.getElementById('search_mae');
+
+        // Nota: Se o clique não foi no campo de busca nem na lista, fecha tudo
+        if (e.target !== searchPai && e.target !== listPai && !listPai.contains(e.target)) {
+            listPai.classList.remove('show');
         }
+        if (e.target !== searchMae && e.target !== listMae && !listMae.contains(e.target)) {
+            listMae.classList.remove('show');
+        }
+    });
+
+    // Nota: Fechar ao perder o foco (Tab ou clicar noutro campo)
+    document.getElementById('search_pai').addEventListener('blur', function () {
+        // Nota: Timeout curto para permitir que o clique na sugestão seja registado antes de fechar
+        setTimeout(() => document.getElementById('list_pai').classList.remove('show'), 200);
+    });
+
+    document.getElementById('search_mae').addEventListener('blur', function () {
+        setTimeout(() => document.getElementById('list_mae').classList.remove('show'), 200);
     });
 
     // 2. FUNÇÃO: MOSTRAR/ESCONDER CEDIDO
