@@ -68,22 +68,42 @@ body {
 }
 
 @keyframes fadeIn {
-   from { opacity: 0; transform: translateY(10px); }
-   to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dropdown-item {
-  color: #334155;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
-  border-radius: 8px;
-  transition: all 0.2s;
+/* Nota: Bloco completo para substituir .dropdown-item e o seu :hover */
+
+.custom-dropdown .dropdown-item {
+  color: #1e293b !important;
+  /* Texto quase preto para leitura perfeita */
+  padding: 10px 15px !important;
+  border-bottom: 1px solid #f1f5f9;
+  /* Linha divisória muito subtil */
+  font-weight: 500 !important;
+  background-color: #ffffff !important;
+  /* Garante fundo branco */
 }
 
-.dropdown-item:hover {
-  background-color: #f1f5f9;
-  color: #0d6efd;
-  transform: translateX(5px);
+.custom-dropdown .dropdown-item:hover {
+  background-color: #eff6ff !important;
+  /* Azul MyLoft clarinho (suave) */
+  color: #2563eb !important;
+  /* Letras ganham cor azul vibrante no destaque[cite: 1] */
+  cursor: pointer;
+}
+
+/* Nota: Remove o contorno azul feio que o browser às vezes coloca ao clicar */
+.custom-dropdown .dropdown-item:focus {
+  background-color: #eff6ff !important;
+  outline: none !important;
 }
 
 .main-container {
@@ -138,9 +158,11 @@ body {
   .main-container {
     padding-top: 1rem;
   }
+
   .card-main {
     border-radius: 16px;
   }
+
   .navbar-brand-text {
     font-size: 1.25rem;
   }
