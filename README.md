@@ -31,7 +31,7 @@ Como executar a versão desktop (Tkinter)
 Ainda no PowerShell, dentro da pasta do projeto, execute:
 
 ```powershell
-python .\main.py
+python .\app.py
 ```
 
 Como executar a versão web (desktop + mobile)

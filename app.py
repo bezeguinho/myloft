@@ -1,6 +1,11 @@
 import os
 import re
 import ssl
+from dotenv import load_dotenv
+load_dotenv() 
+
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+# ... resto do código igual ...
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
