@@ -42,7 +42,6 @@
         margin-top: 5px;
     }
 
-    /* Nota: Seletor reforçado para garantir fundo branco e letras pretas no MYLOFT */
     #list_pai.dropdown-menu,
     #list_mae.dropdown-menu {
         background-color: #ffffff !important;
@@ -50,24 +49,19 @@
         padding: 5px 0 !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
         display: none;
-        /* Nota: Mantém escondido por padrão */
+        /* Adicionado o limite de altura e scroll vertical */
+        max-height: 280px !important;
+        overflow-y: auto !important;
     }
 
-    /* Nota: Estilo dos itens da lista */
-    #list_pai .dropdown-item,
-    #list_mae .dropdown-item {
-        background-color: #ffffff !important;
-        color: #1e293b !important;
-        border-bottom: 1px solid #f1f5f9 !important;
-        padding: 10px 15px !important;
-        font-size: 0.75rem !important;
+    /* Scrollbar estilizada e elegante para não ser pesada visualmente */
+    .custom-dropdown::-webkit-scrollbar {
+        width: 6px;
     }
 
-    /* Nota: Hover Suave - Azul MyLoft clarinho */
-    #list_pai .dropdown-item:hover,
-    #list_mae .dropdown-item:hover {
-        background-color: #eff6ff !important;
-        color: #2563eb !important;
+    .custom-dropdown::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
     }
 
     /* Nota: Classe utilitária para mostrar o menu via JS */
@@ -148,20 +142,23 @@
                                     {% for m in machos %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ m.id }}"
                                         data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
-                                        data-nome="{{ m.nome|lower or '' }}" data-cor="{{ m.cor|lower or '' }}"
-                                        style="cursor: pointer; font-size: 0.75rem;">
+                                        data-nome="{{ m.nome|upper or '' }}" data-cor="{{ m.cor|upper or '' }}"
+                                        style="font-size: 0.75rem;">
 
-                                        <span class="fw-bold text-primary">{{ m.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ (m.ano|string)[-2:] }}</span> {# Nota: Forma
-                                        alternativa e segura de pegar os últimos 2 dígitos #}
-
-                                        {% if m.cor %}
-                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ m.cor
+                                        <!-- Anilha e Ano juntos em Azul -->
+                                        <span class="fw-bold text-primary">{{ m.anilha }} -{{ (m.ano|string)[-2:]
                                             }}</span>
+
+                                        <!-- Cor a Preto -->
+                                        {% if m.cor %}
+                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{
+                                            m.cor|upper }}</span>
                                         {% endif %}
 
+                                        <!-- Nome em itálico sem parênteses -->
                                         {% if m.nome %}
-                                        <span class="ms-2 text-secondary fst-italic text-truncate">({{ m.nome }})</span>
+                                        <span class="ms-2 text-secondary fst-italic text-truncate">{{ m.nome|upper
+                                            }}</span>
                                         {% endif %}
                                     </li>
                                     {% endfor %}
@@ -184,20 +181,23 @@
                                     {% for f in femeas %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ f.id }}"
                                         data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
-                                        data-nome="{{ f.nome|lower or '' }}" data-cor="{{ f.cor|lower or '' }}"
-                                        style="cursor: pointer; font-size: 0.75rem;">
+                                        data-nome="{{ f.nome|upper or '' }}" data-cor="{{ f.cor|upper or '' }}"
+                                        style="font-size: 0.75rem;">
 
-                                        <span class="fw-bold text-primary">{{ f.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ (f.ano|string)[-2:] }}</span> {# Nota: Forma
-                                        alternativa e segura de pegar os últimos 2 dígitos #}
-
-                                        {% if f.cor %}
-                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ f.cor
+                                        <!-- Anilha e Ano juntos em Azul -->
+                                        <span class="fw-bold text-primary">{{ f.anilha }} -{{ (f.ano|string)[-2:]
                                             }}</span>
+
+                                        <!-- Cor a Preto -->
+                                        {% if f.cor %}
+                                        <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{
+                                            f.cor|upper }}</span>
                                         {% endif %}
 
+                                        <!-- Nome em itálico sem parênteses -->
                                         {% if f.nome %}
-                                        <span class="ms-2 text-secondary fst-italic text-truncate">({{ f.nome }})</span>
+                                        <span class="ms-2 text-secondary fst-italic text-truncate">{{ f.nome|upper
+                                            }}</span>
                                         {% endif %}
                                     </li>
                                     {% endfor %}
@@ -284,34 +284,27 @@
 </div>
 
 <script>
-    // 1. FILTRO COM PESQUISA INTEGRADA
+    // 1. Função de Pesquisa e Seleção (Corrigida)
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
         if (!input || !lista) return;
 
-        // --- A CIRURGIA ENTRA AQUI (Estas 4 linhas) ---
-        const listPai = document.getElementById('list_pai');
-        const listMae = document.getElementById('list_mae');
-        if (listPai) listPai.classList.remove('show');
-        if (listMae) listMae.classList.remove('show');
-        // ----------------------------------------------
-
         const termo = input.value.toLowerCase();
         const anoFilhoSelect = document.getElementById('ano_select');
         const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
-        lista.classList.add('show');
-
         let visiveis = 0;
         const options = lista.querySelectorAll('.pombo-opt');
+
         options.forEach(opt => {
             const anoP = parseInt(opt.getAttribute('data-ano'));
             const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
             const nomeP = opt.getAttribute('data-nome').toLowerCase();
+            const corP = opt.getAttribute('data-cor').toLowerCase();
 
             const bateAno = !anoFilho || anoP <= anoFilho;
-            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
+            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo) || corP.includes(termo);
 
             if (bateAno && bateTexto) {
                 opt.style.display = 'block';
@@ -320,43 +313,48 @@
                 opt.style.display = 'none';
             }
 
-            opt.onclick = function () {
-                input.value = opt.innerText.trim();
+            // CORREÇÃO DO BUG: Usar onmousedown em vez de onclick
+            // Isto regista o clique antes de o campo perder o foco
+            opt.onmousedown = function (e) {
+                e.preventDefault(); // Evita a perda de foco prematura
+                const anoCompleto = opt.getAttribute('data-ano');
+                const anoCurto = "-" + anoCompleto.slice(-2);
+                const anilha = opt.getAttribute('data-anilha');
+
+                // Formatamos como pediste: Anilha -YY • Cor Nome (Sem parênteses)
+                let textoCaixa = anilha + " " + anoCurto;
+                if (opt.getAttribute('data-cor')) textoCaixa += " • " + opt.getAttribute('data-cor').toUpperCase();
+                if (opt.getAttribute('data-nome')) textoCaixa += " " + opt.getAttribute('data-nome').toUpperCase();
+
+                input.value = textoCaixa;
                 document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
                 lista.classList.remove('show');
             };
         });
 
-        if (visiveis === 0) lista.classList.remove('show');
+        if (visiveis > 0) {
+            lista.classList.add('show');
+        } else {
+            lista.classList.remove('show');
+        }
     }
 
-    // Nota: Função para fechar as listas de sugestões se clicarmos fora delas
-    document.addEventListener('click', function (e) {
+    // 2. Fechar a lista ao clicar fora ou mover para outro campo
+    document.addEventListener('mousedown', function (e) {
         const listPai = document.getElementById('list_pai');
         const listMae = document.getElementById('list_mae');
         const searchPai = document.getElementById('search_pai');
         const searchMae = document.getElementById('search_mae');
 
-        // Nota: Se o clique não foi no campo de busca nem na lista, fecha tudo
-        if (e.target !== searchPai && e.target !== listPai && !listPai.contains(e.target)) {
+        if (listPai && e.target !== searchPai && !listPai.contains(e.target)) {
             listPai.classList.remove('show');
         }
-        if (e.target !== searchMae && e.target !== listMae && !listMae.contains(e.target)) {
+        if (listMae && e.target !== searchMae && !listMae.contains(e.target)) {
             listMae.classList.remove('show');
         }
     });
 
-    // Nota: Fechar ao perder o foco (Tab ou clicar noutro campo)
-    document.getElementById('search_pai').addEventListener('blur', function () {
-        // Nota: Timeout curto para permitir que o clique na sugestão seja registado antes de fechar
-        setTimeout(() => document.getElementById('list_pai').classList.remove('show'), 200);
-    });
-
-    document.getElementById('search_mae').addEventListener('blur', function () {
-        setTimeout(() => document.getElementById('list_mae').classList.remove('show'), 200);
-    });
-
-    // 2. FUNÇÃO: MOSTRAR/ESCONDER CEDIDO
+    // 3. FUNÇÃO: MOSTRAR/ESCONDER CEDIDO
     function toggleCedido() {
         const selectCat = document.getElementById('categoria_select');
         const linhaCedido = document.getElementById('linha_cedido');
@@ -367,13 +365,13 @@
     const selCat = document.getElementById('categoria_select');
     if (selCat) selCat.addEventListener('change', toggleCedido);
 
-    // 3. FUNÇÃO: CONTADOR DE CARACTERES
+    // 4. FUNÇÃO: CONTADOR DE CARACTERES
     function updateChars(obj) {
         const display = document.getElementById('char_count');
         if (display) display.innerHTML = obj.value.length;
     }
 
-    // 4. FUNÇÃO: VALIDAR GRAVAÇÃO (Verificar se os pais existem)
+    // 5. FUNÇÃO: VALIDAR GRAVAÇÃO (Verificar se os pais existem)
     function validarGravação(event) {
         const verificarProgenitor = (tipo, nomeTipo) => {
             const inputPesquisa = document.getElementById('search_' + tipo);
@@ -381,7 +379,6 @@
             if (!inputPesquisa || !inputOcultoId) return true;
 
             const termoDigitado = inputPesquisa.value.trim().toLowerCase();
-
             if (termoDigitado === "") {
                 inputOcultoId.value = "";
                 return true;
@@ -389,11 +386,9 @@
 
             const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
             let idEncontrado = null;
-
             listaOpcoes.forEach(opt => {
                 const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
                 const textoCompleto = opt.innerText.trim().toLowerCase();
-
                 if (anilhaLista === termoDigitado || textoCompleto === termoDigitado) {
                     idEncontrado = opt.getAttribute('data-id');
                 }
@@ -413,41 +408,15 @@
 
         if (!verificarProgenitor('pai', 'Pai')) return false;
         if (!verificarProgenitor('mae', 'Mãe')) return false;
-
         return true;
     }
 
-    // 5. INICIALIZAÇÃO AO ABRIR A PÁGINA
+    // 6. INICIALIZAÇÃO AO ABRIR A PÁGINA
     window.onload = function () {
         toggleCedido();
         const obs = document.getElementById('obs');
         if (obs) updateChars(obs);
     };
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const formulario = document.querySelector('form');
-
-        if (formulario) {
-            formulario.addEventListener('submit', function () {
-                // Se tivermos um pombo (modo edição), guardamos o ID
-                {% if pombo %}
-                sessionStorage.setItem('ultimoPomboClicado', 'pombo-{{ pombo.id }}');
-                {% endif %}
-            });
-        }
-
-        // Se tiveres um botão "Voltar" personalizado no formulário, 
-        // ele também deve garantir que a memória não se perde
-        const btnVoltar = document.querySelector('.btn-voltar'); // Ajusta a classe se necessário
-        if (btnVoltar) {
-            btnVoltar.addEventListener('click', function () {
-                {% if pombo %}
-                sessionStorage.setItem('ultimoPomboClicado', 'pombo-{{ pombo.id }}');
-                {% endif %}
-            });
-        }
-    });
 </script>
 
 {% endblock %}
