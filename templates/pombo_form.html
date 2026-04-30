@@ -119,7 +119,8 @@
                                         style="cursor: pointer; font-size: 0.75rem;">
 
                                         <span class="fw-bold text-primary">{{ m.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ m.ano|string|slice(-2:) }}</span>
+                                        <span class="text-muted ms-1">-{{ (m.ano|string)[-2:] }}</span> {# Nota: Forma
+                                        alternativa e segura de pegar os últimos 2 dígitos #}
 
                                         {% if m.cor %}
                                         <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ m.cor
@@ -154,7 +155,8 @@
                                         style="cursor: pointer; font-size: 0.75rem;">
 
                                         <span class="fw-bold text-primary">{{ f.anilha }}</span>
-                                        <span class="text-muted ms-1">-{{ f.ano|string|slice(-2:) }}</span>
+                                        <span class="text-muted ms-1">-{{ (f.ano|string)[-2:] }}</span> {# Nota: Forma
+                                        alternativa e segura de pegar os últimos 2 dígitos #}
 
                                         {% if f.cor %}
                                         <span class="ms-2 text-dark text-truncate" style="max-width: 70px;">• {{ f.cor
