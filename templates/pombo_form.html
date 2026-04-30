@@ -110,13 +110,16 @@
                                 <input type="hidden" name="pai_id" id="pai_id"
                                     value="{{ pombo.pai_id if pombo else '' }}">
 
-                                <ul id="list_pai" class="dropdown-menu w-100 shadow-sm"
-                                    style="max-height: 200px; overflow-y: auto;">
+
+                                <ul id="list_pai" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for m in machos %}
                                     <li class="dropdown-item pombo-opt" data-id="{{ m.id }}" data-ano="{{ m.ano }}"
                                         data-anilha="{{ m.anilha }}" data-nome="{{ m.nome|lower or '' }}"
-                                        style="cursor: pointer;">
-                                        {{ m.anilha }} ({{ m.ano }}) {% if m.nome %}- {{ m.nome }}{% endif %}
+                                        data-cor="{{ m.cor|lower or '' }}" {# Nota: Adicionado atributo de cor para
+                                        pesquisa e exibição #} style="cursor: pointer;">
+                                        {{ m.anilha }} ({{ m.ano }}) {% if m.cor %}- {{ m.cor }}{% endif %} {% if m.nome
+                                        %}- {{ m.nome }}{% endif %}
+                                        {# Nota: A cor aparece agora antes do nome na lista de sugestões #}
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -133,13 +136,16 @@
                                 <input type="hidden" name="mae_id" id="mae_id"
                                     value="{{ pombo.mae_id if pombo else '' }}">
 
-                                <ul id="list_mae" class="dropdown-menu w-100 shadow-sm"
-                                    style="max-height: 200px; overflow-y: auto;">
+
+                                <ul id="list_mae" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for f in femeas %}
                                     <li class="dropdown-item pombo-opt" data-id="{{ f.id }}" data-ano="{{ f.ano }}"
                                         data-anilha="{{ f.anilha }}" data-nome="{{ f.nome|lower or '' }}"
-                                        style="cursor: pointer;">
-                                        {{ f.anilha }} ({{ f.ano }}) {% if f.nome %}- {{ f.nome }}{% endif %}
+                                        data-cor="{{ f.cor|lower or '' }}" {# Nota: Adicionado atributo de cor para
+                                        pesquisa e exibição #} style="cursor: pointer;">
+                                        {{ f.anilha }} ({{ f.ano }}) {% if f.cor %}- {{ f.cor }}{% endif %} {% if f.nome
+                                        %}- {{ f.nome }}{% endif %}
+                                        {# Nota: A cor aparece agora antes do nome na lista de sugestões #}
                                     </li>
                                     {% endfor %}
                                 </ul>
