@@ -225,11 +225,17 @@ def api_pombo_existe(search):
 @app.route('/novo_pombo', methods=['GET', 'POST'])
 @login_required
 def novo_pombo():
+    # 1. Preparação de dados para o formulário
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
-    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano, Pombo.anilha).all()
+    # Listas para sugestão de Pais/Mães
+    machos = Pombo.query.filter_by(sexo='Macho', user_id=current_user.id).order_by(Pombo.ano.desc(), Pombo.anilha).all()
+    femeas = Pombo.query.filter_by(sexo='Fêmea', user_id=current_user.id).order_by(Pombo.ano.desc(), Pombo.anilha).all()
     
+    # Nota: Extração de cores únicas do utilizador para o Datalist (conforme solicitado)
+    cores_query = db.session.query(Pombo.cor).filter(Pombo.user_id == current_user.id).distinct().all()
+    cores_lista = sorted([c[0] for c in cores_query if c[0]]) # Limpa nulos e ordena alfabeticamente
+
     sugerir_anilha = ""
     sugerir_ano = ""
 
@@ -237,12 +243,13 @@ def novo_pombo():
         anilha_input = request.form.get('anilha')
         ano_input = int(request.form.get('ano') or 0)
         
-        # CIRURGIA: VERIFICAÇÃO DE DUPLICADOS AO INSERIR
+        # 2. Cirurgia: Verificação de Duplicados
         existente = Pombo.query.filter_by(anilha=anilha_input, ano=ano_input, user_id=current_user.id).first()
         if existente:
             flash(f"Atenção: Já existe um pombo com a anilha {anilha_input} do ano {ano_input}!", "danger")
             return redirect(url_for('novo_pombo'))
 
+        # 3. Criação do Objeto
         novo = Pombo()
         novo.user_id = current_user.id
         novo.anilha = anilha_input
@@ -252,11 +259,13 @@ def novo_pombo():
         novo.sexo = request.form.get('sexo')
         novo.categoria = request.form.get('categoria')
         
+        # IDs dos progenitores vindos do JavaScript (campos ocultos)
         novo.pai = request.form.get('pai_id') or None
         novo.mae = request.form.get('mae_id') or None
         
         novo.obs = request.form.get('obs')
         novo.cedido_a = request.form.get('cedido_a')
+        # Nota: Lógica do campo Oculto (Mobile-friendly toggle)
         novo.oculto = True if request.form.get('oculto') == 'on' else False
 
         try:
@@ -264,79 +273,92 @@ def novo_pombo():
             db.session.commit()
             flash("Pombo gravado com sucesso!", "success")
 
+            # 4. Lógica de Sugestão para inserção em massa (Próximo pombo)
             try:
                 sugerir_anilha = int(novo.anilha) + 1
             except:
                 sugerir_anilha = novo.anilha
             sugerir_ano = novo.ano
 
+            # Após gravar, recarregamos as cores para incluir a nova se for caso disso
+            cores_query = db.session.query(Pombo.cor).filter(Pombo.user_id == current_user.id).distinct().all()
+            cores_lista = sorted([c[0] for c in cores_query if c[0]])
+
         except Exception as e:
             db.session.rollback()
             flash(f"Erro ao gravar: {str(e)}", "danger")
 
+    # 5. Renderização final (Garante que todos os dados chegam ao pombo_form.html)
     return render_template("pombo_form.html", 
                            pombo=None, 
                            sugerir_anilha=sugerir_anilha, 
                            sugerir_ano=sugerir_ano,
                            anos_lista=anos_lista, 
                            machos=machos, 
-                           femeas=femeas)
+                           femeas=femeas,
+                           cores_lista=cores_lista)
                            
 @app.route('/editar_pombo/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_pombo(id):
-    pombo = Pombo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    # 1. Busca o pombo ou retorna 404 se não existir
+    pombo = Pombo.query.get_or_404(id)
+    
+    # Segurança: Garante que o utilizador só edita os seus próprios pombos
+    if pombo.user_id != current_user.id:
+        flash("Acesso negado!", "danger")
+        return redirect(url_for('index'))
+
+    # 2. Preparação de dados para o formulário
     anos_lista = list(range(datetime.now().year, 1990, -1))
     
-    sugerir_anilha = ""
-    sugerir_ano = ""
+    # Listas para sugestão de Pais/Mães (Exclui o próprio pombo para evitar erro de linhagem)
+    machos = Pombo.query.filter(Pombo.sexo == 'Macho', 
+                                Pombo.user_id == current_user.id, 
+                                Pombo.id != id).order_by(Pombo.ano.desc(), Pombo.anilha).all()
+    
+    femeas = Pombo.query.filter(Pombo.sexo == 'Fêmea', 
+                                Pombo.user_id == current_user.id, 
+                                Pombo.id != id).order_by(Pombo.ano.desc(), Pombo.anilha).all()
+    
+    # Nota: Extração de cores únicas do utilizador para o Datalist
+    cores_query = db.session.query(Pombo.cor).filter(Pombo.user_id == current_user.id).distinct().all()
+    cores_lista = sorted([c[0] for c in cores_query if c[0]])
 
     if request.method == 'POST':
-        nova_anilha = request.form.get('anilha')
-        novo_ano = int(request.form.get('ano') or 0)
-        
-        # CIRURGIA: VERIFICAÇÃO DE DUPLICADOS
-        # Vê se já existe outro pombo (com ID diferente) com esta anilha e ano
-        existente = Pombo.query.filter_by(anilha=nova_anilha, ano=novo_ano, user_id=current_user.id).first()
-        if existente and existente.id != pombo.id:
-            flash(f"Atenção: Já existe um pombo com a anilha {nova_anilha} do ano {novo_ano}!", "danger")
-            return redirect(url_for('editar_pombo', id=id))
-
-        # Se passou a verificação, atualiza os dados
-        pombo.anilha = nova_anilha
-        pombo.ano = novo_ano
+        # 3. Atualização dos campos básicos
         pombo.nome = request.form.get('nome')
         pombo.cor = request.form.get('cor')
         pombo.sexo = request.form.get('sexo')
         pombo.categoria = request.form.get('categoria')
         
+        # IDs dos progenitores (Vêm dos inputs hidden preenchidos pelo JS)
         pombo.pai = request.form.get('pai_id') or None
         pombo.mae = request.form.get('mae_id') or None
         
         pombo.obs = request.form.get('obs')
         pombo.cedido_a = request.form.get('cedido_a')
+        
+        # Nota: Lógica do campo Oculto (checkbox HTML enviada como 'on')[cite: 1]
         pombo.oculto = True if request.form.get('oculto') == 'on' else False
 
         try:
             db.session.commit()
-            flash("Pombo atualizado com sucesso!", "success")
-            return redirect(url_for('lista_pombos'))
+            flash("Alterações gravadas com sucesso!", "success")
+            return redirect(url_for('ver_pombo', id=pombo.id))
         except Exception as e:
             db.session.rollback()
             flash(f"Erro ao atualizar: {str(e)}", "danger")
 
-    # CIRURGIA: EXCLUIR O PRÓPRIO POMBO DAS LISTAS DE PAIS (Pombo.id != id)
-    machos = Pombo.query.filter(Pombo.sexo=='Macho', Pombo.user_id==current_user.id, Pombo.id != id).order_by(Pombo.ano, Pombo.anilha).all()
-    femeas = Pombo.query.filter(Pombo.sexo=='Fêmea', Pombo.user_id==current_user.id, Pombo.id != id).order_by(Pombo.ano, Pombo.anilha).all()
-    
+    # 4. Renderização (Envia todos os dados necessários para o pombo_form.html)[cite: 1]
     return render_template("pombo_form.html", 
                            pombo=pombo, 
                            anos_lista=anos_lista, 
                            machos=machos, 
-                           femeas=femeas, 
-                           sugerir_anilha=sugerir_anilha, 
-                           sugerir_ano=sugerir_ano)
-
+                           femeas=femeas,
+                           cores_lista=cores_lista,
+                           sugerir_anilha=None,
+                           sugerir_ano=None)
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required

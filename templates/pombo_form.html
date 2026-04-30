@@ -111,34 +111,34 @@
                                 {% if pombo %}<input type="hidden" name="ano" value="{{ pombo.ano }}">{% endif %}
                             </div>
 
-                            <!-- Nome: 12 colunas no mobile (100%), 4 colunas no desktop -->
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-bold small text-uppercase">Nome</label>
-                                <input type="text" name="nome" id="nome" class="form-control" autocomplete="off"
-                                    maxlength="24" value="{{ pombo.nome if pombo else '' }}">
+                            <!-- Nota: Inversão de Cor e Nome com suporte a Datalist dinâmico -->
+                            <div class="row g-2 mb-3">
+                                <!-- COR (Agora em 1º lugar entre os campos de texto) -->
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-bold small text-uppercase">Cor</label>
+                                    <input type="text" name="cor" class="form-control" list="cores_user"
+                                        autocomplete="off" value="{{ pombo.cor if pombo else '' }}">
+
+                                    <!-- Nota: O Datalist é preenchido pela cores_lista enviada pelo app.py -->
+                                    <datalist id="cores_user">
+                                        {% for cor in cores_lista %}
+                                        <option value="{{ cor }}">
+                                            {% endfor %}
+                                    </datalist>
+                                </div>
+
+                                <!-- NOME (Agora em 2º lugar) -->
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label fw-bold small text-uppercase">Nome</label>
+                                    <input type="text" name="nome" class="form-control"
+                                        value="{{ pombo.nome if pombo else '' }}" maxlength="24">
+                                </div>
                             </div>
 
-                            <!-- Cor: 12 colunas no mobile (100%), 4 colunas no desktop -->
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-bold small text-uppercase">Cor</label>
-                                <!-- Nota: O atributo list="cores_sugestoes" liga este input à lista nativa abaixo -->
-                                <input type="text" name="cor" class="form-control" autocomplete="off" maxlength="24"
-                                    value="{{ pombo.cor if pombo else '' }}" list="cores_sugestoes">
-
-                                <!-- Lista nativa HTML5 de sugestões rápidas (Mobile-friendly e leve) -->
-                                <datalist id="cores_sugestoes">
-                                    <option value="Azul">
-                                    <option value="Pedrez">
-                                    <option value="Borracho">
-                                    <option value="Vermelho">
-                                    <option value="Preto">
-                                    <option value="Branco">
-                                    <option value="Escama">
-                                    <option value="Grizalho">
-                                    <option value="Salgado">
-                                    <option value="Pigarro">
-                                    <option value="Mosaico">
-                                </datalist>
+                            <!-- Nota: Campo Cedido a - Sem sugestões de histórico (autocomplete="off") -->
+                            <div id="linha_cedido" class="col-12 mt-2" style="display:none;">
+                                <label class="form-label fw-bold small text-uppercase">Cedido a:</label>
+                                <input type="text" name="cedido_a" class="form-control" autocomplete="off">
                             </div>
                         </div>
                         <div class="row">
@@ -260,8 +260,9 @@
                         </div>
 
                         <div class="row" id="linha_cedido">
-                            <div class="col-md-4 mb-3 d-flex align-items-center justify-content-end">
-                                <label class="fw-bold small mb-0 text-nowrap">Cedido a:</label>
+                            <div id="linha_cedido" class="col-12" style="display:none;">
+                                <label class="form-label fw-bold small text-uppercase">Cedido a:</label>
+                                <input type="text" name="cedido_a" class="form-control" autocomplete="off">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <input type="text" name="cedido_a" class="form-control"
