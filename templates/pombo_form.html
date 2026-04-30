@@ -111,7 +111,6 @@
                                     value="{{ pombo.pai_id if pombo else '' }}">
 
 
-                                <!-- Nota: Atualização da lista do PAI - Formato compactado e fonte 0.75rem para mobile -->
                                 <ul id="list_pai" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for m in machos %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ m.id }}"
@@ -147,7 +146,6 @@
                                     value="{{ pombo.mae_id if pombo else '' }}">
 
 
-                                <!-- Nota: Atualização da lista da MÃE - Mesma lógica de otimização de espaço -->
                                 <ul id="list_mae" class="dropdown-menu w-100 shadow-sm custom-dropdown">
                                     {% for f in femeas %}
                                     <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ f.id }}"
