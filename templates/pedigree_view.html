@@ -180,8 +180,8 @@
 
     .box-detail {
         font-weight: bold;
-        margin-bottom: 1px;
-        padding-bottom: 1px;
+        margin-bottom: 0px;
+        padding-bottom: 0px;
     }
 
     .descricao-text {
@@ -352,6 +352,11 @@
     {% if node and node.pombo %}
     <div class="micro-title">
         <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
+        <span class="sex-badge-pedigree" style="top: 2px; right: 2px; font-size: 0.75rem;">
+            {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary" title="Macho"></i>
+            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;" title="Fêmea"></i>
+            {% else %}<i class="bi bi-question-circle text-secondary" title="Indefinido"></i>{% endif %}
+        </span>
     </div>
     <div class="micro-detail">{{ node.pombo.cor or '' }}</div>
     <div class="micro-detail">{{ node.pombo.nome or '' }}</div>
