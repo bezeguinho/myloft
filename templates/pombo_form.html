@@ -219,29 +219,7 @@
 
                     <!-- 5. Descrição e Botões -->
                     <!-- SUBSTITUIR APENAS O BLOCO FINAL DA DESCRIÇÃO E BOTÕES -->
-                    <div class="row g-4 mt-2">
-                        <!-- Coluna da Descrição -->
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
-                            <textarea name="obs" id="obs" class="form-control" rows="8"
-                                maxlength="200">{{ pombo.obs if pombo else '' }}</textarea>
-                            <div class="text-center small text-muted mt-1">
-                                <span id="char_count">0</span> / 200 carateres
-                            </div>
-                        </div>
 
-                        <!-- Espaço para empurrar os botões para a direita como na imagem -->
-                        <div class="col-md-1"></div>
-
-                        <!-- Coluna dos Botões (Centralizados Verticalmente) -->
-                        <div class="col-12 col-md-5 d-flex flex-column justify-content-center gap-3">
-                            <button type="submit"
-                                class="btn btn-primary btn-lg fw-bold text-uppercase py-3">Gravar</button>
-                            <!-- Corrigido para 'lista_pombos' conforme a tua rota real -->
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-warning btn-lg fw-bold text-uppercase py-3">Voltar</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -249,55 +227,45 @@
 </div>
 
 <script>
-    // 1. Função de Pesquisa e Seleção (Corrigida)
+    // Função para mostrar e filtrar progenitores com base no sexo e ano
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
-        if (!input || !lista) return;
+        const filtro = input.value.toLowerCase();
+        const anoPombo = parseInt(document.getElementById('ano_select').value) || 9999;
+        const itens = lista.getElementsByClassName('pombo-opt');
 
-        const termo = input.value.toLowerCase();
-        const anoFilhoSelect = document.getElementById('ano_select');
-        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
+        // Mostra a lista ao interagir
+        lista.classList.add('show');
 
-        let visiveis = 0;
-        const options = lista.querySelectorAll('.pombo-opt');
+        Array.from(itens).forEach(item => {
+            const anilha = item.getAttribute('data-anilha').toLowerCase();
+            const nome = item.getAttribute('data-nome').toLowerCase();
+            const anoProgenitor = parseInt(item.getAttribute('data-ano'));
 
-        options.forEach(opt => {
-            const anoP = parseInt(opt.getAttribute('data-ano'));
-            const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-            const nomeP = opt.getAttribute('data-nome').toLowerCase();
-            const corP = opt.getAttribute('data-cor').toLowerCase();
+            // REGRA: Deve coincidir com a pesquisa E ser do mesmo ano ou mais velho
+            const matchesSearch = anilha.includes(filtro) || nome.includes(filtro);
+            const matchesAge = anoProgenitor <= anoPombo;
 
-            const bateAno = !anoFilho || anoP <= anoFilho;
-            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo) || corP.includes(termo);
-
-            if (bateAno && bateTexto) {
-                opt.style.display = 'block';
-                visiveis++;
+            if (matchesSearch && matchesAge) {
+                item.style.display = 'flex';
             } else {
-                opt.style.display = 'none';
+                item.style.display = 'none';
             }
-
-            // CORREÇÃO DO BUG: Usar onmousedown em vez de onclick
-            opt.onmousedown = function (e) {
-                e.preventDefault();
-                const anoCompleto = opt.getAttribute('data-ano');
-                const anilha = opt.getAttribute('data-anilha');
-
-                // Nota: Agora coloca apenas a Anilha e o Ano Completo na caixa, como sugeriste
-                input.value = anilha + " (" + anoCompleto + ")";
-                document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
-                lista.classList.remove('show');
-            };
         });
-
-        if (visiveis > 0) {
-            lista.classList.add('show');
-        } else {
-            lista.classList.remove('show');
-        }
     }
 
+    // Fechar as listas ao clicar fora
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.position-relative')) {
+            document.getElementById('list_pai').classList.remove('show');
+            document.getElementById('list_mae').classList.remove('show');
+        }
+    });
+
+    // Adiciona evento para abrir a lista ao clicar na caixa (mesmo sem escrever)
+    document.getElementById('search_pai').addEventListener('focus', () => filtrarProgenitores('pai'));
+    document.getElementById('search_mae').addEventListener('focus', () => filtrarProgenitores('mae'));
     // 2. Fechar a lista ao clicar fora ou mover para outro campo
     document.addEventListener('mousedown', function (e) {
         const listPai = document.getElementById('list_pai');
