@@ -327,12 +327,19 @@
                     </div>
 
                     <!-- LINHA 4: CAMPO CEDIDO A (DINÂMICO) -->
+                    <!-- ========================================== -->
+                    <!-- LINHA 4: CAMPO CEDIDO A (Alinhado à Esquerda) -->
+                    <!-- ========================================== -->
                     <div id="linha_cedido" class="row mb-3"
-                        style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %};">
-                        <div class="col-12 col-md-4 offset-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Cedido A:</label>
+                        style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %}; margin-top: -10px;">
+                        <div class="col-12 col-md-6 offset-md-4 d-flex align-items-center gap-2">
+                            <!-- White-space: nowrap impede que o texto quebre em duas linhas -->
+                            <label class="form-label fw-bold small text-uppercase mb-0"
+                                style="white-space: nowrap; min-width: fit-content;">
+                                Cedido A:
+                            </label>
                             <input type="text" name="cedido_a" id="cedido_a" class="form-control shadow-sm"
-                                autocomplete="off" maxlength="20" style="border-radius: 8px;"
+                                autocomplete="off" maxlength="20" style="border-radius: 8px; height: 34px;"
                                 value="{{ pombo.cedido_a if pombo else '' }}">
                         </div>
                     </div>
