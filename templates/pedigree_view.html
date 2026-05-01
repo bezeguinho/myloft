@@ -147,13 +147,13 @@
     .rect-box .box-title {
         font-size: 0.72rem;
         line-height: 1.35;
-        margin-bottom: 1px;
+        margin-bottom: 0px;
     }
 
     .rect-box .box-detail {
         font-size: 0.72rem;
         border-bottom: none;
-        margin-bottom: 2.5px;
+        margin-bottom: 1.5px;
         padding-bottom: 0;
         line-height: 1.35;
     }
@@ -175,14 +175,13 @@
         display: flex;
         justify-content: space-between;
         font-weight: bold;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
     }
 
     .box-detail {
         font-weight: bold;
-        margin-bottom: 4px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 2px;
+        margin-bottom: 3px;
+        padding-bottom: 1px;
     }
 
     .descricao-text {
@@ -262,6 +261,10 @@
         .no-print, .navbar {
             display: none !important;
         }
+
+        .owner-photo-text {
+            color: transparent !important;
+        }
     }
 </style>
 
@@ -285,9 +288,14 @@
             {% else %}<i class="bi bi-question-circle text-secondary" title="Indefinido"></i>{% endif %}
         </span>
     </div>
+    {% if extra_class == 'square-box' %}
+    <div class="box-detail">{{ node.pombo.cor or '' }}</div>
+    <div class="box-detail">{{ node.pombo.nome or '' }}</div>
+    {% else %}
     <div class="box-detail">
         {{ node.pombo.cor or '' }}{% if node.pombo.cor and node.pombo.nome %} - {% endif %}{{ node.pombo.nome or '' }}
     </div>
+    {% endif %}
     <div class="descricao-text">{{ node.pombo.obs or '' }}</div>
     {% else %}
     <div class="box-title"><span>.</span></div>
@@ -315,7 +323,7 @@
             {% if utilizador and utilizador.foto %}
             <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Logo" class="owner-photo">
             {% else %}
-            <div class="owner-photo d-flex align-items-center justify-content-center bg-light text-muted">Sem Foto</div>
+            <div class="owner-photo d-flex align-items-center justify-content-center bg-light text-muted owner-photo-text">Foto</div>
             {% endif %}
         </div>
     </div>
