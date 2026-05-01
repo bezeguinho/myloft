@@ -139,6 +139,7 @@
                                 autocomplete="off"
                                 value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% endif %}{% endfor %}{% endif %}"
                                 onclick="this.select(); filtrarProgenitores('pai');"
+                                onfocus="this.select(); filtrarProgenitores('pai');"
                                 oninput="filtrarProgenitores('pai')">
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai_id if pombo else '' }}">
                             <ul id="list_pai" class="dropdown-menu w-100 shadow-sm custom-dropdown">
@@ -164,6 +165,7 @@
                                 autocomplete="off"
                                 value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} ({{ f.ano }}){% endif %}{% endfor %}{% endif %}"
                                 onclick="this.select(); filtrarProgenitores('mae');"
+                                onfocus="this.select(); filtrarProgenitores('mae');"
                                 oninput="filtrarProgenitores('mae')">
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae_id if pombo else '' }}">
                             <ul id="list_mae" class="dropdown-menu w-100 shadow-sm custom-dropdown">
@@ -216,12 +218,12 @@
 
                         <!-- Ocultar Pombo alinhado pelo fim da caixa da Mãe -->
                         <div class="col-md-4 mb-3">
-                            <!-- Label invisível para forçar o alinhamento perfeito com as outras colunas -->
-                            <label class="fw-bold text-uppercase small d-block"
-                                style="visibility: hidden;">Ocultar</label>
+                            <!-- Label com espaço invisível garante a altura milimétrica igual às outras colunas -->
+                            <label class="form-label fw-bold small text-uppercase d-block">&nbsp;</label>
 
                             <label for="oculto"
-                                class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm">
+                                class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm"
+                                style="height: 38px;">
                                 <span class="fw-bold mb-0 small text-uppercase" style="user-select: none;">Ocultar
                                     Pombo?</span>
                                 <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0"
@@ -283,90 +285,63 @@
 </div>
 
 <script>
-    // 1. FILTRO COM PESQUISA INTEGRADA (CORRIGIDO)
+    // 1. FILTRO COM PESQUISA INTEGRADA E ABERTURA GARANTIDA
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
         if (!input || !lista) return;
 
-        // 1. FILTRO COM PESQUISA INTEGRADA (ROBUSTO)
-        function filtrarProgenitores(tipo) {
-            const input = document.getElementById('search_' + tipo);
-            const lista = document.getElementById('list_' + tipo);
-            if (!input || !lista) return;
+        // Fecha a OUTRA lista para evitar sobreposições
+        const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
+        const listaOutro = document.getElementById('list_' + outroTipo);
+        if (listaOutro) listaOutro.classList.remove('show');
 
-            // Fecha a OUTRA lista para evitar sobreposições feias
-            const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
-            const listaOutro = document.getElementById('list_' + outroTipo);
-            if (listaOutro) listaOutro.style.display = 'none';
+        const termo = input.value.toLowerCase();
+        const anoFilhoSelect = document.getElementById('ano_select');
+        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
-            const termo = input.value.toLowerCase();
-            const anoFilhoSelect = document.getElementById('ano_select');
-            const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
+        let visiveis = 0;
+        const options = lista.querySelectorAll('.pombo-opt');
 
-            let visiveis = 0;
-            const options = lista.querySelectorAll('.pombo-opt');
+        options.forEach(opt => {
+            const anoP = parseInt(opt.getAttribute('data-ano'));
+            const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+            const nomeP = opt.getAttribute('data-nome').toLowerCase();
 
-            options.forEach(opt => {
-                const anoP = parseInt(opt.getAttribute('data-ano'));
-                const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-                const nomeP = opt.getAttribute('data-nome').toLowerCase();
-                const bateAno = !anoFilho || anoP <= anoFilho;
-                const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
+            const bateAno = !anoFilho || anoP <= anoFilho;
+            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
 
-                if (bateAno && bateTexto) {
-                    opt.style.display = 'block';
-                    visiveis++;
-                } else {
-                    opt.style.display = 'none';
-                }
-
-                // Garantir que clicar na opção atualiza os dados e fecha a lista
-                opt.onclick = function (e) {
-                    e.stopPropagation(); // Impede que o clique feche a caixa antes de gravar o valor
-                    input.value = opt.innerText.trim();
-                    document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
-                    lista.style.display = 'none';
-                };
-            });
-
-            // Só exibe a lista se houver resultados
-            if (visiveis > 0) {
-                lista.style.display = 'block';
-                lista.style.position = 'absolute';
-                lista.style.zIndex = '1050';
-                lista.style.width = '100%';
+            if (bateAno && bateTexto) {
+                opt.style.display = 'block';
+                visiveis++;
             } else {
-                lista.style.display = 'none';
+                opt.style.display = 'none';
             }
-        }
 
-        // Fechar a lista de sugestões se clicar em qualquer outro lado do ecrã
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.position-relative')) {
-                const listPai = document.getElementById('list_pai');
-                const listMae = document.getElementById('list_mae');
-                if (listPai) listPai.style.display = 'none';
-                if (listMae) listMae.style.display = 'none';
-            }
+            // Evento de clique para escolher o pombo
+            opt.onclick = function (e) {
+                e.preventDefault();
+                input.value = opt.innerText.trim();
+                document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
+                lista.classList.remove('show');
+            };
         });
-        // FORÇA a abertura se houver pombos visíveis
+
+        // Mostra a lista acionando a classe nativa do Bootstrap
         if (visiveis > 0) {
-            lista.style.display = 'block';
-            lista.style.position = 'absolute';
-            lista.style.zIndex = '1050'; // Garante que fica por cima de tudo
+            lista.classList.add('show');
         } else {
-            lista.style.display = 'none';
+            lista.classList.remove('show');
         }
     }
 
-    // Fechar lista se clicar fora
+    // Fechar ao clicar noutro lado qualquer do ecrã
     document.addEventListener('click', function (e) {
-        if (!e.target.id.includes('search')) {
+        if (!e.target.closest('.position-relative')) {
             const listPai = document.getElementById('list_pai');
             const listMae = document.getElementById('list_mae');
-            if (listPai) listPai.style.display = 'none';
-            if (listMae) listMae.style.display = 'none';
+            if (listPai) listPai.classList.remove('show');
+            if (listMae) listMae.classList.remove('show');
         }
     });
 
