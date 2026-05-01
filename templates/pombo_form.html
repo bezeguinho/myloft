@@ -217,22 +217,25 @@
                         </div>
                     </div>
                     <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (COLAR ANTES DO FIM DO </form>) -->
-                    <div class="row g-3 mt-3">
-                        <!-- Coluna da Descrição (Ocupa 7/12 da largura no Desktop) -->
-                        <div class="col-12 col-md-7">
+                    <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (REPOSIÇÃO FIEL AO ORIGINAL) -->
+                    <div class="row g-3 mt-2">
+                        <!-- Coluna da Descrição (Quadrada e com contador abaixo) -->
+                        <div class="col-12 col-md-6">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
                             <textarea name="obs" id="obs" class="form-control" rows="5" maxlength="200"
-                                oninput="contarCaracteres()">{{ pombo.obs if pombo else '' }}</textarea>
-                            <div class="text-start small text-muted mt-1">
-                                <span id="char_count">0</span> / 200 carateres
-                            </div>
+                                oninput="document.getElementById('char_count').innerText = this.value.length">{{ pombo.obs if pombo else '' }}</textarea>
+                            <div class="small text-muted mt-1"><span id="char_count">0</span> / 200 carateres</div>
                         </div>
 
-                        <!-- Coluna dos Botões (Ocupa 5/12 da largura no Desktop - Tamanho Normal) -->
-                        <div class="col-12 col-md-5 d-flex flex-column justify-content-end gap-2">
-                            <button type="submit" class="btn btn-primary fw-bold text-uppercase">Gravar</button>
-                            <a href="{{ url_for('lista_pombos') }}"
-                                class="btn btn-warning fw-bold text-uppercase">Voltar</a>
+                        <!-- Coluna dos Botões: Tamanho normal e alinhados com o topo da caixa -->
+                        <div class="col-12 col-md-4 mt-md-4 pt-md-2">
+                            <div class="d-flex flex-column gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold text-uppercase px-4"
+                                    style="width: fit-content; min-width: 150px;">Gravar</button>
+                                <a href="{{ url_for('lista_pombos') }}"
+                                    class="btn btn-warning fw-bold text-uppercase px-4"
+                                    style="width: fit-content; min-width: 150px;">Voltar</a>
+                            </div>
                         </div>
                     </div>
 
@@ -246,15 +249,22 @@
 </div>
 
 <script>
-    // Função para mostrar e filtrar progenitores com base no sexo e ano
+    // Função para filtrar Progenitores com base no Sexo e na Regra da Idade
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
         const filtro = input.value.toLowerCase();
-        const anoPombo = parseInt(document.getElementById('ano_select').value) || 9999;
-        const itens = lista.getElementsByClassName('pombo-opt');
 
-        // Mostra a lista ao interagir
+        // Obtém o ano selecionado para o pombo atual
+        const anoPombo = parseInt(document.getElementById('ano_select').value);
+
+        if (!anoPombo) {
+            alert("Por favor, selecione primeiro o ANO do pombo.");
+            input.value = "";
+            return;
+        }
+
+        const itens = lista.getElementsByClassName('pombo-opt');
         lista.classList.add('show');
 
         Array.from(itens).forEach(item => {
@@ -262,8 +272,8 @@
             const nome = item.getAttribute('data-nome').toLowerCase();
             const anoProgenitor = parseInt(item.getAttribute('data-ano'));
 
-            // REGRA: Deve coincidir com a pesquisa E ser do mesmo ano ou mais velho
             const matchesSearch = anilha.includes(filtro) || nome.includes(filtro);
+            // Regra: O progenitor deve ser do mesmo ano ou MAIS VELHO
             const matchesAge = anoProgenitor <= anoPombo;
 
             if (matchesSearch && matchesAge) {
@@ -274,32 +284,16 @@
         });
     }
 
-    // Fechar as listas ao clicar fora
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.position-relative')) {
-            document.getElementById('list_pai').classList.remove('show');
-            document.getElementById('list_mae').classList.remove('show');
-        }
+    // Inicialização de página
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Cursor a piscar na anilha
+        const anilhaInput = document.getElementById('anilha');
+        if (anilhaInput) anilhaInput.focus();
+
+        // 2. Atualizar contador de caracteres se já houver texto (edição)
+        const obs = document.getElementById('obs');
+        if (obs) document.getElementById('char_count').innerText = obs.value.length;
     });
-
-    // Adiciona evento para abrir a lista ao clicar na caixa (mesmo sem escrever)
-    document.getElementById('search_pai').addEventListener('focus', () => filtrarProgenitores('pai'));
-    document.getElementById('search_mae').addEventListener('focus', () => filtrarProgenitores('mae'));
-    // 2. Fechar a lista ao clicar fora ou mover para outro campo
-    document.addEventListener('mousedown', function (e) {
-        const listPai = document.getElementById('list_pai');
-        const listMae = document.getElementById('list_mae');
-        const searchPai = document.getElementById('search_pai');
-        const searchMae = document.getElementById('search_mae');
-
-        if (listPai && e.target !== searchPai && !listPai.contains(e.target)) {
-            listPai.classList.remove('show');
-        }
-        if (listMae && e.target !== searchMae && !listMae.contains(e.target)) {
-            listMae.classList.remove('show');
-        }
-    });
-
     function toggleCedido() {
         const selectCat = document.getElementById('categoria_select');
         const linhaCedido = document.getElementById('linha_cedido');
