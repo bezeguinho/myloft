@@ -366,6 +366,7 @@
         }
     });
 
+    // SUBSTITUIR APENAS ESTA FUNÇÃO NO TEU SCRIPT
     function toggleCedido() {
         const selectCat = document.getElementById('categoria_select');
         const linhaCedido = document.getElementById('linha_cedido');
@@ -373,8 +374,8 @@
 
         if (selectCat.value === 'Cedido') {
             linhaCedido.style.display = 'flex';
-            // Timeout para garantir que o elemento está visível antes de focar
-            setTimeout(() => { inputCedido.focus(); }, 100);
+            // Delay necessário para o browser processar a visibilidade antes do foco
+            setTimeout(() => { inputCedido.focus(); }, 150);
         } else {
             linhaCedido.style.display = 'none';
             inputCedido.value = '';
