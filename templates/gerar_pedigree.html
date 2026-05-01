@@ -30,11 +30,24 @@
             
             <form action="{{ url_for('view_pedigree') }}" method="POST">
                 <div class="mb-4 text-start">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="geracoes" id="geracoes4" value="4" checked>
+                        <label class="form-check-label fw-bold text-secondary" for="geracoes4">
+                            4 Gerações
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="geracoes" id="geracoes5" value="5">
+                        <label class="form-check-label fw-bold text-secondary" for="geracoes5">
+                            5 Gerações
+                        </label>
+                    </div>
+                    
                     <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME</label>
                     <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" placeholder="Pesquisar pombo..." autocomplete="off" required style="border-radius: 12px; padding: 15px;">
                     <datalist id="pombosList">
                         {% for p in pombos %}
-                        <option value="{{ p.anilha }}">{{ p.anilha }} - {{ p.nome or 'Sem Nome' }}</option>
+                        <option value="{{ p.anilha }} - {{ p.nome or 'Sem Nome' }}"></option>
                         {% endfor %}
                     </datalist>
                 </div>

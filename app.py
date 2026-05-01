@@ -494,12 +494,16 @@ def gerar_pedigree():
 @app.route("/pedigree/view", methods=['POST'])
 @login_required
 def view_pedigree():
-    anilha = request.form.get('anilha')
-    if not anilha:
+    anilha_input = request.form.get('anilha')
+    if not anilha_input:
         flash('Por favor, indique a anilha do pombo.', 'warning')
         return redirect(url_for('gerar_pedigree'))
         
-    tree = get_pombo_tree(anilha, current_user.id)
+    anilha = anilha_input.split(' - ')[0].strip()
+    geracoes = request.form.get('geracoes', '4')
+    max_depth = 5 if geracoes == '5' else 4
+    
+    tree = get_pombo_tree(anilha, current_user.id, max_depth=max_depth)
     if not tree or tree.get('nome') == 'Não Registado':
         flash('Pombo não encontrado.', 'danger')
         return redirect(url_for('gerar_pedigree'))
