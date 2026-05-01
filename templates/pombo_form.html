@@ -210,7 +210,7 @@
                     </div>
 
                     <!-- ============================================================== -->
-                    <!-- BLOCO UNIFICADO: PROGENITORES, CATEGORIAS E DESCRIÇÃO -->
+                    <!-- BLOCO DEFINITIVO: DESDE O PAI ATÉ AO FIM DO FORMULÁRIO -->
                     <!-- ============================================================== -->
 
                     <!-- LINHA 2: PROGENITORES (PAI E MÃE) -->
@@ -224,27 +224,20 @@
                                 value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('pai')" oninput="filtrarDropdown('pai')">
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
-
                             <div id="list_pai" class="dropdown-menu w-100 custom-dropdown"
                                 style="position: absolute; z-index: 1050;">
-                                <div id="opcoes_pai">
-                                    {% for m in machos %}
-                                    <button type="button"
-                                        class="dropdown-item pombo-opt-pai text-truncate d-block border-bottom pb-2 pt-2"
-                                        data-id="{{ m.id }}" data-anilha="{{ m.anilha }}"
-                                        data-nome="{{ m.nome|lower or '' }}" data-ano="{{ m.ano }}"
-                                        onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace('\'', '\\\'') }}{% endif %}')">
-                                        <span class="fw-bold text-primary">{{ m.anilha }}</span>
-                                        <span class="text-dark fw-medium"> -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{
-                                            m.nome }}{% endif %}</span>
-                                    </button>
-                                    {% endfor %}
-                                </div>
-                                <div id="notfound_pai" style="display: none;" class="p-2">
-                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
-                                        class="btn btn-sm w-100 fw-bold"
-                                        style="background-color: #eef4ff; color: #0d6efd;">+ Inserir novo?</a>
-                                </div>
+                                <!-- Lista de machos gerada pelo Flask -->
+                                {% for m in machos %}
+                                <button type="button"
+                                    class="dropdown-item pombo-opt-pai text-truncate d-block border-bottom pb-2 pt-2"
+                                    data-id="{{ m.id }}" data-anilha="{{ m.anilha }}"
+                                    data-nome="{{ m.nome|lower or '' }}" data-ano="{{ m.ano }}"
+                                    onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace('\'', '\\\'') }}{% endif %}')">
+                                    <span class="fw-bold text-primary">{{ m.anilha }}</span>
+                                    <span class="text-dark fw-medium"> -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{
+                                        m.nome }}{% endif %}</span>
+                                </button>
+                                {% endfor %}
                             </div>
                         </div>
 
@@ -257,27 +250,20 @@
                                 value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('mae')" oninput="filtrarDropdown('mae')">
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
-
                             <div id="list_mae" class="dropdown-menu w-100 custom-dropdown"
                                 style="position: absolute; z-index: 1050;">
-                                <div id="opcoes_mae">
-                                    {% for f in femeas %}
-                                    <button type="button"
-                                        class="dropdown-item pombo-opt-mae text-truncate d-block border-bottom pb-2 pt-2"
-                                        data-id="{{ f.id }}" data-anilha="{{ f.anilha }}"
-                                        data-nome="{{ f.nome|lower or '' }}" data-ano="{{ f.ano }}"
-                                        onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace('\'', '\\\'') }}{% endif %}')">
-                                        <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
-                                        <span class="text-dark fw-medium"> -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{
-                                            f.nome }}{% endif %}</span>
-                                    </button>
-                                    {% endfor %}
-                                </div>
-                                <div id="notfound_mae" style="display: none;" class="p-2">
-                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
-                                        class="btn btn-sm w-100 fw-bold"
-                                        style="background-color: #fff0f3; color: #ff4d6d;">+ Inserir novo?</a>
-                                </div>
+                                <!-- Lista de fêmeas gerada pelo Flask -->
+                                {% for f in femeas %}
+                                <button type="button"
+                                    class="dropdown-item pombo-opt-mae text-truncate d-block border-bottom pb-2 pt-2"
+                                    data-id="{{ f.id }}" data-anilha="{{ f.anilha }}"
+                                    data-nome="{{ f.nome|lower or '' }}" data-ano="{{ f.ano }}"
+                                    onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace('\'', '\\\'') }}{% endif %}')">
+                                    <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
+                                    <span class="text-dark fw-medium"> -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{
+                                        f.nome }}{% endif %}</span>
+                                </button>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -301,8 +287,7 @@
                         <div class="col-md-4 mb-3">
                             <label class="fw-bold text-uppercase small mb-2 d-block">Categoria</label>
                             <select name="categoria" id="categoria_select" class="form-select shadow-sm"
-                                style="border-radius: 8px;" required
-                                onchange="if(typeof toggleCedido === 'function') toggleCedido();">
+                                style="border-radius: 8px;" required onchange="toggleCedido()">
                                 <option value="" disabled hidden {% if not pombo %}selected{% endif %}>Escolha..
                                 </option>
                                 <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
@@ -318,42 +303,33 @@
                             <label class="fw-bold text-uppercase small mb-2 d-block"
                                 style="visibility: hidden;">Ocultar</label>
                             <div class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light shadow-sm"
-                                style="height: 38px; border-radius: 8px; cursor: pointer;">
-                                <span class="fw-bold mb-0 small text-uppercase">Ocultar Pombo?</span>
+                                style="height: 38px; border-radius: 8px;">
+                                <span class="fw-bold mb-0 small text-uppercase">Ocultar?</span>
                                 <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
                                     pombo and pombo.oculto %}checked{% endif %}>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ========================================== -->
-                    <!-- LINHA 4: CAMPO CEDIDO A (Alinhamento Perfeito) -->
-                    <!-- ========================================== -->
+                    <!-- LINHA 4: CAMPO CEDIDO A (Alinhado à box da categoria) -->
                     <div id="linha_cedido" class="row mb-3 align-items-center"
                         style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %}; margin-top: -10px;">
-
-                        <!-- Coluna 1 (4 unidades): Onde colocamos a Label alinhada à direita para encostar na box -->
-                        <div class="col-md-4 text-md-end text-start">
-                            <label class="form-label fw-bold small text-uppercase mb-0">
-                                Cedido A:
-                            </label>
+                        <div class="col-md-4 text-md-end text-start mb-1 mb-md-0">
+                            <label class="fw-bold small text-uppercase mb-0">Cedido A:</label>
                         </div>
-
-                        <!-- Coluna 2 (4 unidades): Onde o input fica com o tamanho exato da Categoria acima -->
                         <div class="col-md-4">
                             <input type="text" name="cedido_a" id="cedido_a" class="form-control shadow-sm"
                                 autocomplete="off" maxlength="20" style="border-radius: 8px; height: 38px;"
                                 value="{{ pombo.cedido_a if pombo else '' }}">
                         </div>
-
-                        <!-- Coluna 3 (4 unidades): Vazia para manter o equilíbrio da grelha -->
                         <div class="col-md-4"></div>
                     </div>
 
                     <!-- LINHA 5: DESCRIÇÃO E BOTÕES -->
                     <div class="row g-3 mt-2 align-items-start">
                         <div class="col-auto">
-                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
+                            <label class="form-label fw-bold small text-uppercase mb-1">Descrição para o
+                                Pedigree...</label>
                             <textarea name="obs" id="obs" class="form-control shadow-sm"
                                 style="width: 250px; height: 180px; resize: none; border-radius: 8px;" maxlength="200"
                                 oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
@@ -374,184 +350,180 @@
                         </div>
                     </div>
 
-                    <!-- FECHO DO FORMULÁRIO E DO CONTEÚDO DO CARD -->
-                    </form>
-                </div>
-            </div>
-            <!-- FECHO DA ESTRUTURA PRINCIPAL DO CARD (IMPEDE O COLLAPSE DO PRINT) -->
-        </div>
-    </div>
+                    </form> <!-- Fecha o formulário -->
+                </div> <!-- Fecha o card-body -->
+            </div> <!-- Fecha o card principal -->
 
-    <script>
-        // =========================================================
-        // BLOCO DE PESQUISA DE PROGENITORES (PAI/MÃE)
-        // =========================================================
+            <script>
+                // =========================================================
+                // BLOCO DE PESQUISA DE PROGENITORES (PAI/MÃE)
+                // =========================================================
 
-        /**
-         * Filtra as opções de pai/mãe com base no texto digitado e no ano de nascimento.
-         * Implementação Mobile-First com foco em performance.
-         */
-        function filtrarDropdown(tipo) {
-            const input = document.getElementById('search_' + tipo);
-            const lista = document.getElementById('list_' + tipo);
-            if (!input || !lista) return;
+                /**
+                 * Filtra as opções de pai/mãe com base no texto digitado e no ano de nascimento.
+                 * Implementação Mobile-First com foco em performance.
+                 */
+                function filtrarDropdown(tipo) {
+                    const input = document.getElementById('search_' + tipo);
+                    const lista = document.getElementById('list_' + tipo);
+                    if (!input || !lista) return;
 
-            // Fecha a lista oposta para evitar poluição visual em ecrãs pequenos
-            const outroTipo = (tipo === 'pai') ? 'mae' : 'pai';
-            const listaOutro = document.getElementById('list_' + outroTipo);
-            if (listaOutro) listaOutro.style.display = 'none';
+                    // Fecha a lista oposta para evitar poluição visual em ecrãs pequenos
+                    const outroTipo = (tipo === 'pai') ? 'mae' : 'pai';
+                    const listaOutro = document.getElementById('list_' + outroTipo);
+                    if (listaOutro) listaOutro.style.display = 'none';
 
-            // Mostra a lista atual
-            lista.style.display = 'block';
+                    // Mostra a lista atual
+                    lista.style.display = 'block';
 
-            const termo = String(input.value).toLowerCase().trim();
+                    const termo = String(input.value).toLowerCase().trim();
 
-            // Lógica de validação de idade (Pai/Mãe deve ser mais velho que o Filho)
-            const anoSelect = document.getElementById('ano_select');
-            let anoFilho = (anoSelect && anoSelect.value) ? parseInt(anoSelect.value) : 0;
+                    // Lógica de validação de idade (Pai/Mãe deve ser mais velho que o Filho)
+                    const anoSelect = document.getElementById('ano_select');
+                    let anoFilho = (anoSelect && anoSelect.value) ? parseInt(anoSelect.value) : 0;
 
-            let visiveis = 0;
-            const options = document.querySelectorAll('.pombo-opt-' + tipo);
-
-            options.forEach(opt => {
-                const anoP = parseInt(opt.getAttribute('data-ano')) || 0;
-                const anilhaP = String(opt.getAttribute('data-anilha') || '').toLowerCase();
-                const nomeP = String(opt.getAttribute('data-nome') || '').toLowerCase();
-
-                // Critérios de filtragem
-                const bateAno = (anoFilho === 0 || anoP === 0) ? true : (anoP <= anoFilho);
-                const bateTexto = (termo === "") || anilhaP.includes(termo) || nomeP.includes(termo);
-
-                if (bateAno && bateTexto) {
-                    opt.style.display = 'block';
-                    visiveis++;
-                } else {
-                    opt.style.display = 'none';
-                }
-            });
-
-            // Gere o estado do botão "Não encontrado"
-            const notFoundBox = document.getElementById('notfound_' + tipo);
-            if (notFoundBox) {
-                notFoundBox.style.display = (visiveis === 0 && termo !== "") ? 'block' : 'none';
-            }
-
-            // Reset do ID oculto para garantir que o utilizador seleciona uma opção válida
-            const hiddenInput = document.getElementById(tipo + '_id');
-            if (hiddenInput) hiddenInput.value = '';
-        }
-
-        /**
-         * Define o progenitor selecionado no formulário.
-         */
-        function selecionarProgenitor(tipo, id, texto) {
-            const inputVisual = document.getElementById('search_' + tipo);
-            const inputHidden = document.getElementById(tipo + '_id');
-            const lista = document.getElementById('list_' + tipo);
-
-            if (inputVisual) inputVisual.value = texto;
-            if (inputHidden) inputHidden.value = id;
-            if (lista) lista.style.display = 'none';
-        }
-
-        // Event Listener para fechar dropdowns ao clicar fora (UX Mobile)
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
-                const listPai = document.getElementById('list_pai');
-                const listMae = document.getElementById('list_mae');
-                if (listPai) listPai.style.display = 'none';
-                if (listMae) listMae.style.display = 'none';
-            }
-        });
-
-        // =========================================================
-        // UTILIDADES E VALIDAÇÃO DE GRAVAÇÃO
-        // =========================================================
-
-        /**
-         * Contador de caracteres para o campo de observações.
-         */
-        function updateChars(obj) {
-            const display = document.getElementById('char_count');
-            if (display) display.innerHTML = obj.value.length;
-        }
-
-        /**
-         * Mostra/Oculta o campo de destino se o pombo for "Cedido".
-         */
-        function toggleCedido() {
-            const select = document.getElementById('categoria_select');
-            const linhaCedido = document.getElementById('linha_cedido');
-            if (select && linhaCedido) {
-                linhaCedido.style.display = (select.value === 'Cedido') ? 'flex' : 'none';
-            }
-        }
-
-        /**
-         * Validação final antes do envio (Submit).
-         */
-        function validarGravação(event) {
-            const verificarProgenitor = (tipo, nomeTipo) => {
-                const inputPesquisa = document.getElementById('search_' + tipo);
-                const inputOcultoId = document.getElementById(tipo + '_id');
-
-                if (!inputPesquisa || !inputOcultoId) return true;
-
-                const textoDigitado = inputPesquisa.value.trim();
-
-                // Se estiver vazio, é válido (sem progenitor definido)
-                if (textoDigitado === "") {
-                    inputOcultoId.value = "";
-                    return true;
-                }
-
-                // Se tem texto mas não tem ID selecionado, tenta encontrar correspondência exata
-                if (inputOcultoId.value === "") {
-                    const anilhaDigitada = textoDigitado.toLowerCase().split(' ')[0];
-                    let idEncontrado = null;
+                    let visiveis = 0;
                     const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
                     options.forEach(opt => {
-                        const anilhaLista = String(opt.getAttribute('data-anilha') || '').toLowerCase();
-                        if (anilhaLista === anilhaDigitada) {
-                            idEncontrado = opt.getAttribute('data-id');
+                        const anoP = parseInt(opt.getAttribute('data-ano')) || 0;
+                        const anilhaP = String(opt.getAttribute('data-anilha') || '').toLowerCase();
+                        const nomeP = String(opt.getAttribute('data-nome') || '').toLowerCase();
+
+                        // Critérios de filtragem
+                        const bateAno = (anoFilho === 0 || anoP === 0) ? true : (anoP <= anoFilho);
+                        const bateTexto = (termo === "") || anilhaP.includes(termo) || nomeP.includes(termo);
+
+                        if (bateAno && bateTexto) {
+                            opt.style.display = 'block';
+                            visiveis++;
+                        } else {
+                            opt.style.display = 'none';
                         }
                     });
 
-                    if (idEncontrado) {
-                        inputOcultoId.value = idEncontrado;
-                        return true;
-                    } else {
-                        const querInserir = confirm(`O ${nomeTipo} com a anilha "${textoDigitado}" não existe na tua base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
-                        if (querInserir) window.open('/novo_pombo', '_blank');
-                        return false;
+                    // Gere o estado do botão "Não encontrado"
+                    const notFoundBox = document.getElementById('notfound_' + tipo);
+                    if (notFoundBox) {
+                        notFoundBox.style.display = (visiveis === 0 && termo !== "") ? 'block' : 'none';
+                    }
+
+                    // Reset do ID oculto para garantir que o utilizador seleciona uma opção válida
+                    const hiddenInput = document.getElementById(tipo + '_id');
+                    if (hiddenInput) hiddenInput.value = '';
+                }
+
+                /**
+                 * Define o progenitor selecionado no formulário.
+                 */
+                function selecionarProgenitor(tipo, id, texto) {
+                    const inputVisual = document.getElementById('search_' + tipo);
+                    const inputHidden = document.getElementById(tipo + '_id');
+                    const lista = document.getElementById('list_' + tipo);
+
+                    if (inputVisual) inputVisual.value = texto;
+                    if (inputHidden) inputHidden.value = id;
+                    if (lista) lista.style.display = 'none';
+                }
+
+                // Event Listener para fechar dropdowns ao clicar fora (UX Mobile)
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
+                        const listPai = document.getElementById('list_pai');
+                        const listMae = document.getElementById('list_mae');
+                        if (listPai) listPai.style.display = 'none';
+                        if (listMae) listMae.style.display = 'none';
+                    }
+                });
+
+                // =========================================================
+                // UTILIDADES E VALIDAÇÃO DE GRAVAÇÃO
+                // =========================================================
+
+                /**
+                 * Contador de caracteres para o campo de observações.
+                 */
+                function updateChars(obj) {
+                    const display = document.getElementById('char_count');
+                    if (display) display.innerHTML = obj.value.length;
+                }
+
+                /**
+                 * Mostra/Oculta o campo de destino se o pombo for "Cedido".
+                 */
+                function toggleCedido() {
+                    const select = document.getElementById('categoria_select');
+                    const linhaCedido = document.getElementById('linha_cedido');
+                    if (select && linhaCedido) {
+                        linhaCedido.style.display = (select.value === 'Cedido') ? 'flex' : 'none';
                     }
                 }
-                return true;
-            };
 
-            if (!verificarProgenitor('pai', 'Pai')) return false;
-            if (!verificarProgenitor('mae', 'Mãe')) return false;
+                /**
+                 * Validação final antes do envio (Submit).
+                 */
+                function validarGravação(event) {
+                    const verificarProgenitor = (tipo, nomeTipo) => {
+                        const inputPesquisa = document.getElementById('search_' + tipo);
+                        const inputOcultoId = document.getElementById(tipo + '_id');
 
-            return true;
-        }
+                        if (!inputPesquisa || !inputOcultoId) return true;
 
-        /**
-         * Inicialização do DOM.
-         */
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('form');
-            if (form) {
-                form.onsubmit = function (e) {
-                    if (!validarGravação(e)) {
-                        e.preventDefault();
+                        const textoDigitado = inputPesquisa.value.trim();
+
+                        // Se estiver vazio, é válido (sem progenitor definido)
+                        if (textoDigitado === "") {
+                            inputOcultoId.value = "";
+                            return true;
+                        }
+
+                        // Se tem texto mas não tem ID selecionado, tenta encontrar correspondência exata
+                        if (inputOcultoId.value === "") {
+                            const anilhaDigitada = textoDigitado.toLowerCase().split(' ')[0];
+                            let idEncontrado = null;
+                            const options = document.querySelectorAll('.pombo-opt-' + tipo);
+
+                            options.forEach(opt => {
+                                const anilhaLista = String(opt.getAttribute('data-anilha') || '').toLowerCase();
+                                if (anilhaLista === anilhaDigitada) {
+                                    idEncontrado = opt.getAttribute('data-id');
+                                }
+                            });
+
+                            if (idEncontrado) {
+                                inputOcultoId.value = idEncontrado;
+                                return true;
+                            } else {
+                                const querInserir = confirm(`O ${nomeTipo} com a anilha "${textoDigitado}" não existe na tua base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
+                                if (querInserir) window.open('/novo_pombo', '_blank');
+                                return false;
+                            }
+                        }
+                        return true;
+                    };
+
+                    if (!verificarProgenitor('pai', 'Pai')) return false;
+                    if (!verificarProgenitor('mae', 'Mãe')) return false;
+
+                    return true;
+                }
+
+                /**
+                 * Inicialização do DOM.
+                 */
+                document.addEventListener('DOMContentLoaded', function () {
+                    const form = document.querySelector('form');
+                    if (form) {
+                        form.onsubmit = function (e) {
+                            if (!validarGravação(e)) {
+                                e.preventDefault();
+                            }
+                        };
                     }
-                };
-            }
 
-            // Inicializa o estado do campo Cedido ao carregar (se estiver a editar)
-            toggleCedido();
-        });
-    </script>
+                    // Inicializa o estado do campo Cedido ao carregar (se estiver a editar)
+                    toggleCedido();
+                });
+            </script>
 
-    {% endblock %}
+            {% endblock %}
