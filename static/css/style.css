@@ -79,27 +79,6 @@ body {
   }
 }
 
-/* --- Otimização de Texto e Hifenização --- */
-.descricao-text,
-.pombo-box,
-.valor-perfil {
-  /* 1. Ativa a divisão por hífens automática */
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-  hyphens: auto;
-
-  /* 2. Força a quebra de palavras muito longas (ex: links ou nomes sem espaços) */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-
-  /* 3. Justifica o texto para um aspeto mais profissional em mobile */
-  text-align: justify;
-
-  /* 4. Garante que o texto não "foge" da box */
-  max-width: 100%;
-  display: block;
-}
-
 /* Nota: Bloco completo para substituir .dropdown-item e o seu :hover */
 
 .custom-dropdown .dropdown-item {
@@ -140,6 +119,27 @@ body {
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(5px);
   overflow: hidden;
+}
+
+/* --- Otimização de Texto e Hifenização --- */
+.descricao-text,
+.pombo-box,
+.valor-perfil {
+  /* 1. Ativa a divisão por hífens automática */
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+
+  /* 2. Força a quebra de palavras muito longas (ex: links ou nomes sem espaços) */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  /* 3. Justifica o texto para um aspeto mais profissional em mobile */
+  text-align: justify;
+
+  /* 4. Garante que o texto não "foge" da box */
+  max-width: 100%;
+  display: block;
 }
 
 .btn {
