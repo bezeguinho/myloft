@@ -136,14 +136,16 @@
                     <div class="row mb-3">
 
                         <!-- COLUNA PAI -->
+                        <!-- COLUNA PAI -->
                         <div class="col-md-6 position-relative" id="container_pai">
                             <label class="fw-bold text-uppercase small mb-1">Pai</label>
+
+                            <!-- Campo Livre: Aceita letras e números para pesquisa ágil -->
                             <input type="text" id="search_pai" class="form-control fw-bold shadow-sm"
-                                placeholder="-- Escolha o pai --" autocomplete="off" inputmode="numeric"
-                                pattern="[0-9]*" style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }}{% endif %}{% endfor %}{% endif %}"
-                                onfocus="this.select(); filtrarDropdown('pai');"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); filtrarDropdown('pai')">
+                                placeholder="-- Escolha o pai --" autocomplete="off"
+                                style="border-radius: 8px; height: 38px;"
+                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% endif %}{% endfor %}{% endif %}"
+                                onfocus="this.select(); filtrarDropdown('pai');" oninput="filtrarDropdown('pai')">
 
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
 
@@ -151,11 +153,12 @@
                                 style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
                                 <div id="opcoes_pai">
                                     {% for m in machos %}
+                                    <!-- O onclick agora envia "Anilha (Ano)" para o ecrã -->
                                     <button type="button"
                                         class="dropdown-item pombo-opt-pai text-wrap border-bottom pb-2 pt-2"
                                         data-id="{{ m.id }}" data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
                                         data-nome="{{ m.nome|lower or '' }}"
-                                        onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }}')">
+                                        onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} ({{ m.ano }})')">
                                         <span class="fw-bold text-primary">{{ m.anilha }}</span>
                                         <span class="text-dark fw-medium"> ({{ m.ano }}) {% if m.nome %}- {{ m.nome }}{%
                                             endif %}</span>
@@ -175,14 +178,16 @@
                         </div>
 
                         <!-- COLUNA MÃE -->
+                        <!-- COLUNA MÃE -->
                         <div class="col-md-6 position-relative mt-3 mt-md-0" id="container_mae">
                             <label class="fw-bold text-uppercase small mb-1">Mãe</label>
+
+                            <!-- Campo Livre: Aceita letras e números para pesquisa ágil -->
                             <input type="text" id="search_mae" class="form-control fw-bold shadow-sm"
-                                placeholder="-- Escolha a mãe --" autocomplete="off" inputmode="numeric"
-                                pattern="[0-9]*" style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }}{% endif %}{% endfor %}{% endif %}"
-                                onfocus="this.select(); filtrarDropdown('mae');"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); filtrarDropdown('mae')">
+                                placeholder="-- Escolha a mãe --" autocomplete="off"
+                                style="border-radius: 8px; height: 38px;"
+                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} ({{ f.ano }}){% endif %}{% endfor %}{% endif %}"
+                                onfocus="this.select(); filtrarDropdown('mae');" oninput="filtrarDropdown('mae')">
 
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
 
@@ -190,11 +195,12 @@
                                 style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
                                 <div id="opcoes_mae">
                                     {% for f in femeas %}
+                                    <!-- O onclick agora envia "Anilha (Ano)" para o ecrã -->
                                     <button type="button"
                                         class="dropdown-item pombo-opt-mae text-wrap border-bottom pb-2 pt-2"
                                         data-id="{{ f.id }}" data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
                                         data-nome="{{ f.nome|lower or '' }}"
-                                        onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }}')">
+                                        onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} ({{ f.ano }})')">
                                         <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
                                         <span class="text-dark fw-medium"> ({{ f.ano }}) {% if f.nome %}- {{ f.nome }}{%
                                             endif %}</span>
@@ -212,7 +218,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <!-- FECHA A LINHA DOS PROGENITORES (Este era o causador do erro, agora está no sítio exato) -->
 
