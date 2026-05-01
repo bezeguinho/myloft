@@ -309,18 +309,23 @@
     </div>
 
     <script>
+        // =========================================================
+        // INÍCIO DO BLOCO DE PESQUISA DE PROGENITORES (PAI/MÃE)
+        // =========================================================
+
         // 1. FILTRO INTELIGENTE COM AVISO DE "NÃO EXISTE"
         function filtrarDropdown(tipo) {
             const input = document.getElementById('search_' + tipo);
             const lista = document.getElementById('list_' + tipo);
             if (!input || !lista) return;
 
-            // Fecha a lista do outro progenitor para não sobrepor
+            // Fecha a lista do outro progenitor para não sobrepor no ecrã
             const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
             const listaOutro = document.getElementById('list_' + outroTipo);
             if (listaOutro) listaOutro.style.display = 'none';
 
-            lista.style.display = 'block'; // Abre a lista atual
+            // Abre a lista atual mal o utilizador clica ou escreve
+            lista.style.display = 'block';
 
             const termo = input.value.toLowerCase();
             const anoFilhoSelect = document.getElementById('ano_select');
@@ -334,6 +339,7 @@
                 const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
                 const nomeP = opt.getAttribute('data-nome').toLowerCase();
 
+                // Regra: O pai/mãe não pode nascer num ano posterior ao filho
                 const bateAno = !anoFilho || anoP <= anoFilho;
                 const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
 
@@ -345,93 +351,41 @@
                 }
             });
 
-            // Mostra a caixa de "Não existe" se não houver pombos correspondentes
+            // Mostra a caixa de "Não existe / Inserir" se não houver pombos correspondentes
             const notFoundBox = document.getElementById('notfound_' + tipo);
-            if (visiveis === 0) {
-                notFoundBox.style.display = 'block';
-            } else {
-                notFoundBox.style.display = 'none';
+            if (notFoundBox) {
+                if (visiveis === 0) {
+                    notFoundBox.style.display = 'block';
+                } else {
+                    notFoundBox.style.display = 'none';
+                }
             }
         }
 
-        // 2. FUNÇÃO DE SELEÇÃO
+        // 2. FUNÇÃO QUE EXECUTA A SELEÇÃO DO POMBO
         function selecionarProgenitor(tipo, id, texto) {
+            // Coloca o texto escolhido no input visível
             document.getElementById('search_' + tipo).value = texto;
+            // Guarda o ID no input invisível para gravar na Base de Dados
             document.getElementById(tipo + '_id').value = id;
+            // Esconde a lista suspensa
             document.getElementById('list_' + tipo).style.display = 'none';
         }
 
-        // Fechar ao clicar fora
+        // 3. SEGURANÇA: FECHAR LISTAS AO CLICAR FORA DELAS
         document.addEventListener('click', function (e) {
+            // Se o clique não foi dentro da caixa do pai nem da mãe, fecha ambas
             if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
                 const listPai = document.getElementById('list_pai');
                 const listMae = document.getElementById('list_mae');
                 if (listPai) listPai.style.display = 'none';
                 if (listMae) listMae.style.display = 'none';
-            }// 1. FILTRO DENTRO DA DROPDOWN
-            function filtrarDropdown(tipo) {
-                const input = document.getElementById('search_' + tipo);
-                const termo = input.value.toLowerCase();
-
-                // Verifica o ano do filho para não sugerir pais mais novos do que o filho
-                const anoFilhoSelect = document.getElementById('ano_select');
-                const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
-
-                const options = document.querySelectorAll('.pombo-opt-' + tipo);
-
-                options.forEach(opt => {
-                    const anoP = parseInt(opt.getAttribute('data-ano'));
-                    const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-                    const nomeP = opt.getAttribute('data-nome').toLowerCase();
-
-                    const bateAno = !anoFilho || anoP <= anoFilho;
-                    const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
-
-                    if (bateAno && bateTexto) {
-                        opt.style.display = 'block';
-                    } else {
-                        opt.style.display = 'none';
-                    }
-                });
-            }
-
-            // 2. FUNÇÃO QUE EXECUTA A SELEÇÃO DO POMBO
-            function selecionarProgenitor(tipo, id, texto) {
-                // Atualiza o texto do botão principal
-                document.getElementById('btn_' + tipo).innerText = texto;
-                // Guarda o ID no input invisível para enviar para a base de dados
-                document.getElementById(tipo + '_id').value = id;
-                // Limpa a barra de pesquisa para a próxima vez que abrir
-                document.getElementById('search_' + tipo).value = '';
-                // Restaura a lista toda para a próxima vez
-                filtrarDropdown(tipo);
             }
         });
-        // Inicialização de página
-        document.addEventListener('DOMContentLoaded', function () {
-            // 1. Cursor a piscar na anilha
-            const anilhaInput = document.getElementById('anilha');
-            if (anilhaInput) anilhaInput.focus();
 
-            // 2. Atualizar contador de caracteres se já houver texto (edição)
-            const obs = document.getElementById('obs');
-            if (obs) document.getElementById('char_count').innerText = obs.value.length;
-        });
-        function toggleCedido() {
-            const selectCat = document.getElementById('categoria_select');
-            const linhaCedido = document.getElementById('linha_cedido');
-            const inputCedido = document.getElementById('cedido_a');
-
-            if (selectCat.value === 'Cedido') {
-                linhaCedido.style.display = 'flex';
-                // Foco imediato na caixa de texto
-                setTimeout(() => { inputCedido.focus(); }, 100);
-            } else {
-                linhaCedido.style.display = 'none';
-                inputCedido.value = '';
-            }
-        }
-
+        // =========================================================
+        // FIM DO BLOCO DE PESQUISA DE PROGENITORES
+        // =========================================================
         // 4. FUNÇÃO: CONTADOR DE CARACTERES
         function updateChars(obj) {
             const display = document.getElementById('char_count');
