@@ -87,37 +87,48 @@
                             <!-- Nota: Todos os 4 campos na mesma row para alinhamento horizontal no Desktop -->
                             <div class="row g-2 mb-3">
                                 <!-- Anilha (2 colunas no Desktop, 6 no Mobile) -->
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
-                                    <input type="text" name="anilha" id="anilha" class="form-control"
-                                        value="{{ pombo.anilha if pombo else sugerir_anilha }}" required>
-                                </div>
+                                <!-- SUBSTITUIR A PRIMEIRA ROW COMPLETA DO FORMULÁRIO -->
+                                <div class="row g-2 mb-3">
+                                    <!-- 1. Anilha (Sem sugestões) -->
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
+                                        <input type="text" name="anilha" id="anilha" class="form-control"
+                                            value="{{ pombo.anilha if pombo else sugerir_anilha }}" required
+                                            autocomplete="off">
+                                    </div>
 
-                                <!-- Ano (2 colunas no Desktop, 6 no Mobile) -->
-                                <div class="col-6 col-md-2">
-                                    <label class="form-label fw-bold small text-uppercase">Ano</label>
-                                    <select name="ano" id="ano_select" class="form-select" required>
-                                        <!-- Nota: Opção padrão 'Escolha' que só aparece se não houver valor prévio -->
-                                        <option value="" disabled {% if not pombo and not sugerir_ano %}selected{% endif
-                                            %}>Escolha</option>
-                                        {% for a in anos_lista %}
-                                        <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
-                                            (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                                    <!-- 2. Ano (Com opção Escolha) -->
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label fw-bold small text-uppercase">Ano</label>
+                                        <select name="ano" id="ano_select" class="form-select" required>
+                                            <option value="" disabled {% if not pombo and not sugerir_ano %}selected{%
+                                                endif %}>Escolha</option>
+                                            {% for a in anos_lista %}
+                                            <option value="{{ a }}" {% if (pombo and pombo.ano==a) or
+                                                (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 
-                                <!-- Cor (4 colunas no Desktop, 12 no Mobile) -->
-                                <div class="col-12 col-md-4">
-                                    <label class="form-label fw-bold small text-uppercase">Cor</label>
-                                    <input type="text" name="cor" class="form-control" list="cores_user"
-                                        autocomplete="off" value="{{ pombo.cor if pombo else '' }}">
-                                    <datalist id="cores_user">
-                                        {% for cor in cores_lista %}<option value="{{ cor }}">{% endfor %}
-                                    </datalist>
-                                </div>
+                                    <!-- 3. Cor (Com as TUAS sugestões da base de dados) -->
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label fw-bold small text-uppercase">Cor</label>
+                                        <input type="text" name="cor" class="form-control" list="cores_user"
+                                            autocomplete="off" value="{{ pombo.cor if pombo else '' }}">
+                                        <datalist id="cores_user">
+                                            {% for cor in cores_lista %}
+                                            <option value="{{ cor }}">
+                                                {% endfor %}
+                                        </datalist>
+                                    </div>
 
-                                <!-- Nome (4 colunas no Desktop, 12 no Mobile) -->
+                                    <!-- 4. Nome (Sem sugestões) -->
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label fw-bold small text-uppercase">Nome</label>
+                                        <input type="text" name="nome" class="form-control"
+                                            value="{{ pombo.nome if pombo else '' }}" maxlength="24" autocomplete="off">
+                                    </div>
+                                </div> <!-- Nome (4 colunas no Desktop, 12 no Mobile) -->
                                 <div class="col-12 col-md-4">
                                     <label class="form-label fw-bold small text-uppercase">Nome</label>
                                     <input type="text" name="nome" class="form-control"
@@ -203,47 +214,49 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="row align-items-end">
-                                <div class="col-md-4 mb-3">
-                                    <label class="fw-bold text-uppercase small">Sexo</label>
-                                    <select name="sexo" class="form-select" required>
-                                        <option value="" disabled hidden {% if not pombo %}selected{% endif %}>
-                                            Escolha..
-                                        </option>
-                                        <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
-                                            Macho</option>
-                                        <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
-                                            Fêmea</option>
-                                        <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{%
-                                            endif %}>Indefinido</option>
-                                    </select>
-                                </div>
-                                <div class="row g-2 mb-3 align-items-center">
-                                    <!-- Categoria -->
-                                    <div class="col-12 col-md-4">
-                                        <label class="form-label fw-bold small text-uppercase">Categoria</label>
-                                        <select name="categoria" id="categoria_select" class="form-select"
-                                            onchange="toggleCedido()">
-                                            <option value="">Escolha..</option>
-                                            <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
-                                                %}selected{% endif %}>Reprodutor</option>
-                                            <option value="Voador" {% if pombo and pombo.categoria=='Voador'
-                                                %}selected{% endif %}>Voador</option>
-                                            <option value="Cedido" {% if pombo and pombo.categoria=='Cedido'
-                                                %}selected{% endif %}>Cedido</option>
-                                        </select>
+                            <!-- Nota: Linha unificada para Sexo, Categoria e Oculto (Mesma linha no Desktop) -->
+                            <div class="row g-2 mb-3 align-items-end">
+                                <!-- Sexo -->
+                                <<!-- SUBSTITUIR A ROW DO SEXO, CATEGORIA E OCULTO -->
+                                    <div class="row g-2 mb-3 align-items-center">
+                                        <!-- Sexo -->
+                                        <div class="col-12 col-md-4">
+                                            <label class="form-label fw-bold small text-uppercase">Sexo</label>
+                                            <select name="sexo" class="form-select" required>
+                                                <option value="">Escolha..</option>
+                                                <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{%
+                                                    endif %}>Macho</option>
+                                                <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{%
+                                                    endif %}>Fêmea</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Categoria -->
+                                        <div class="col-12 col-md-4">
+                                            <label class="form-label fw-bold small text-uppercase">Categoria</label>
+                                            <select name="categoria" id="categoria_select" class="form-select"
+                                                onchange="toggleCedido()">
+                                                <option value="">Escolha..</option>
+                                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
+                                                    %}selected{% endif %}>Reprodutor</option>
+                                                <option value="Voador" {% if pombo and pombo.categoria=='Voador'
+                                                    %}selected{% endif %}>Voador</option>
+                                                <option value="Cedido" {% if pombo and pombo.categoria=='Cedido'
+                                                    %}selected{% endif %}>Cedido</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pombo Oculto (Estilo Clássico e Correção de Gravação) -->
+                                        <div class="col-12 col-md-4 d-flex align-items-center mt-md-4">
+                                            <span class="fw-bold small text-uppercase me-2">Pombo Oculto?</span>
+                                            <input type="checkbox" name="oculto" id="oculto" value="on" {% if pombo and
+                                                pombo.oculto %}checked{% endif %}
+                                                style="width: 20px; height: 20px; cursor: pointer;">
+                                        </div>
                                     </div>
 
-                                    <!-- Pombo Oculto: Estilo Clássico (Pergunta depois Caixa) -->
-                                    <div class="col-12 col-md-4 d-flex align-items-center mt-md-4">
-                                        <span class="fw-bold small text-uppercase me-2">Pombo Oculto?</span>
-                                        <input type="checkbox" name="oculto" id="oculto" value="on" {% if pombo and
-                                            pombo.oculto %}checked{% endif %}
-                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    </div>
-                                </div>
-                                <!-- Nota: O ID 'linha_cedido' é obrigatório para o JavaScript funcionar -->
-                                <div class="row mb-3" id="linha_cedido" style="display:none;">
+                                    <!-- Campo Cedido A (Apenas aparece quando a categoria é Cedido) -->
+                                    <!-- SUBSTITUIR O BLOCO DO CEDIDO -->
                                     <div id="linha_cedido" class="row mb-3"
                                         style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %};">
                                         <div class="col-12">
@@ -255,52 +268,32 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="oculto" id="oculto" {% if
-                                            pombo and pombo.oculto %}checked{% endif %}>
-                                        <label class="form-check-label fw-bold small text-uppercase" for="oculto">Pombo
-                                            Oculto</label>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-uppercase small">Descrição para o
+                                                Pedigree...</label>
+                                            <textarea name="obs" id="obs" class="form-control"
+                                                style="width: 250px; height: 250px; resize: none; overflow: hidden;"
+                                                maxlength="200"
+                                                oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
+
+                                            <div class="text-muted mt-1 fw-bold"
+                                                style="width: 250px; text-align: right; font-size: 0.8rem;">
+                                                <span id="char_count">0</span> / 200 carateres
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
+                                            <div class="d-grid gap-2">
+                                                <button type="submit"
+                                                    class="btn btn-gravar fw-bold py-2">GRAVAR</button>
+                                                <a href="{{ url_for('lista_pombos') }}"
+                                                    class="btn btn-voltar fw-bold py-2">VOLTAR</a>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="row" id="linha_cedido">
-                                <div id="linha_cedido" class="col-12" style="display:none;">
-                                    <label class="form-label fw-bold small text-uppercase">Cedido a:</label>
-                                    <input type="text" name="cedido_a" class="form-control" autocomplete="off">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <input type="text" name="cedido_a" class="form-control"
-                                        value="{{ pombo.cedido_a if pombo else '' }}">
-                                </div>
-                                <div class="col-md-4"></div>
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <label class="fw-bold text-uppercase small">Descrição para o Pedigree...</label>
-                                    <textarea name="obs" id="obs" class="form-control"
-                                        style="width: 250px; height: 250px; resize: none; overflow: hidden;"
-                                        maxlength="200"
-                                        oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
-
-                                    <div class="text-muted mt-1 fw-bold"
-                                        style="width: 250px; text-align: right; font-size: 0.8rem;">
-                                        <span id="char_count">0</span> / 200 carateres
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label style="visibility: hidden;" class="small d-block mb-2">Espaço</label>
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-gravar fw-bold py-2">GRAVAR</button>
-                                        <a href="{{ url_for('lista_pombos') }}"
-                                            class="btn btn-voltar fw-bold py-2">VOLTAR</a>
-                                    </div>
-                                </div>
-                            </div>
                     </form>
                 </div>
             </div>
@@ -380,7 +373,7 @@
 
         if (selectCat.value === 'Cedido') {
             linhaCedido.style.display = 'flex';
-            // Nota: Timeout de 100ms para garantir que o elemento está visível antes do foco
+            // Timeout para garantir que o elemento está visível antes de focar
             setTimeout(() => { inputCedido.focus(); }, 100);
         } else {
             linhaCedido.style.display = 'none';
