@@ -216,6 +216,25 @@
                                 maxlength="20" value="{{ pombo.cedido_a if pombo else '' }}">
                         </div>
                     </div>
+                    <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (COLAR ANTES DO FIM DO </form>) -->
+                    <div class="row g-3 mt-3">
+                        <!-- Coluna da Descrição (Ocupa 7/12 da largura no Desktop) -->
+                        <div class="col-12 col-md-7">
+                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
+                            <textarea name="obs" id="obs" class="form-control" rows="5" maxlength="200"
+                                oninput="contarCaracteres()">{{ pombo.obs if pombo else '' }}</textarea>
+                            <div class="text-start small text-muted mt-1">
+                                <span id="char_count">0</span> / 200 carateres
+                            </div>
+                        </div>
+
+                        <!-- Coluna dos Botões (Ocupa 5/12 da largura no Desktop - Tamanho Normal) -->
+                        <div class="col-12 col-md-5 d-flex flex-column justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary fw-bold text-uppercase">Gravar</button>
+                            <a href="{{ url_for('lista_pombos') }}"
+                                class="btn btn-warning fw-bold text-uppercase">Voltar</a>
+                        </div>
+                    </div>
 
                     <!-- 5. Descrição e Botões -->
                     <!-- SUBSTITUIR APENAS O BLOCO FINAL DA DESCRIÇÃO E BOTÕES -->
@@ -351,6 +370,24 @@
         const obs = document.getElementById('obs');
         if (obs) updateChars(obs);
     };
+
+    // Função para atualizar o contador de caracteres da descrição
+    function contarCaracteres() {
+        const textarea = document.getElementById('obs');
+        const counter = document.getElementById('char_count');
+        if (textarea && counter) {
+            counter.innerText = textarea.value.length;
+        }
+    }
+
+    // Executar ao carregar a página para o caso de estares a EDITAR um pombo
+    document.addEventListener('DOMContentLoaded', function () {
+        contarCaracteres();
+
+        // Aproveitamos para garantir o foco inicial na anilha
+        const anilhaInput = document.getElementById('anilha');
+        if (anilhaInput) anilhaInput.focus();
+    });
 </script>
 
 {% endblock %}
