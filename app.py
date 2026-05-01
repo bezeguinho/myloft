@@ -509,7 +509,7 @@ def view_pedigree():
         return redirect(url_for('gerar_pedigree'))
         
     utilizador = Utilizador.query.filter_by(user_id=current_user.id).first()
-    return render_template("pedigree_view.html", tree=tree, utilizador=utilizador)
+    return render_template("pedigree_view.html", tree=tree, utilizador=utilizador, geracoes=geracoes)
 
 @app.route("/meus-dados/ver")
 @login_required

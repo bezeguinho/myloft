@@ -180,7 +180,7 @@
 
     .box-detail {
         font-weight: bold;
-        margin-bottom: 3px;
+        margin-bottom: 1px;
         padding-bottom: 1px;
     }
 
@@ -189,6 +189,49 @@
         color: #444;
         white-space: pre-line;
         flex: 1;
+        overflow: hidden;
+    }
+
+    /* 5 GERAÇÕES - ESTILOS ADICIONAIS */
+    .pedigree-5g .col-3 {
+        width: 46.5mm;
+    }
+
+    .col-4 {
+        width: 34.5mm;
+        flex: none;
+    }
+
+    .tetravo-pair {
+        height: 27.5mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .micro-box {
+        height: 12.75mm;
+        border-radius: 5px;
+        padding: 2px 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .micro-title {
+        font-size: 0.68rem;
+        font-weight: bold;
+        line-height: 1.1;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .micro-detail {
+        font-size: 0.60rem;
+        font-weight: bold;
+        line-height: 1.1;
+        white-space: nowrap;
         overflow: hidden;
     }
 
@@ -304,6 +347,20 @@
 </div>
 {% endmacro %}
 
+{% macro render_micro_box(node) %}
+<div class="pombo-box micro-box">
+    {% if node and node.pombo %}
+    <div class="micro-title">
+        <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
+    </div>
+    <div class="micro-detail">{{ node.pombo.cor or '' }}</div>
+    <div class="micro-detail">{{ node.pombo.nome or '' }}</div>
+    {% else %}
+    <div class="micro-title"><span>.</span></div>
+    {% endif %}
+</div>
+{% endmacro %}
+
 <div class="pedigree-container">
     <div class="header-top">
         <div class="header-left">
@@ -328,7 +385,7 @@
         </div>
     </div>
 
-    <div class="tree-wrapper">
+    <div class="tree-wrapper {% if geracoes == '5' %}pedigree-5g{% endif %}">
         <div class="generation col-1" style="padding: 29.643mm 0;">
             {{ render_box(tree.pai, 'square-box') }}
             {{ render_box(tree, 'square-box') }}
@@ -352,6 +409,28 @@
             {{ render_box(tree.mae.mae.pai if tree.mae and tree.mae.mae else None, 'rect-box') }}
             {{ render_box(tree.mae.mae.mae if tree.mae and tree.mae.mae else None, 'rect-box') }}
         </div>
+        
+        {% if geracoes == '5' %}
+        <div class="generation col-4">
+            {% set bisavos = [
+                tree.pai.pai.pai if tree.pai and tree.pai.pai else None,
+                tree.pai.pai.mae if tree.pai and tree.pai.pai else None,
+                tree.pai.mae.pai if tree.pai and tree.pai.mae else None,
+                tree.pai.mae.mae if tree.pai and tree.pai.mae else None,
+                tree.mae.pai.pai if tree.mae and tree.mae.pai else None,
+                tree.mae.pai.mae if tree.mae and tree.mae.pai else None,
+                tree.mae.mae.pai if tree.mae and tree.mae.mae else None,
+                tree.mae.mae.mae if tree.mae and tree.mae.mae else None
+            ] %}
+            
+            {% for bisavo in bisavos %}
+            <div class="tetravo-pair">
+                {{ render_micro_box(bisavo.pai if bisavo else None) }}
+                {{ render_micro_box(bisavo.mae if bisavo else None) }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 
     <div class="footer-watermark">www.myloft.pt</div>
