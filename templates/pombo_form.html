@@ -136,15 +136,14 @@
                         <div class="col-md-6 mb-3 position-relative" id="container_pai">
                             <label class="fw-bold text-uppercase small">Pai</label>
 
-                            <!-- Único Campo de Pesquisa Unificado (Lupa, Anilha e Nome) -->
-                            <div class="input-group shadow-sm" style="border-radius: 8px;">
-                                <span class="input-group-text bg-white border-end-0 text-primary"><i
-                                        class="bi bi-search"></i></span>
-                                <input type="text" id="search_pai" class="form-control border-start-0 ps-0 fw-bold"
-                                    placeholder="Pesquisar anilha ou nome..." autocomplete="off"
-                                    value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }}{% endif %}{% endfor %}{% endif %}"
-                                    onfocus="this.select(); filtrarDropdown('pai');" oninput="filtrarDropdown('pai')">
-                            </div>
+                            <!-- Campo Limpo: Apenas Números, Teclado Numérico Mobile -->
+                            <input type="text" id="search_pai" class="form-control fw-bold shadow-sm"
+                                placeholder="-- Escolha o pai --" autocomplete="off" inputmode="numeric"
+                                pattern="[0-9]*" style="border-radius: 8px;"
+                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }}{% endif %}{% endfor %}{% endif %}"
+                                onfocus="this.select(); filtrarDropdown('pai');"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); filtrarDropdown('pai')">
+
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
 
                             <!-- Lista Suspensa -->
@@ -233,6 +232,46 @@
                     </div>
                 </div>
             </div> <!-- Fecha a linha (row) do Pai e Mãe -->
+            <div class="col-md-6 mb-3 position-relative" id="container_mae">
+                <label class="fw-bold text-uppercase small">Mãe</label>
+
+                <!-- Campo Limpo: Apenas Números, Teclado Numérico Mobile -->
+                <input type="text" id="search_mae" class="form-control fw-bold shadow-sm"
+                    placeholder="-- Escolha a mãe --" autocomplete="off" inputmode="numeric" pattern="[0-9]*"
+                    style="border-radius: 8px;"
+                    value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }}{% endif %}{% endfor %}{% endif %}"
+                    onfocus="this.select(); filtrarDropdown('mae');"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); filtrarDropdown('mae')">
+
+                <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
+
+                <!-- Lista Suspensa -->
+                <div id="list_mae" class="dropdown-menu w-100 p-2 shadow-lg"
+                    style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
+                    <div id="opcoes_mae">
+                        {% for f in femeas %}
+                        <button type="button" class="dropdown-item pombo-opt-mae text-wrap border-bottom pb-2 pt-2"
+                            data-id="{{ f.id }}" data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
+                            data-nome="{{ f.nome|lower or '' }}"
+                            onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }}')">
+                            <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
+                            <span class="text-dark fw-medium"> ({{ f.ano }}) {% if f.nome %}- {{ f.nome }}{% endif
+                                %}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Alerta: Não Existe / Inserir Novo -->
+                    <div id="notfound_mae" style="display: none;">
+                        <div class="p-2">
+                            <a href="{{ url_for('novo_pombo') }}" target="_blank" class="btn btn-sm w-100 fw-bold py-2"
+                                style="background-color: #fff0f3; color: #ff4d6d; border-radius: 8px;">
+                                <i class="bi bi-plus-circle me-2"></i>Não existe. Inserir pombo?
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 3. Linha de Gestão: Sexo, Categoria e Ocultar -->
             <div class="row g-2 mb-3 align-items-end">
