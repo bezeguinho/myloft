@@ -326,22 +326,28 @@
                         </div>
                     </div>
 
-                    <!-- LINHA 4: CAMPO CEDIDO A (DINÂMICO) -->
                     <!-- ========================================== -->
-                    <!-- LINHA 4: CAMPO CEDIDO A (Alinhado à Esquerda) -->
+                    <!-- LINHA 4: CAMPO CEDIDO A (Alinhamento Perfeito) -->
                     <!-- ========================================== -->
-                    <div id="linha_cedido" class="row mb-3"
+                    <div id="linha_cedido" class="row mb-3 align-items-center"
                         style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %}; margin-top: -10px;">
-                        <div class="col-12 col-md-6 offset-md-4 d-flex align-items-center gap-2">
-                            <!-- White-space: nowrap impede que o texto quebre em duas linhas -->
-                            <label class="form-label fw-bold small text-uppercase mb-0"
-                                style="white-space: nowrap; min-width: fit-content;">
+
+                        <!-- Coluna 1 (4 unidades): Onde colocamos a Label alinhada à direita para encostar na box -->
+                        <div class="col-md-4 text-md-end text-start">
+                            <label class="form-label fw-bold small text-uppercase mb-0">
                                 Cedido A:
                             </label>
+                        </div>
+
+                        <!-- Coluna 2 (4 unidades): Onde o input fica com o tamanho exato da Categoria acima -->
+                        <div class="col-md-4">
                             <input type="text" name="cedido_a" id="cedido_a" class="form-control shadow-sm"
-                                autocomplete="off" maxlength="20" style="border-radius: 8px; height: 34px;"
+                                autocomplete="off" maxlength="20" style="border-radius: 8px; height: 38px;"
                                 value="{{ pombo.cedido_a if pombo else '' }}">
                         </div>
+
+                        <!-- Coluna 3 (4 unidades): Vazia para manter o equilíbrio da grelha -->
+                        <div class="col-md-4"></div>
                     </div>
 
                     <!-- LINHA 5: DESCRIÇÃO E BOTÕES -->
