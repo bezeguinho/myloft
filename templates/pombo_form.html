@@ -133,367 +133,387 @@
                     <!-- 2. Linha de Progenitores (Pai e Mãe lado a lado) -->
                     <div class="row g-2 mb-3">
                         <!-- Pai -->
-                        <div class="col-md-6 mb-3 position-relative" id="container_pai">
+                        <div class="col-md-6 mb-3 position-relative">
                             <label class="fw-bold text-uppercase small">Pai</label>
 
-                            <!-- Input com Lupa Integrada -->
-                            <div class="input-group shadow-sm" style="border-radius: 8px;">
-                                <span class="input-group-text bg-white border-end-0 text-primary"><i
-                                        class="bi bi-search"></i></span>
-                                <input type="text" id="search_pai" class="form-control border-start-0 ps-0"
-                                    placeholder="Pesquisar anilha ou nome..." autocomplete="off"
-                                    value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% endif %}{% endfor %}{% endif %}"
-                                    onfocus="this.select(); filtrarDropdown('pai');" oninput="filtrarDropdown('pai')">
-                            </div>
-                            <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
-
-                            <!-- Menu Dropdown -->
-                            <div id="list_pai" class="dropdown-menu w-100 p-2 shadow-lg"
-                                style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
-                                <button type="button" class="dropdown-item fw-bold text-danger mb-1"
-                                    onclick="selecionarProgenitor('pai', '', '')">
-                                    <i class="bi bi-x-circle me-1"></i> Nenhum / Limpar
+                            <div class="dropdown">
+                                <!-- O Botão que mostra o pombo escolhido -->
+                                <button class="form-select text-start text-truncate" type="button" id="btn_pai"
+                                    data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #fff;">
+                                    {% if pombo and pombo.pai %}
+                                    {% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% if
+                                    m.nome %} - {{ m.nome }}{% endif %}{% endif %}{% endfor %}
+                                    {% else %}
+                                    -- Escolha o pai --
+                                    {% endif %}
                                 </button>
+                                <!-- O campo oculto que vai guardar o ID para a Base de Dados -->
+                                <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
 
-                                <div id="opcoes_pai">
-                                    {% for m in machos %}
-                                    <button type="button" class="dropdown-item pombo-opt-pai" data-id="{{ m.id }}"
-                                        data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
-                                        data-nome="{{ m.nome|lower or '' }}"
-                                        onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} ({{ m.ano }})')">
-                                        <span class="fw-bold text-primary">{{ m.anilha }}</span> ({{ m.ano }}) {% if
-                                        m.nome %}- {{ m.nome }}{% endif %}
-                                    </button>
-                                    {% endfor %}
-                                </div>
+                                <!-- O Menu Dropdown com a Pesquisa lá dentro -->
+                                <div class="dropdown-menu w-100 p-2 shadow-lg"
+                                    style="border-radius: 12px; max-height: 280px; overflow-y: auto;">
+                                    <input type="text" id="search_pai" class="form-control mb-2 shadow-sm"
+                                        placeholder="🔍 Procurar anilha ou nome..." autocomplete="off"
+                                        onclick="event.stopPropagation();" oninput="filtrarDropdown('pai')">
 
-                                <!-- Alerta: Não Existe / Inserir Novo -->
-                                <div id="notfound_pai" style="display: none;">
-                                    <hr class="dropdown-divider">
-                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
-                                        class="dropdown-item text-center fw-bold py-2"
-                                        style="background-color: #eef4ff; color: #0d6efd; border-radius: 8px; white-space: normal;">
-                                        <i class="bi bi-plus-circle me-2"></i>Não existe. Quer inserir pombo?
-                                    </a>
+                                    <div id="list_pai">
+                                        <!-- Botão para limpar a seleção -->
+                                        <button type="button" class="dropdown-item fw-bold text-danger mb-1"
+                                            onclick="selecionarProgenitor('pai', '', '-- Escolha o pai --')">
+                                            <i class="bi bi-x-circle me-1"></i> Nenhum / Limpar
+                                        </button>
+                                        {% for m in machos %}
+                                        <button type="button" class="dropdown-item pombo-opt-pai" data-id="{{ m.id }}"
+                                            data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
+                                            data-nome="{{ m.nome|lower or '' }}"
+                                            onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} ({{ m.ano }}) {% if m.nome %}- {{ m.nome }}{% endif %}')">
+                                            <span class="fw-bold text-primary">{{ m.anilha }}</span> ({{ m.ano }}) {% if
+                                            m.nome %}- {{ m.nome }}{% endif %}
+                                        </button>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Mãe -->
-                        <div class="col-md-6 mb-3 position-relative" id="container_mae">
-                            <label class="fw-bold text-uppercase small">Mãe</label>
+                        // 1. FILTRO DENTRO DA DROPDOWN
+                        function filtrarDropdown(tipo) {
+                        const input = document.getElementById('search_' + tipo);
+                        const termo = input.value.toLowerCase();
 
-                            <!-- Input com Lupa Integrada -->
-                            <div class="input-group shadow-sm" style="border-radius: 8px;">
-                                <span class="input-group-text bg-white border-end-0" style="color: #ff4d6d;"><i
-                                        class="bi bi-search"></i></span>
-                                <input type="text" id="search_mae" class="form-control border-start-0 ps-0"
-                                    placeholder="Pesquisar anilha ou nome..." autocomplete="off"
-                                    value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} ({{ f.ano }}){% endif %}{% endfor %}{% endif %}"
-                                    onfocus="this.select(); filtrarDropdown('mae');" oninput="filtrarDropdown('mae')">
-                            </div>
-                            <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
+                        // Verifica o ano do filho para não sugerir pais mais novos do que o filho
+                        const anoFilhoSelect = document.getElementById('ano_select');
+                        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
-                            <!-- Menu Dropdown -->
-                            <div id="list_mae" class="dropdown-menu w-100 p-2 shadow-lg"
-                                style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
-                                <button type="button" class="dropdown-item fw-bold text-danger mb-1"
-                                    onclick="selecionarProgenitor('mae', '', '')">
-                                    <i class="bi bi-x-circle me-1"></i> Nenhum / Limpar
-                                </button>
+                        const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
-                                <div id="opcoes_mae">
-                                    {% for f in femeas %}
-                                    <button type="button" class="dropdown-item pombo-opt-mae" data-id="{{ f.id }}"
-                                        data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
-                                        data-nome="{{ f.nome|lower or '' }}"
-                                        onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} ({{ f.ano }})')">
-                                        <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span> ({{ f.ano
-                                        }}) {% if f.nome %}- {{ f.nome }}{% endif %}
-                                    </button>
-                                    {% endfor %}
+                        options.forEach(opt => {
+                        const anoP = parseInt(opt.getAttribute('data-ano'));
+                        const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+                        const nomeP = opt.getAttribute('data-nome').toLowerCase();
+
+                        const bateAno = !anoFilho || anoP <= anoFilho; const bateTexto=anilhaP.includes(termo) ||
+                            nomeP.includes(termo); if (bateAno && bateTexto) { opt.style.display='block' ; } else {
+                            opt.style.display='none' ; } }); } // 2. FUNÇÃO QUE EXECUTA A SELEÇÃO DO POMBO function
+                            selecionarProgenitor(tipo, id, texto) { // Atualiza o texto do botão principal
+                            document.getElementById('btn_' + tipo).innerText=texto; // Guarda o ID no input invisível
+                            para enviar para a base de dados document.getElementById(tipo + '_id' ).value=id; // Limpa a
+                            barra de pesquisa para a próxima vez que abrir document.getElementById('search_' +
+                            tipo).value='' ; // Restaura a lista toda para a próxima vez filtrarDropdown(tipo); } </div>
+
+                            <!-- 3. Linha de Gestão: Sexo, Categoria e Ocultar -->
+                            <div class="row g-2 mb-3 align-items-end">
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold text-uppercase small mb-2 d-block">Sexo</label>
+                                    <select name="sexo" class="form-select" required>
+                                        <option value="" disabled hidden style="display: none;" {% if not pombo
+                                            %}selected{% endif %}>Escolha..</option>
+                                        <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>
+                                            Macho
+                                        </option>
+                                        <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>
+                                            Fêmea
+                                        </option>
+                                        <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{%
+                                            endif %}>Indefinido</option>
+                                    </select>
                                 </div>
 
-                                <!-- Alerta: Não Existe / Inserir Novo -->
-                                <div id="notfound_mae" style="display: none;">
-                                    <hr class="dropdown-divider">
-                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
-                                        class="dropdown-item text-center fw-bold py-2"
-                                        style="background-color: #fff0f3; color: #ff4d6d; border-radius: 8px; white-space: normal;">
-                                        <i class="bi bi-plus-circle me-2"></i>Não existe. Quer inserir pombo?
-                                    </a>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold text-uppercase small mb-2 d-block">Categoria</label>
+                                    <select name="categoria" id="categoria_select" class="form-select" required>
+                                        <option value="" disabled hidden style="display: none;" {% if not pombo
+                                            %}selected{% endif %}>Escolha..</option>
+                                        <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{%
+                                            endif %}>
+                                            Voador</option>
+                                        <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor'
+                                            %}selected{% endif %}>Reprodutor</option>
+                                        <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{%
+                                            endif %}>
+                                            Cedido</option>
+                                    </select>
+                                </div>
+
+                                <!-- Ocultar Pombo alinhado pelo fim da caixa da Mãe -->
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold text-uppercase small mb-2 d-block"
+                                        style="visibility: hidden;">Ocultar</label>
+
+                                    <label for="oculto"
+                                        class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm"
+                                        style="height: 38px; cursor: pointer;">
+                                        <span class="fw-bold mb-0 small text-uppercase"
+                                            style="user-select: none;">Ocultar
+                                            Pombo?</span>
+                                        <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0"
+                                            style="cursor: pointer;" {% if pombo and pombo.oculto %}checked{% endif %}>
+                                    </label>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- 3. Linha de Gestão: Sexo, Categoria e Ocultar -->
-                    <div class="row g-2 mb-3 align-items-end">
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold text-uppercase small mb-2 d-block">Sexo</label>
-                            <select name="sexo" class="form-select" required>
-                                <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
-                                    endif %}>Escolha..</option>
-                                <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>Macho
-                                </option>
-                                <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>Fêmea
-                                </option>
-                                <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{% endif
-                                    %}>Indefinido</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold text-uppercase small mb-2 d-block">Categoria</label>
-                            <select name="categoria" id="categoria_select" class="form-select" required>
-                                <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
-                                    endif %}>Escolha..</option>
-                                <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
-                                    Voador</option>
-                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
-                                    endif %}>Reprodutor</option>
-                                <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{% endif %}>
-                                    Cedido</option>
-                            </select>
-                        </div>
-
-                        <!-- Ocultar Pombo alinhado pelo fim da caixa da Mãe -->
-                        <div class="col-md-4 mb-3">
-                            <label class="fw-bold text-uppercase small mb-2 d-block"
-                                style="visibility: hidden;">Ocultar</label>
-
-                            <label for="oculto"
-                                class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm"
-                                style="height: 38px; cursor: pointer;">
-                                <span class="fw-bold mb-0 small text-uppercase" style="user-select: none;">Ocultar
-                                    Pombo?</span>
-                                <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0"
-                                    style="cursor: pointer;" {% if pombo and pombo.oculto %}checked{% endif %}>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- 4. Campo Cedido A (Alinhado sob Categoria, limitado a 20 chars) -->
-                    <div id="linha_cedido" class="row mb-3"
-                        style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %};">
-                        <div class="col-12 col-md-4 offset-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Cedido A:</label>
-                            <input type="text" name="cedido_a" id="cedido_a" class="form-control" autocomplete="off"
-                                maxlength="20" value="{{ pombo.cedido_a if pombo else '' }}">
-                        </div>
-                    </div>
-                    <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (COLAR ANTES DO FIM DO </form>) -->
-                    <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (REPOSIÇÃO FIEL AO ORIGINAL) -->
-                    <!-- SECÇÃO FINAL: DESCRIÇÃO QUADRADA E BOTÕES COMPACTOS -->
-                    <!-- SECÇÃO FINAL: DESCRIÇÃO AJUSTADA E BOTÕES COMPACTOS -->
-                    <!-- SECÇÃO FINAL: DESCRIÇÃO ESTRITAMENTE QUADRADA E BOTÕES COMPACTOS -->
-                    <!-- SECÇÃO FINAL: GEOMETRIA PRECISA 20x10 (QUADRADA) -->
-                    <!-- SECÇÃO FINAL: GEOMETRIA PRECISA 20x10 (QUADRADA) -->
-                    <div class="row g-3 mt-2 align-items-start">
-                        <!-- Descrição: Configurada para largura de ~20-22 caracteres e 10 linhas -->
-                        <div class="col-auto">
-                            <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
-                            <textarea name="obs" id="obs" class="form-control"
-                                style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="200"
-                                oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
-                            <div class="text-start small text-muted mt-1">
-                                <span id="char_count">0</span> / 200 carateres
+                            <!-- 4. Campo Cedido A (Alinhado sob Categoria, limitado a 20 chars) -->
+                            <div id="linha_cedido" class="row mb-3"
+                                style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %};">
+                                <div class="col-12 col-md-4 offset-md-4">
+                                    <label class="form-label fw-bold small text-uppercase">Cedido A:</label>
+                                    <input type="text" name="cedido_a" id="cedido_a" class="form-control"
+                                        autocomplete="off" maxlength="20" value="{{ pombo.cedido_a if pombo else '' }}">
+                                </div>
                             </div>
-                        </div>
+                            <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (COLAR ANTES DO FIM DO </form>) -->
+                            <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (REPOSIÇÃO FIEL AO ORIGINAL) -->
+                            <!-- SECÇÃO FINAL: DESCRIÇÃO QUADRADA E BOTÕES COMPACTOS -->
+                            <!-- SECÇÃO FINAL: DESCRIÇÃO AJUSTADA E BOTÕES COMPACTOS -->
+                            <!-- SECÇÃO FINAL: DESCRIÇÃO ESTRITAMENTE QUADRADA E BOTÕES COMPACTOS -->
+                            <!-- SECÇÃO FINAL: GEOMETRIA PRECISA 20x10 (QUADRADA) -->
+                            <!-- SECÇÃO FINAL: GEOMETRIA PRECISA 20x10 (QUADRADA) -->
+                            <div class="row g-3 mt-2 align-items-start">
+                                <!-- Descrição: Configurada para largura de ~20-22 caracteres e 10 linhas -->
+                                <div class="col-auto">
+                                    <label class="form-label fw-bold small text-uppercase">Descrição para o
+                                        Pedigree...</label>
+                                    <textarea name="obs" id="obs" class="form-control"
+                                        style="width: 250px; height: 250px; resize: none; overflow: hidden;"
+                                        maxlength="200"
+                                        oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
+                                    <div class="text-start small text-muted mt-1">
+                                        <span id="char_count">0</span> / 200 carateres
+                                    </div>
+                                </div>
 
-                        <!-- Coluna dos Botões: Alinhados ao topo da box, tamanho compacto -->
-                        <div class="col-auto">
-                            <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
-                                <button type="submit" class="btn btn-primary fw-bold text-uppercase shadow-sm"
-                                    style="width: 140px; height: 45px;">
-                                    Gravar
-                                </button>
-                                <a href="{{ url_for('lista_pombos') }}"
-                                    class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center"
-                                    style="width: 140px; height: 45px;">
-                                    Voltar
-                                </a>
+                                <!-- Coluna dos Botões: Alinhados ao topo da box, tamanho compacto -->
+                                <div class="col-auto">
+                                    <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
+                                        <button type="submit" class="btn btn-primary fw-bold text-uppercase shadow-sm"
+                                            style="width: 140px; height: 45px;">
+                                            Gravar
+                                        </button>
+                                        <a href="{{ url_for('lista_pombos') }}"
+                                            class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center"
+                                            style="width: 140px; height: 45px;">
+                                            Voltar
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- 5. Descrição e Botões -->
-                    <!-- SUBSTITUIR APENAS O BLOCO FINAL DA DESCRIÇÃO E BOTÕES -->
+                            <!-- 5. Descrição e Botões -->
+                            <!-- SUBSTITUIR APENAS O BLOCO FINAL DA DESCRIÇÃO E BOTÕES -->
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // 1. FILTRO INTELIGENTE COM AVISO DE "NÃO EXISTE"
-    function filtrarDropdown(tipo) {
-        const input = document.getElementById('search_' + tipo);
-        const lista = document.getElementById('list_' + tipo);
-        if (!input || !lista) return;
+    <script>
+        // 1. FILTRO INTELIGENTE COM AVISO DE "NÃO EXISTE"
+        function filtrarDropdown(tipo) {
+            const input = document.getElementById('search_' + tipo);
+            const lista = document.getElementById('list_' + tipo);
+            if (!input || !lista) return;
 
-        // Fecha a lista do outro progenitor para não sobrepor
-        const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
-        const listaOutro = document.getElementById('list_' + outroTipo);
-        if (listaOutro) listaOutro.style.display = 'none';
+            // Fecha a lista do outro progenitor para não sobrepor
+            const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
+            const listaOutro = document.getElementById('list_' + outroTipo);
+            if (listaOutro) listaOutro.style.display = 'none';
 
-        lista.style.display = 'block'; // Abre a lista atual
+            lista.style.display = 'block'; // Abre a lista atual
 
-        const termo = input.value.toLowerCase();
-        const anoFilhoSelect = document.getElementById('ano_select');
-        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
+            const termo = input.value.toLowerCase();
+            const anoFilhoSelect = document.getElementById('ano_select');
+            const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
-        let visiveis = 0;
-        const options = document.querySelectorAll('.pombo-opt-' + tipo);
+            let visiveis = 0;
+            const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
-        options.forEach(opt => {
-            const anoP = parseInt(opt.getAttribute('data-ano'));
-            const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-            const nomeP = opt.getAttribute('data-nome').toLowerCase();
+            options.forEach(opt => {
+                const anoP = parseInt(opt.getAttribute('data-ano'));
+                const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+                const nomeP = opt.getAttribute('data-nome').toLowerCase();
 
-            const bateAno = !anoFilho || anoP <= anoFilho;
-            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
+                const bateAno = !anoFilho || anoP <= anoFilho;
+                const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
 
-            if (bateAno && bateTexto) {
-                opt.style.display = 'block';
-                visiveis++;
-            } else {
-                opt.style.display = 'none';
-            }
-        });
-
-        // Mostra a caixa de "Não existe" se não houver pombos correspondentes
-        const notFoundBox = document.getElementById('notfound_' + tipo);
-        if (visiveis === 0) {
-            notFoundBox.style.display = 'block';
-        } else {
-            notFoundBox.style.display = 'none';
-        }
-    }
-
-    // 2. FUNÇÃO DE SELEÇÃO
-    function selecionarProgenitor(tipo, id, texto) {
-        document.getElementById('search_' + tipo).value = texto;
-        document.getElementById(tipo + '_id').value = id;
-        document.getElementById('list_' + tipo).style.display = 'none';
-    }
-
-    // Fechar ao clicar fora
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
-            const listPai = document.getElementById('list_pai');
-            const listMae = document.getElementById('list_mae');
-            if (listPai) listPai.style.display = 'none';
-            if (listMae) listMae.style.display = 'none';
-        }
-    });
-    // Inicialização de página
-    document.addEventListener('DOMContentLoaded', function () {
-        // 1. Cursor a piscar na anilha
-        const anilhaInput = document.getElementById('anilha');
-        if (anilhaInput) anilhaInput.focus();
-
-        // 2. Atualizar contador de caracteres se já houver texto (edição)
-        const obs = document.getElementById('obs');
-        if (obs) document.getElementById('char_count').innerText = obs.value.length;
-    });
-    function toggleCedido() {
-        const selectCat = document.getElementById('categoria_select');
-        const linhaCedido = document.getElementById('linha_cedido');
-        const inputCedido = document.getElementById('cedido_a');
-
-        if (selectCat.value === 'Cedido') {
-            linhaCedido.style.display = 'flex';
-            // Foco imediato na caixa de texto
-            setTimeout(() => { inputCedido.focus(); }, 100);
-        } else {
-            linhaCedido.style.display = 'none';
-            inputCedido.value = '';
-        }
-    }
-
-    // 4. FUNÇÃO: CONTADOR DE CARACTERES
-    function updateChars(obj) {
-        const display = document.getElementById('char_count');
-        if (display) display.innerHTML = obj.value.length;
-    }
-
-    // 5. FUNÇÃO: VALIDAR GRAVAÇÃO (Verificar se os pais existem)
-    function validarGravação(event) {
-        const verificarProgenitor = (tipo, nomeTipo) => {
-            const inputPesquisa = document.getElementById('search_' + tipo);
-            const inputOcultoId = document.getElementById(tipo + '_id');
-            if (!inputPesquisa || !inputOcultoId) return true;
-
-            const termoDigitado = inputPesquisa.value.trim().toLowerCase();
-            if (termoDigitado === "") {
-                inputOcultoId.value = "";
-                return true;
-            }
-
-            // Nota: Extrai a anilha (tudo antes do primeiro espaço) para garantir validação correta
-            const anilhaDigitada = termoDigitado.split(' ')[0];
-
-            const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
-            let idEncontrado = null;
-            listaOpcoes.forEach(opt => {
-                const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
-                // Compara a anilha isolada com a anilha da lista
-                if (anilhaLista === anilhaDigitada) {
-                    idEncontrado = opt.getAttribute('data-id');
+                if (bateAno && bateTexto) {
+                    opt.style.display = 'block';
+                    visiveis++;
+                } else {
+                    opt.style.display = 'none';
                 }
             });
 
-            if (idEncontrado) {
-                inputOcultoId.value = idEncontrado;
-                return true;
+            // Mostra a caixa de "Não existe" se não houver pombos correspondentes
+            const notFoundBox = document.getElementById('notfound_' + tipo);
+            if (visiveis === 0) {
+                notFoundBox.style.display = 'block';
             } else {
-                const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
-                if (querInserir) {
-                    window.open('/novo_pombo', '_blank');
-                }
-                return false;
+                notFoundBox.style.display = 'none';
             }
+        }
+
+        // 2. FUNÇÃO DE SELEÇÃO
+        function selecionarProgenitor(tipo, id, texto) {
+            document.getElementById('search_' + tipo).value = texto;
+            document.getElementById(tipo + '_id').value = id;
+            document.getElementById('list_' + tipo).style.display = 'none';
+        }
+
+        // Fechar ao clicar fora
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
+                const listPai = document.getElementById('list_pai');
+                const listMae = document.getElementById('list_mae');
+                if (listPai) listPai.style.display = 'none';
+                if (listMae) listMae.style.display = 'none';
+            }// 1. FILTRO DENTRO DA DROPDOWN
+            function filtrarDropdown(tipo) {
+                const input = document.getElementById('search_' + tipo);
+                const termo = input.value.toLowerCase();
+
+                // Verifica o ano do filho para não sugerir pais mais novos do que o filho
+                const anoFilhoSelect = document.getElementById('ano_select');
+                const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
+
+                const options = document.querySelectorAll('.pombo-opt-' + tipo);
+
+                options.forEach(opt => {
+                    const anoP = parseInt(opt.getAttribute('data-ano'));
+                    const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+                    const nomeP = opt.getAttribute('data-nome').toLowerCase();
+
+                    const bateAno = !anoFilho || anoP <= anoFilho;
+                    const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
+
+                    if (bateAno && bateTexto) {
+                        opt.style.display = 'block';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                });
+            }
+
+            // 2. FUNÇÃO QUE EXECUTA A SELEÇÃO DO POMBO
+            function selecionarProgenitor(tipo, id, texto) {
+                // Atualiza o texto do botão principal
+                document.getElementById('btn_' + tipo).innerText = texto;
+                // Guarda o ID no input invisível para enviar para a base de dados
+                document.getElementById(tipo + '_id').value = id;
+                // Limpa a barra de pesquisa para a próxima vez que abrir
+                document.getElementById('search_' + tipo).value = '';
+                // Restaura a lista toda para a próxima vez
+                filtrarDropdown(tipo);
+            }
+        });
+        // Inicialização de página
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Cursor a piscar na anilha
+            const anilhaInput = document.getElementById('anilha');
+            if (anilhaInput) anilhaInput.focus();
+
+            // 2. Atualizar contador de caracteres se já houver texto (edição)
+            const obs = document.getElementById('obs');
+            if (obs) document.getElementById('char_count').innerText = obs.value.length;
+        });
+        function toggleCedido() {
+            const selectCat = document.getElementById('categoria_select');
+            const linhaCedido = document.getElementById('linha_cedido');
+            const inputCedido = document.getElementById('cedido_a');
+
+            if (selectCat.value === 'Cedido') {
+                linhaCedido.style.display = 'flex';
+                // Foco imediato na caixa de texto
+                setTimeout(() => { inputCedido.focus(); }, 100);
+            } else {
+                linhaCedido.style.display = 'none';
+                inputCedido.value = '';
+            }
+        }
+
+        // 4. FUNÇÃO: CONTADOR DE CARACTERES
+        function updateChars(obj) {
+            const display = document.getElementById('char_count');
+            if (display) display.innerHTML = obj.value.length;
+        }
+
+        // 5. FUNÇÃO: VALIDAR GRAVAÇÃO (Verificar se os pais existem)
+        function validarGravação(event) {
+            const verificarProgenitor = (tipo, nomeTipo) => {
+                const inputPesquisa = document.getElementById('search_' + tipo);
+                const inputOcultoId = document.getElementById(tipo + '_id');
+                if (!inputPesquisa || !inputOcultoId) return true;
+
+                const termoDigitado = inputPesquisa.value.trim().toLowerCase();
+                if (termoDigitado === "") {
+                    inputOcultoId.value = "";
+                    return true;
+                }
+
+                // Nota: Extrai a anilha (tudo antes do primeiro espaço) para garantir validação correta
+                const anilhaDigitada = termoDigitado.split(' ')[0];
+
+                const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.pombo-opt');
+                let idEncontrado = null;
+                listaOpcoes.forEach(opt => {
+                    const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
+                    // Compara a anilha isolada com a anilha da lista
+                    if (anilhaLista === anilhaDigitada) {
+                        idEncontrado = opt.getAttribute('data-id');
+                    }
+                });
+
+                if (idEncontrado) {
+                    inputOcultoId.value = idEncontrado;
+                    return true;
+                } else {
+                    const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
+                    if (querInserir) {
+                        window.open('/novo_pombo', '_blank');
+                    }
+                    return false;
+                }
+            };
+
+            if (!verificarProgenitor('pai', 'Pai')) return false;
+            if (!verificarProgenitor('mae', 'Mãe')) return false;
+            return true;
+        }
+
+        // 6. INICIALIZAÇÃO AO ABRIR A PÁGINA
+        window.onload = function () {
+            toggleCedido();
+            const obs = document.getElementById('obs');
+            if (obs) updateChars(obs);
         };
 
-        if (!verificarProgenitor('pai', 'Pai')) return false;
-        if (!verificarProgenitor('mae', 'Mãe')) return false;
-        return true;
-    }
-
-    // 6. INICIALIZAÇÃO AO ABRIR A PÁGINA
-    window.onload = function () {
-        toggleCedido();
-        const obs = document.getElementById('obs');
-        if (obs) updateChars(obs);
-    };
-
-    function contarCaracteres() {
-        const text = document.getElementById('obs');
-        const count = document.getElementById('char_count');
-        if (text && count) {
-            count.innerText = text.value.length;
+        function contarCaracteres() {
+            const text = document.getElementById('obs');
+            const count = document.getElementById('char_count');
+            if (text && count) {
+                count.innerText = text.value.length;
+            }
         }
-    }
 
-    // Inicialização de Rigor
-    document.addEventListener('DOMContentLoaded', function () {
-        // 1. Cursor a piscar na anilha (Praticidade Mobile/Desktop)
-        const anilhaInput = document.getElementById('anilha');
-        if (anilhaInput) anilhaInput.focus();
+        // Inicialização de Rigor
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Cursor a piscar na anilha (Praticidade Mobile/Desktop)
+            const anilhaInput = document.getElementById('anilha');
+            if (anilhaInput) anilhaInput.focus();
 
-        // 2. Atualiza contador se houver dados (Edição)
-        contarCaracteres();
-    });
+            // 2. Atualiza contador se houver dados (Edição)
+            contarCaracteres();
+        });
 
-    // Executar ao carregar a página para o caso de estares a EDITAR um pombo
-    document.addEventListener('DOMContentLoaded', function () {
-        contarCaracteres();
+        // Executar ao carregar a página para o caso de estares a EDITAR um pombo
+        document.addEventListener('DOMContentLoaded', function () {
+            contarCaracteres();
 
-        // Aproveitamos para garantir o foco inicial na anilha
-        const anilhaInput = document.getElementById('anilha');
-        if (anilhaInput) anilhaInput.focus();
-    });
-</script>
+            // Aproveitamos para garantir o foco inicial na anilha
+            const anilhaInput = document.getElementById('anilha');
+            if (anilhaInput) anilhaInput.focus();
+        });
+    </script>
 
-{% endblock %}
+    {% endblock %}
