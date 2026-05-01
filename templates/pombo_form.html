@@ -228,8 +228,8 @@
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
                             <textarea name="obs" id="obs" class="form-control text-hyphen"
-                                style="width: 250px; height: 250px; resize: none;" maxlength="200"
-                                oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
+                                style="width: 250px; height: 250px; resize: none; overflow-wrap: anywhere;"
+                                maxlength="200" oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
                             <div class="text-start small text-muted mt-1">
                                 <span id="char_count">0</span> / 200 carateres
                             </div>

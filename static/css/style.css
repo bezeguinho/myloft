@@ -121,25 +121,21 @@ body {
   overflow: hidden;
 }
 
-/* --- Otimização de Texto e Hifenização --- */
+/* Localização: Podes colocar no fim do style.css ou antes dos botões */
+.text-hyphen,
 .descricao-text,
-.pombo-box,
-.valor-perfil {
-  /* 1. Ativa a divisão por hífens automática */
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-  hyphens: auto;
+textarea#obs {
+  /* 1. Hifenização para palavras REAIS (ex: "cometeram") */
+  -webkit-hyphens: auto !important;
+  hyphens: auto !important;
 
-  /* 2. Força a quebra de palavras muito longas (ex: links ou nomes sem espaços) */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  /* 2. Quebra FORÇADA para palavras "inventadas" ou muito longas */
+  /* Isto resolve o que vês no teu print */
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
 
-  /* 3. Justifica o texto para um aspeto mais profissional em mobile */
+  /* 3. Garante que o comportamento se mantém em Mobile */
   text-align: justify;
-
-  /* 4. Garante que o texto não "foge" da box */
-  max-width: 100%;
-  display: block;
 }
 
 .btn {
