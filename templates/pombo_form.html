@@ -187,8 +187,8 @@
 
                     <!-- 3. Linha de Gestão: Sexo, Categoria e Ocultar -->
                     <div class="row g-2 mb-3 align-items-end">
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Sexo</label>
+                        <div class="col-md-4 mb-3">
+                            <label class="fw-bold text-uppercase small mb-2 d-block">Sexo</label>
                             <select name="sexo" class="form-select" required>
                                 <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
                                     endif %}>Escolha..</option>
@@ -201,23 +201,25 @@
                             </select>
                         </div>
 
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold small text-uppercase">Categoria</label>
-                            <select name="categoria" id="categoria_select" class="form-select"
-                                onchange="toggleCedido()">
+                        <div class="col-md-4 mb-3">
+                            <label class="fw-bold text-uppercase small mb-2 d-block">Categoria</label>
+                            <select name="categoria" id="categoria_select" class="form-select" required>
                                 <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
                                     endif %}>Escolha..</option>
-                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
-                                    endif %}>Reprodutor</option>
                                 <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
                                     Voador</option>
+                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
+                                    endif %}>Reprodutor</option>
                                 <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{% endif %}>
                                     Cedido</option>
                             </select>
                         </div>
 
                         <!-- Ocultar Pombo alinhado pelo fim da caixa da Mãe -->
-                        <div class="col-md-4 mb-3 d-flex flex-column justify-content-end">
+                        <div class="col-md-4 mb-3">
+                            <label class="fw-bold text-uppercase small mb-2 d-block"
+                                style="visibility: hidden;">Ocultar</label>
+
                             <label for="oculto"
                                 class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm"
                                 style="height: 38px; cursor: pointer;">
