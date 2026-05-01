@@ -1,5 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+    /* Botão Gravar: Azul, texto default Branco, hover Preto */
+    .btn-gravar {
+        color: #ffffff !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gravar:hover {
+        color: #000000 !important;
+    }
+
+    /* Botão Voltar: Amarelo, texto default Preto, hover Branco */
+    .btn-voltar {
+        color: #000000 !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-voltar:hover {
+        color: #ffffff !important;
+    }
+</style>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
@@ -288,28 +309,37 @@
                         <!-- LINHA 5: DESCRIÇÃO E BOTÕES DE AÇÃO -->
                         <!-- ========================================== -->
                         <div class="row g-3 mt-2 align-items-start">
-                            <div class="col-auto">
-                                <label class="form-label fw-bold small text-uppercase">Descrição para o
-                                    Pedigree...</label>
-                                <textarea name="obs" id="obs" class="form-control"
-                                    style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="200"
-                                    oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
-                                <div class="text-start small text-muted mt-1">
-                                    <span id="char_count">0</span> / 200 carateres
-                                </div>
-                            </div>
-
+                            <!-- Coluna dos Botões -->
                             <div class="col-auto">
                                 <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
-                                    <button type="submit" class="btn btn-primary fw-bold text-uppercase shadow-sm"
+                                    <button type="submit"
+                                        class="btn btn-primary fw-bold text-uppercase shadow-sm btn-gravar"
                                         style="width: 140px; height: 45px;">
                                         Gravar
                                     </button>
                                     <a href="{{ url_for('lista_pombos') }}"
-                                        class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center"
+                                        class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center btn-voltar"
                                         style="width: 140px; height: 45px;">
                                         Voltar
                                     </a>
+                                </div>
+                            </div>
+
+                            <div class="col-auto">
+                                <!-- Coluna dos Botões -->
+                                <div class="col-auto">
+                                    <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
+                                        <button type="submit"
+                                            class="btn btn-primary fw-bold text-uppercase shadow-sm btn-gravar"
+                                            style="width: 140px; height: 45px;">
+                                            Gravar
+                                        </button>
+                                        <a href="{{ url_for('lista_pombos') }}"
+                                            class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center btn-voltar"
+                                            style="width: 140px; height: 45px;">
+                                            Voltar
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -322,20 +352,22 @@
     </form> <!-- Assumindo que aqui terminava o form do teu layout original -->
 
     <script>
-        // 1. FILTRO INTELIGENTE UNIFICADO (Anilha + Nome)
+        // =========================================================
+        // BLOCO DE PESQUISA DE PROGENITORES (PAI/MÃE)
+        // =========================================================
+
         function filtrarDropdown(tipo) {
             const input = document.getElementById('search_' + tipo);
             const lista = document.getElementById('list_' + tipo);
             if (!input || !lista) return;
 
-            // Fecha a lista oposta para não sujar o ecrã
+            // Fecha a lista oposta para manter o ecrã limpo (Mobile-First)
             const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
             const listaOutro = document.getElementById('list_' + outroTipo);
             if (listaOutro) listaOutro.style.display = 'none';
 
             lista.style.display = 'block';
 
-            // O texto pesquisado (aceita números e letras)
             const termo = input.value.toLowerCase().trim();
             const anoFilhoSelect = document.getElementById('ano_select');
             const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
@@ -344,13 +376,12 @@
             const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
             options.forEach(opt => {
-                const anoP = parseInt(opt.getAttribute('data-ano'));
-                const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
-                const nomeP = opt.getAttribute('data-nome').toLowerCase();
+                const anoP = parseInt(opt.getAttribute('data-ano')) || 0;
+                // O uso de ( || '') é crítico: previne que a app bloqueie se não houver nome
+                const anilhaP = (opt.getAttribute('data-anilha') || '').toLowerCase();
+                const nomeP = (opt.getAttribute('data-nome') || '').toLowerCase();
 
                 const bateAno = !anoFilho || anoP <= anoFilho;
-
-                // Verifica se o texto digitado bate com a anilha OU com o nome
                 const bateTexto = termo === "" || anilhaP.includes(termo) || nomeP.includes(termo);
 
                 if (bateAno && bateTexto) {
@@ -361,39 +392,32 @@
                 }
             });
 
-            // Mostra a opção de inserir caso não haja pombos na pesquisa
             const notFoundBox = document.getElementById('notfound_' + tipo);
             if (notFoundBox) {
                 notFoundBox.style.display = visiveis === 0 ? 'block' : 'none';
             }
 
-            // Limpa o ID oculto caso o utilizador esteja a digitar algo novo
+            // Limpa o ID oculto se o utilizador voltar a digitar algo novo
             document.getElementById(tipo + '_id').value = '';
         }
 
-        // 2. FUNÇÃO DE SELEÇÃO
-        function selecionarProgenitor(tipo, id, anilhaEscolhida) {
-            // Preenche o campo visível apenas com a anilha para ficar limpo
-            document.getElementById('search_' + tipo).value = anilhaEscolhida;
-            // Grava o ID no formulário oculto
+        function selecionarProgenitor(tipo, id, texto) {
+            document.getElementById('search_' + tipo).value = texto;
             document.getElementById(tipo + '_id').value = id;
-            // Fecha a lista
             document.getElementById('list_' + tipo).style.display = 'none';
         }
-        // Fecha as listas ao clicar fora
-        document.addEventListener('click', function (e) {
-            const listaPai = document.getElementById('list_pai');
-            const listaMae = document.getElementById('list_mae');
 
-            // Se o clique não foi dentro do container do pai nem dentro do container da mãe
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
-                if (listaPai) listaPai.style.display = 'none';
-                if (listaMae) listaMae.style.display = 'none';
+                const listPai = document.getElementById('list_pai');
+                const listMae = document.getElementById('list_mae');
+                if (listPai) listPai.style.display = 'none';
+                if (listMae) listMae.style.display = 'none';
             }
         });
 
         // =========================================================
-        // UTILIDADES E VALIDAÇÕES DO FORMULÁRIO
+        // UTILIDADES E VALIDAÇÃO DE GRAVAÇÃO
         // =========================================================
 
         function updateChars(obj) {
@@ -401,61 +425,67 @@
             if (display) display.innerHTML = obj.value.length;
         }
 
-        function contarCaracteres() {
-            const text = document.getElementById('obs');
-            const count = document.getElementById('char_count');
-            if (text && count) {
-                count.innerText = text.value.length;
-            }
-        }
-
+        // Função de validação blindada
         function validarGravação(event) {
             const verificarProgenitor = (tipo, nomeTipo) => {
                 const inputPesquisa = document.getElementById('search_' + tipo);
                 const inputOcultoId = document.getElementById(tipo + '_id');
                 if (!inputPesquisa || !inputOcultoId) return true;
 
-                const termoDigitado = inputPesquisa.value.trim().toLowerCase();
-                if (termoDigitado === "") {
+                const textoDigitado = inputPesquisa.value.trim();
+
+                // Se o campo estiver vazio, avança sem problemas
+                if (textoDigitado === "") {
                     inputOcultoId.value = "";
                     return true;
                 }
 
-                const anilhaDigitada = termoDigitado.split(' ')[0];
-                const listaOpcoes = document.getElementById('list_' + tipo).querySelectorAll('.dropdown-item');
+                // Se existe texto mas o ID oculto está vazio (ou seja, ele digitou mas não clicou na lista)
+                if (inputOcultoId.value === "") {
+                    const anilhaDigitada = textoDigitado.toLowerCase().split(' ')[0]; // Extrai só a anilha
+                    let idEncontrado = null;
+                    const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
-                let idEncontrado = null;
-                listaOpcoes.forEach(opt => {
-                    if (opt.hasAttribute('data-anilha')) {
-                        const anilhaLista = opt.getAttribute('data-anilha').toLowerCase();
+                    options.forEach(opt => {
+                        const anilhaLista = (opt.getAttribute('data-anilha') || '').toLowerCase();
                         if (anilhaLista === anilhaDigitada) {
                             idEncontrado = opt.getAttribute('data-id');
                         }
-                    }
-                });
+                    });
 
-                if (idEncontrado) {
-                    inputOcultoId.value = idEncontrado;
-                    return true;
-                } else {
-                    const querInserir = confirm(`O ${nomeTipo} com a anilha "${inputPesquisa.value}" não existe na base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
-                    if (querInserir) {
-                        window.open('/novo_pombo', '_blank');
+                    if (idEncontrado) {
+                        inputOcultoId.value = idEncontrado; // Corrige o ID silenciosamente e avança
+                        return true;
+                    } else {
+                        const querInserir = confirm(`O ${nomeTipo} com a anilha "${textoDigitado}" não existe na base de dados.\n\nDeseja abrir uma nova janela para o inserir primeiro?`);
+                        if (querInserir) window.open('/novo_pombo', '_blank');
+                        return false; // Bloqueia a gravação para evitar erros na BD
                     }
-                    return false;
                 }
+                return true;
             };
 
             if (!verificarProgenitor('pai', 'Pai')) return false;
             if (!verificarProgenitor('mae', 'Mãe')) return false;
+
             return true;
         }
 
-        // Inicialização Limpa e Unificada
+        // Interceta o submit do formulário para garantir que a validação atua
         document.addEventListener('DOMContentLoaded', function () {
-            if (typeof toggleCedido === 'function') toggleCedido();
-            contarCaracteres();
+            const form = document.querySelector('form');
+            if (form) {
+                form.onsubmit = function (e) {
+                    if (!validarGravação(e)) {
+                        e.preventDefault(); // Trava o "Gravar" se a validação falhar
+                    }
+                };
+            }
 
+            // Inicializações
+            if (typeof toggleCedido === 'function') toggleCedido();
+            const obs = document.getElementById('obs');
+            if (obs) updateChars(obs);
             const anilhaInput = document.getElementById('anilha');
             if (anilhaInput) anilhaInput.focus();
         });
