@@ -180,7 +180,7 @@
 
     .box-detail {
         font-weight: bold;
-        margin-bottom: 0px;
+        margin-bottom: -0.5px;
         padding-bottom: 0px;
     }
 
@@ -190,6 +190,7 @@
         white-space: pre-line;
         flex: 1;
         overflow: hidden;
+        line-height: calc(1em - 0.5px);
     }
 
     /* 5 GERAÇÕES - ESTILOS ADICIONAIS */
@@ -207,10 +208,11 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        gap: 1mm;
     }
 
     .micro-box {
-        height: 12.75mm;
+        height: 13.25mm;
         border-radius: 5px;
         padding: 2px 4px;
         display: flex;
