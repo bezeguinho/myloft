@@ -133,55 +133,97 @@
                     <!-- 2. Linha de Progenitores (Pai e Mãe lado a lado) -->
                     <div class="row g-2 mb-3">
                         <!-- Pai -->
-                        <div class="col-12 col-md-6 position-relative">
+                        <div class="col-md-6 mb-3 position-relative" id="container_pai">
                             <label class="fw-bold text-uppercase small">Pai</label>
-                            <input type="text" id="search_pai" class="form-control" placeholder="-- Escolha o pai --"
-                                autocomplete="off"
-                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% endif %}{% endfor %}{% endif %}"
-                                onclick="this.select(); filtrarProgenitores('pai');"
-                                onfocus="this.select(); filtrarProgenitores('pai');"
-                                oninput="filtrarProgenitores('pai')">
-                            <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai_id if pombo else '' }}">
-                            <ul id="list_pai" class="dropdown-menu w-100 shadow-sm custom-dropdown">
-                                {% for m in machos %}
-                                <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ m.id }}"
-                                    data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
-                                    data-nome="{{ m.nome|upper or '' }}" data-cor="{{ m.cor|upper or '' }}"
-                                    style="cursor: pointer; font-size: 0.75rem;">
-                                    <span class="fw-bold text-primary">{{ m.anilha }} -{{ (m.ano|string)[-2:] }}</span>
-                                    {% if m.cor %}<span class="ms-2 text-dark text-truncate" style="max-width: 70px;">•
-                                        {{ m.cor|upper }}</span>{% endif %}
-                                    {% if m.nome %}<span class="ms-2 text-secondary fst-italic text-truncate">{{
-                                        m.nome|upper }}</span>{% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
+
+                            <!-- Input com Lupa Integrada -->
+                            <div class="input-group shadow-sm" style="border-radius: 8px;">
+                                <span class="input-group-text bg-white border-end-0 text-primary"><i
+                                        class="bi bi-search"></i></span>
+                                <input type="text" id="search_pai" class="form-control border-start-0 ps-0"
+                                    placeholder="Pesquisar anilha ou nome..." autocomplete="off"
+                                    value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} ({{ m.ano }}){% endif %}{% endfor %}{% endif %}"
+                                    onfocus="this.select(); filtrarDropdown('pai');" oninput="filtrarDropdown('pai')">
+                            </div>
+                            <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
+
+                            <!-- Menu Dropdown -->
+                            <div id="list_pai" class="dropdown-menu w-100 p-2 shadow-lg"
+                                style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
+                                <button type="button" class="dropdown-item fw-bold text-danger mb-1"
+                                    onclick="selecionarProgenitor('pai', '', '')">
+                                    <i class="bi bi-x-circle me-1"></i> Nenhum / Limpar
+                                </button>
+
+                                <div id="opcoes_pai">
+                                    {% for m in machos %}
+                                    <button type="button" class="dropdown-item pombo-opt-pai" data-id="{{ m.id }}"
+                                        data-ano="{{ m.ano }}" data-anilha="{{ m.anilha }}"
+                                        data-nome="{{ m.nome|lower or '' }}"
+                                        onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} ({{ m.ano }})')">
+                                        <span class="fw-bold text-primary">{{ m.anilha }}</span> ({{ m.ano }}) {% if
+                                        m.nome %}- {{ m.nome }}{% endif %}
+                                    </button>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Alerta: Não Existe / Inserir Novo -->
+                                <div id="notfound_pai" style="display: none;">
+                                    <hr class="dropdown-divider">
+                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
+                                        class="dropdown-item text-center fw-bold py-2"
+                                        style="background-color: #eef4ff; color: #0d6efd; border-radius: 8px; white-space: normal;">
+                                        <i class="bi bi-plus-circle me-2"></i>Não existe. Quer inserir pombo?
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Mãe -->
-                        <div class="col-12 col-md-6 position-relative">
+                        <div class="col-md-6 mb-3 position-relative" id="container_mae">
                             <label class="fw-bold text-uppercase small">Mãe</label>
-                            <input type="text" id="search_mae" class="form-control" placeholder="-- Escolha a mãe --"
-                                autocomplete="off"
-                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} ({{ f.ano }}){% endif %}{% endfor %}{% endif %}"
-                                onclick="this.select(); filtrarProgenitores('mae');"
-                                onfocus="this.select(); filtrarProgenitores('mae');"
-                                oninput="filtrarProgenitores('mae')">
-                            <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae_id if pombo else '' }}">
-                            <ul id="list_mae" class="dropdown-menu w-100 shadow-sm custom-dropdown">
-                                {% for f in femeas %}
-                                <li class="dropdown-item pombo-opt d-flex align-items-center" data-id="{{ f.id }}"
-                                    data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
-                                    data-nome="{{ f.nome|upper or '' }}" data-cor="{{ f.cor|upper or '' }}"
-                                    style="cursor: pointer; font-size: 0.75rem;">
-                                    <span class="fw-bold text-primary">{{ f.anilha }} -{{ (f.ano|string)[-2:] }}</span>
-                                    {% if f.cor %}<span class="ms-2 text-dark text-truncate" style="max-width: 70px;">•
-                                        {{ f.cor|upper }}</span>{% endif %}
-                                    {% if f.nome %}<span class="ms-2 text-secondary fst-italic text-truncate">{{
-                                        f.nome|upper }}</span>{% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
+
+                            <!-- Input com Lupa Integrada -->
+                            <div class="input-group shadow-sm" style="border-radius: 8px;">
+                                <span class="input-group-text bg-white border-end-0" style="color: #ff4d6d;"><i
+                                        class="bi bi-search"></i></span>
+                                <input type="text" id="search_mae" class="form-control border-start-0 ps-0"
+                                    placeholder="Pesquisar anilha ou nome..." autocomplete="off"
+                                    value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} ({{ f.ano }}){% endif %}{% endfor %}{% endif %}"
+                                    onfocus="this.select(); filtrarDropdown('mae');" oninput="filtrarDropdown('mae')">
+                            </div>
+                            <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
+
+                            <!-- Menu Dropdown -->
+                            <div id="list_mae" class="dropdown-menu w-100 p-2 shadow-lg"
+                                style="max-height: 280px; overflow-y: auto; position: absolute; z-index: 1050; top: 100%; display: none;">
+                                <button type="button" class="dropdown-item fw-bold text-danger mb-1"
+                                    onclick="selecionarProgenitor('mae', '', '')">
+                                    <i class="bi bi-x-circle me-1"></i> Nenhum / Limpar
+                                </button>
+
+                                <div id="opcoes_mae">
+                                    {% for f in femeas %}
+                                    <button type="button" class="dropdown-item pombo-opt-mae" data-id="{{ f.id }}"
+                                        data-ano="{{ f.ano }}" data-anilha="{{ f.anilha }}"
+                                        data-nome="{{ f.nome|lower or '' }}"
+                                        onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} ({{ f.ano }})')">
+                                        <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span> ({{ f.ano
+                                        }}) {% if f.nome %}- {{ f.nome }}{% endif %}
+                                    </button>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Alerta: Não Existe / Inserir Novo -->
+                                <div id="notfound_mae" style="display: none;">
+                                    <hr class="dropdown-divider">
+                                    <a href="{{ url_for('novo_pombo') }}" target="_blank"
+                                        class="dropdown-item text-center fw-bold py-2"
+                                        style="background-color: #fff0f3; color: #ff4d6d; border-radius: 8px; white-space: normal;">
+                                        <i class="bi bi-plus-circle me-2"></i>Não existe. Quer inserir pombo?
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -284,23 +326,25 @@
 </div>
 
 <script>
-    // 1. FILTRO COM PESQUISA INTEGRADA E ABERTURA GARANTIDA
-    function filtrarProgenitores(tipo) {
+    // 1. FILTRO INTELIGENTE COM AVISO DE "NÃO EXISTE"
+    function filtrarDropdown(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
         if (!input || !lista) return;
 
-        // Fecha a OUTRA lista para evitar sobreposições
+        // Fecha a lista do outro progenitor para não sobrepor
         const outroTipo = tipo === 'pai' ? 'mae' : 'pai';
         const listaOutro = document.getElementById('list_' + outroTipo);
-        if (listaOutro) listaOutro.classList.remove('show');
+        if (listaOutro) listaOutro.style.display = 'none';
+
+        lista.style.display = 'block'; // Abre a lista atual
 
         const termo = input.value.toLowerCase();
         const anoFilhoSelect = document.getElementById('ano_select');
         const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
         let visiveis = 0;
-        const options = lista.querySelectorAll('.pombo-opt');
+        const options = document.querySelectorAll('.pombo-opt-' + tipo);
 
         options.forEach(opt => {
             const anoP = parseInt(opt.getAttribute('data-ano'));
@@ -316,34 +360,33 @@
             } else {
                 opt.style.display = 'none';
             }
-
-            // Evento de clique para escolher o pombo
-            opt.onclick = function (e) {
-                e.preventDefault();
-                input.value = opt.innerText.trim();
-                document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
-                lista.classList.remove('show');
-            };
         });
 
-        // Mostra a lista acionando a classe nativa do Bootstrap
-        if (visiveis > 0) {
-            lista.classList.add('show');
+        // Mostra a caixa de "Não existe" se não houver pombos correspondentes
+        const notFoundBox = document.getElementById('notfound_' + tipo);
+        if (visiveis === 0) {
+            notFoundBox.style.display = 'block';
         } else {
-            lista.classList.remove('show');
+            notFoundBox.style.display = 'none';
         }
     }
 
-    // Fechar ao clicar noutro lado qualquer do ecrã
+    // 2. FUNÇÃO DE SELEÇÃO
+    function selecionarProgenitor(tipo, id, texto) {
+        document.getElementById('search_' + tipo).value = texto;
+        document.getElementById(tipo + '_id').value = id;
+        document.getElementById('list_' + tipo).style.display = 'none';
+    }
+
+    // Fechar ao clicar fora
     document.addEventListener('click', function (e) {
-        if (!e.target.closest('.position-relative')) {
+        if (!e.target.closest('#container_pai') && !e.target.closest('#container_mae')) {
             const listPai = document.getElementById('list_pai');
             const listMae = document.getElementById('list_mae');
-            if (listPai) listPai.classList.remove('show');
-            if (listMae) listMae.classList.remove('show');
+            if (listPai) listPai.style.display = 'none';
+            if (listMae) listMae.style.display = 'none';
         }
     });
-
     // Inicialização de página
     document.addEventListener('DOMContentLoaded', function () {
         // 1. Cursor a piscar na anilha
