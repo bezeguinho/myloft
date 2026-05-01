@@ -68,6 +68,17 @@
     .custom-dropdown.show {
         display: block !important;
     }
+
+    .box-ocultar {
+        cursor: pointer;
+        height: 38px;
+        transition: all 0.3s ease;
+    }
+
+    .box-ocultar:hover {
+        background-color: #eef4ff !important;
+        border-color: #0d6efd !important;
+    }
 </style>
 
 <div class="container mt-4">
@@ -94,8 +105,8 @@
                         <div class="col-6 col-md-2">
                             <label class="form-label fw-bold small text-uppercase">Ano</label>
                             <select name="ano" id="ano_select" class="form-select" required>
-                                <option value="" disabled {% if not pombo and not sugerir_ano %}selected{% endif %}>
-                                    Escolha</option>
+                                <option value="" disabled hidden style="display: none;" {% if not pombo and not
+                                    sugerir_ano %}selected{% endif %}>Escolha</option>
                                 {% for a in anos_lista %}
                                 <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (sugerir_ano|string==a|string)
                                     %}selected{% endif %}>{{ a }}</option>
@@ -175,7 +186,8 @@
                         <div class="col-12 col-md-4">
                             <label class="form-label fw-bold small text-uppercase">Sexo</label>
                             <select name="sexo" class="form-select" required>
-                                <option value="">Escolha..</option>
+                                <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
+                                    endif %}>Escolha..</option>
                                 <option value="Macho" {% if pombo and pombo.sexo=='Macho' %}selected{% endif %}>Macho
                                 </option>
                                 <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>Fêmea
@@ -189,7 +201,8 @@
                             <label class="form-label fw-bold small text-uppercase">Categoria</label>
                             <select name="categoria" id="categoria_select" class="form-select"
                                 onchange="toggleCedido()">
-                                <option value="">Escolha..</option>
+                                <option value="" disabled hidden style="display: none;" {% if not pombo %}selected{%
+                                    endif %}>Escolha..</option>
                                 <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
                                     endif %}>Reprodutor</option>
                                 <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
@@ -200,10 +213,14 @@
                         </div>
 
                         <!-- Ocultar Pombo alinhado pelo fim da caixa da Mãe -->
-                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-end pb-2">
-                            <span class="fw-bold small text-uppercase me-2">Ocultar Pombo?</span>
-                            <input type="checkbox" name="oculto" id="oculto" value="on" {% if pombo and pombo.oculto
-                                %}checked{% endif %} style="width: 20px; height: 20px; cursor: pointer;">
+                        <div class="col-md-4 mb-3">
+                            <label for="oculto"
+                                class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light w-100 m-0 shadow-sm">
+                                <span class="fw-bold mb-0 small text-uppercase" style="user-select: none;">Ocultar
+                                    Pombo?</span>
+                                <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0"
+                                    style="cursor: pointer;" {% if pombo and pombo.oculto %}checked{% endif %}>
+                            </label>
                         </div>
                     </div>
 
@@ -227,9 +244,9 @@
                         <!-- Descrição: Configurada para largura de ~20-22 caracteres e 10 linhas -->
                         <div class="col-auto">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
-                            <textarea name="obs" id="obs" class="form-control text-hyphen"
-                                style="width: 250px; height: 250px; resize: none; overflow-wrap: anywhere;"
-                                maxlength="200" oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
+                            <textarea name="obs" id="obs" class="form-control"
+                                style="width: 250px; height: 250px; resize: none; overflow: hidden;" maxlength="200"
+                                oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
                             <div class="text-start small text-muted mt-1">
                                 <span id="char_count">0</span> / 200 carateres
                             </div>
@@ -260,40 +277,65 @@
 </div>
 
 <script>
-    // Função para filtrar Progenitores com base no Sexo e na Regra da Idade
+    // 1. FILTRO COM PESQUISA INTEGRADA (CORRIGIDO)
     function filtrarProgenitores(tipo) {
         const input = document.getElementById('search_' + tipo);
         const lista = document.getElementById('list_' + tipo);
-        const filtro = input.value.toLowerCase();
+        if (!input || !lista) return;
 
-        // Obtém o ano selecionado para o pombo atual
-        const anoPombo = parseInt(document.getElementById('ano_select').value);
+        // Fecha ambas primeiro por segurança
+        const listPai = document.getElementById('list_pai');
+        const listMae = document.getElementById('list_mae');
+        if (listPai) listPai.style.display = 'none';
+        if (listMae) listMae.style.display = 'none';
 
-        if (!anoPombo) {
-            alert("Por favor, selecione primeiro o ANO do pombo.");
-            input.value = "";
-            return;
-        }
+        const termo = input.value.toLowerCase();
+        const anoFilhoSelect = document.getElementById('ano_select');
+        const anoFilho = anoFilhoSelect ? parseInt(anoFilhoSelect.value) : 0;
 
-        const itens = lista.getElementsByClassName('pombo-opt');
-        lista.classList.add('show');
+        let visiveis = 0;
+        const options = lista.querySelectorAll('.pombo-opt');
 
-        Array.from(itens).forEach(item => {
-            const anilha = item.getAttribute('data-anilha').toLowerCase();
-            const nome = item.getAttribute('data-nome').toLowerCase();
-            const anoProgenitor = parseInt(item.getAttribute('data-ano'));
+        options.forEach(opt => {
+            const anoP = parseInt(opt.getAttribute('data-ano'));
+            const anilhaP = opt.getAttribute('data-anilha').toLowerCase();
+            const nomeP = opt.getAttribute('data-nome').toLowerCase();
+            const bateAno = !anoFilho || anoP <= anoFilho;
+            const bateTexto = anilhaP.includes(termo) || nomeP.includes(termo);
 
-            const matchesSearch = anilha.includes(filtro) || nome.includes(filtro);
-            // Regra: O progenitor deve ser do mesmo ano ou MAIS VELHO
-            const matchesAge = anoProgenitor <= anoPombo;
-
-            if (matchesSearch && matchesAge) {
-                item.style.display = 'flex';
+            if (bateAno && bateTexto) {
+                opt.style.display = 'block';
+                visiveis++;
             } else {
-                item.style.display = 'none';
+                opt.style.display = 'none';
             }
+
+            opt.onclick = function () {
+                input.value = opt.innerText.trim();
+                document.getElementById(tipo + '_id').value = opt.getAttribute('data-id');
+                lista.style.display = 'none';
+            };
         });
+
+        // FORÇA a abertura se houver pombos visíveis
+        if (visiveis > 0) {
+            lista.style.display = 'block';
+            lista.style.position = 'absolute';
+            lista.style.zIndex = '1050'; // Garante que fica por cima de tudo
+        } else {
+            lista.style.display = 'none';
+        }
     }
+
+    // Fechar lista se clicar fora
+    document.addEventListener('click', function (e) {
+        if (!e.target.id.includes('search')) {
+            const listPai = document.getElementById('list_pai');
+            const listMae = document.getElementById('list_mae');
+            if (listPai) listPai.style.display = 'none';
+            if (listMae) listMae.style.display = 'none';
+        }
+    });
 
     // Inicialização de página
     document.addEventListener('DOMContentLoaded', function () {

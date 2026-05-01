@@ -121,20 +121,14 @@ body {
   overflow: hidden;
 }
 
-/* Localização: Podes colocar no fim do style.css ou antes dos botões */
-.text-hyphen,
+/* --- Otimização de Texto para Leitura (Mobile-First) --- */
 .descricao-text,
-textarea#obs {
-  /* 1. Hifenização para palavras REAIS (ex: "cometeram") */
-  -webkit-hyphens: auto !important;
-  hyphens: auto !important;
-
-  /* 2. Quebra FORÇADA para palavras "inventadas" ou muito longas */
-  /* Isto resolve o que vês no teu print */
-  overflow-wrap: anywhere !important;
-  word-break: break-word !important;
-
-  /* 3. Garante que o comportamento se mantém em Mobile */
+.pombo-box {
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
   text-align: justify;
 }
 
