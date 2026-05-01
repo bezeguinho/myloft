@@ -218,27 +218,34 @@
                     </div>
                     <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (COLAR ANTES DO FIM DO </form>) -->
                     <!-- BLOCO FINAL: DESCRIÇÃO E BOTÕES (REPOSIÇÃO FIEL AO ORIGINAL) -->
-                    <div class="row g-3 mt-2">
-                        <!-- Coluna da Descrição (Quadrada e com contador abaixo) -->
-                        <div class="col-12 col-md-6">
+                    <!-- SECÇÃO FINAL: DESCRIÇÃO QUADRADA E BOTÕES COMPACTOS -->
+                    <div class="row g-3 mt-2 align-items-start">
+                        <!-- Coluna da Descrição (Formato Quadrado no Desktop) -->
+                        <div class="col-12 col-md-5">
                             <label class="form-label fw-bold small text-uppercase">Descrição para o Pedigree...</label>
-                            <textarea name="obs" id="obs" class="form-control" rows="5" maxlength="200"
-                                oninput="document.getElementById('char_count').innerText = this.value.length">{{ pombo.obs if pombo else '' }}</textarea>
-                            <div class="small text-muted mt-1"><span id="char_count">0</span> / 200 carateres</div>
+                            <textarea name="obs" id="obs" class="form-control"
+                                style="aspect-ratio: 1 / 1; min-height: 200px;" maxlength="200"
+                                oninput="contarCaracteres()">{{ pombo.obs if pombo else '' }}</textarea>
+                            <div class="text-start small text-muted mt-1">
+                                <span id="char_count">0</span> / 200 carateres
+                            </div>
                         </div>
 
-                        <!-- Coluna dos Botões: Tamanho normal e alinhados com o topo da caixa -->
-                        <div class="col-12 col-md-4 mt-md-4 pt-md-2">
-                            <div class="d-flex flex-column gap-2">
-                                <button type="submit" class="btn btn-primary fw-bold text-uppercase px-4"
-                                    style="width: fit-content; min-width: 150px;">Gravar</button>
+                        <!-- Coluna dos Botões (Alinhados ao canto superior direito da box) -->
+                        <div class="col-12 col-md-3">
+                            <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
+                                <button type="submit" class="btn btn-primary fw-bold text-uppercase w-100 shadow-sm"
+                                    style="max-width: 150px;">
+                                    Gravar
+                                </button>
                                 <a href="{{ url_for('lista_pombos') }}"
-                                    class="btn btn-warning fw-bold text-uppercase px-4"
-                                    style="width: fit-content; min-width: 150px;">Voltar</a>
+                                    class="btn btn-warning fw-bold text-uppercase w-100 shadow-sm"
+                                    style="max-width: 150px;">
+                                    Voltar
+                                </a>
                             </div>
                         </div>
                     </div>
-
                     <!-- 5. Descrição e Botões -->
                     <!-- SUBSTITUIR APENAS O BLOCO FINAL DA DESCRIÇÃO E BOTÕES -->
 
@@ -365,14 +372,23 @@
         if (obs) updateChars(obs);
     };
 
-    // Função para atualizar o contador de caracteres da descrição
     function contarCaracteres() {
-        const textarea = document.getElementById('obs');
-        const counter = document.getElementById('char_count');
-        if (textarea && counter) {
-            counter.innerText = textarea.value.length;
+        const text = document.getElementById('obs');
+        const count = document.getElementById('char_count');
+        if (text && count) {
+            count.innerText = text.value.length;
         }
     }
+
+    // Inicialização de Rigor
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Cursor a piscar na anilha (Praticidade Mobile/Desktop)
+        const anilhaInput = document.getElementById('anilha');
+        if (anilhaInput) anilhaInput.focus();
+
+        // 2. Atualiza contador se houver dados (Edição)
+        contarCaracteres();
+    });
 
     // Executar ao carregar a página para o caso de estares a EDITAR um pombo
     document.addEventListener('DOMContentLoaded', function () {
