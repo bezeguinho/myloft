@@ -145,7 +145,7 @@
 
     /* Forçar sublinhado ao passar o rato */
     .anilha-link:hover {
-        text-decoration: underline !important;
+        text-decoration: none !important;
         cursor: pointer !important;
         color: #0033a0 !important;
     }
@@ -170,8 +170,9 @@
         <div class="d-flex align-items-center gap-3">
             <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-light text-primary border px-3 py-2 fs-6 rounded-pill">{{ pombos|length }}
-                    Pombos</span>
+                <div class="btn-tabela-geral shadow-sm" style="cursor: default; min-width: 60px; justify-content: center;">
+                    {{ (pombos|length)|string|truncate(3, True, '') }}
+                </div>
                 <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
                     <i class="bi bi-table me-1"></i> Tabela Geral
                 </a>
@@ -214,7 +215,9 @@
                         <th class="text-center align-middle">Sexo</th>
                         <th class="align-middle">Categoria</th>
                         <th class="align-middle">Pai</th>
+                        <th class="align-middle"></th>
                         <th class="align-middle">Mãe</th>
+                        <th class="align-middle"></th>
                         <th class="text-center pe-4 align-middle">Ações</th>
                     </tr>
                     </thead>
@@ -247,32 +250,42 @@
                             <td class="align-middle">
                                 {% if p.pai %}
                                 {% set pai_str = p.pai | string %}
-                                {% if pai_str.isdigit() %}
-                                <a href="{{ url_for('ver_pombo', id=p.pai|int) }}" class="anilha-link">{{
-                                    mapa_pombos.get(pai_str, p.pai) }}</a>
+                                {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
+                                <a href="{{ url_for('ver_pombo', id=p.pai|int) }}" class="anilha-link">{{ mapa_pombos.get(pai_str).anilha }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                    mapa_pombos.get(pai_str, p.pai) }}</span>
+                                <span class="anilha-link" style="cursor: default;">{{ p.pai }}</span>
                                 {% endif %}
                                 {% else %}
-                                <span class="anilha-link"
-                                    style="cursor: default; text-decoration: none !important;">---</span>
+                                <span class="anilha-link" style="cursor: default;">---</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if p.pai %}
+                                {% set pai_str = p.pai | string %}
+                                {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
+                                {{ mapa_pombos.get(pai_str).ano }}
+                                {% endif %}
                                 {% endif %}
                             </td>
 
                             <td class="align-middle">
                                 {% if p.mae %}
                                 {% set mae_str = p.mae | string %}
-                                {% if mae_str.isdigit() %}
-                                <a href="{{ url_for('ver_pombo', id=p.mae|int) }}" class="anilha-link">{{
-                                    mapa_pombos.get(mae_str, p.mae) }}</a>
+                                {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
+                                <a href="{{ url_for('ver_pombo', id=p.mae|int) }}" class="anilha-link">{{ mapa_pombos.get(mae_str).anilha }}</a>
                                 {% else %}
-                                <span class="anilha-link" style="cursor: default; text-decoration: none !important;">{{
-                                    mapa_pombos.get(mae_str, p.mae) }}</span>
+                                <span class="anilha-link" style="cursor: default;">{{ p.mae }}</span>
                                 {% endif %}
                                 {% else %}
-                                <span class="anilha-link"
-                                    style="cursor: default; text-decoration: none !important;">---</span>
+                                <span class="anilha-link" style="cursor: default;">---</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if p.mae %}
+                                {% set mae_str = p.mae | string %}
+                                {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
+                                {{ mapa_pombos.get(mae_str).ano }}
+                                {% endif %}
                                 {% endif %}
                             </td>
 

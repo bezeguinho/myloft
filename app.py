@@ -381,7 +381,7 @@ def lista_pombos(categoria=None):
     # CRIAMOS ESTA LINHA NOVA: Um mapa para converter ID em Anilha
     # Isto cria uma lista onde o computador consulta: "O ID 1 corresponde à Anilha X"
     todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
-    mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
+    mapa_pombos = {str(p.id): {'anilha': p.anilha, 'ano': p.ano} for p in todos_os_meus_pombos}
     
     anilhas_registadas = {p.anilha for p in todos_os_meus_pombos}
     
@@ -405,7 +405,7 @@ def ver_pombo(id):
 
     # O resto do código mantém-se igualzinho e seguro
     todos_os_meus_pombos = Pombo.query.filter_by(user_id=current_user.id).all()
-    mapa_pombos = {str(p.id): f"{p.anilha} ({p.ano})" for p in todos_os_meus_pombos}
+    mapa_pombos = {str(p.id): {'anilha': p.anilha, 'ano': p.ano} for p in todos_os_meus_pombos}
 
     # PESQUISA DO PAI 
     nome_pai = "---"

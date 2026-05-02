@@ -53,6 +53,8 @@
         text-decoration: none;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        text-align: center;
         box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
     }
 
@@ -73,6 +75,8 @@
         text-decoration: none;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .btn-gravar:hover {
@@ -122,11 +126,9 @@
                         <div class="col-6 col-md-2">
                             <label class="form-label fw-bold small text-uppercase">Ano</label>
                             <select name="ano" id="ano_select" class="form-select" required {% if pombo %}disabled{% endif %}>
-                                <option value="" disabled hidden style="display: none;" {% if not pombo and not
-                                    sugerir_ano %}selected{% endif %}>Escolha</option>
+                                <option value="" disabled hidden style="display: none;" {% if not pombo and not sugerir_ano %}selected{% endif %}>Escolha</option>
                                 {% for a in anos_lista %}
-                                <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (sugerir_ano|string==a|string)
-                                    %}selected{% endif %}>{{ a }}</option>
+                                <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
                                 {% endfor %}
                             </select>
                             {% if pombo %}
@@ -220,8 +222,7 @@
                                 </option>
                                 <option value="Fêmea" {% if pombo and pombo.sexo=='Fêmea' %}selected{% endif %}>Fêmea
                                 </option>
-                                <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{% endif
-                                    %}>Indefinido</option>
+                                <option value="Indefinido" {% if pombo and pombo.sexo=='Indefinido' %}selected{% endif %}>Indefinido</option>
                             </select>
                         </div>
 
@@ -233,8 +234,7 @@
                                 </option>
                                 <option value="Voador" {% if pombo and pombo.categoria=='Voador' %}selected{% endif %}>
                                     Voador</option>
-                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{%
-                                    endif %}>Reprodutor</option>
+                                <option value="Reprodutor" {% if pombo and pombo.categoria=='Reprodutor' %}selected{% endif %}>Reprodutor</option>
                                 <option value="Cedido" {% if pombo and pombo.categoria=='Cedido' %}selected{% endif %}>
                                     Cedido</option>
                             </select>
@@ -246,8 +246,7 @@
                             <div class="box-ocultar d-flex align-items-center justify-content-between border rounded px-3 bg-light shadow-sm"
                                 style="height: 38px; border-radius: 8px;">
                                 <span class="fw-bold mb-0 small text-uppercase">Ocultar?</span>
-                                <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if
-                                    pombo and pombo.oculto %}checked{% endif %}>
+                                <input type="checkbox" name="oculto" id="oculto" class="form-check-input mt-0" {% if pombo and pombo.oculto %}checked{% endif %}>
                             </div>
                         </div>
                     </div>

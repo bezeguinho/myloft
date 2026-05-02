@@ -44,7 +44,9 @@
                     </div>
                     
                     <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME</label>
-                    <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" placeholder="Pesquisar pombo..." autocomplete="off" required style="border-radius: 12px; padding: 15px;">
+                    <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" 
+                           placeholder="Pesquisar pombo..." autocomplete="off" required autofocus
+                           style="border-radius: 12px; padding: 15px;">
                     <datalist id="pombosList">
                         {% for p in pombos %}
                         <option value="{{ p.anilha }} - {{ p.nome or 'Sem Nome' }}"></option>
