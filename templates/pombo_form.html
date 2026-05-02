@@ -4,7 +4,7 @@
 <style>
     /* 1. DROPDOWN DE PROGENITORES */
     .custom-dropdown {
-        background-color: #ffffff !important;
+        background-
         border: 1px solid #e2e8f0 !important;
         padding: 5px 0 !important;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
@@ -22,13 +22,13 @@
 
     .custom-dropdown .dropdown-item:hover,
     .custom-dropdown .dropdown-item:focus {
-        background-color: #0d6efd !important;
-        color: #ffffff !important;
+        background-color: #e9ecef !important;
+        
     }
 
     .custom-dropdown .dropdown-item:hover span,
     .custom-dropdown .dropdown-item:focus span {
-        color: #ffffff !important;
+        
     }
 
     .custom-dropdown::-webkit-scrollbar {
@@ -55,7 +55,7 @@
     /* 3. BOTÕES PADRÃO MYLOFT */
     .btn-voltar {
         background-color: #ffcc29 !important;
-        color: #ffffff !important;
+        
         border: none;
         border-radius: 12px;
         padding: 10px 24px;
@@ -76,7 +76,7 @@
     }
 
     .btn-gravar {
-        background-color: #0d6efd !important;
+        background-color: #e9ecef !important;
         color: white !important;
         border: none;
         border-radius: 12px;
@@ -91,7 +91,7 @@
     }
 
     .btn-gravar:hover {
-        background-color: #0d6efd !important;
+        background-color: #e9ecef !important;
         color: black !important;
     }
 
@@ -186,7 +186,7 @@
                                     class="dropdown-item pombo-opt-pai text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ m.id }}" data-anilha="{{ m.anilha }}"
                                     data-nome="{{ m.nome|lower or '' }}" data-ano="{{ m.ano }}"
-                                    onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onmousedown="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace("'", "\\'") }}{% endif %}')">
                                     <span class="fw-bold text-primary">{{ m.anilha }}</span>
                                     <span class="text-dark fw-medium"> {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}</span>
                                 </button>
@@ -211,7 +211,7 @@
                                     class="dropdown-item pombo-opt-mae text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ f.id }}" data-anilha="{{ f.anilha }}"
                                     data-nome="{{ f.nome|lower or '' }}" data-ano="{{ f.ano }}"
-                                    onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onmousedown="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace("'", "\\'") }}{% endif %}')">
                                     <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
                                     <span class="text-dark fw-medium"> {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}</span>
                                 </button>
@@ -500,3 +500,4 @@
             </script>
 
             {% endblock %}
+
