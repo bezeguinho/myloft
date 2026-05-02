@@ -350,7 +350,7 @@ def editar_pombo(id):
         try:
             db.session.commit()
             flash("Alterações gravadas com sucesso!", "success")
-            return redirect(url_for('lista_pombos'))
+            return redirect(url_for('editar_pombo', id=pombo.id))
         except Exception as e:
             db.session.rollback()
             flash(f"Erro ao atualizar: {str(e)}", "danger")
