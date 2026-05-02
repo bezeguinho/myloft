@@ -2,9 +2,8 @@
 {% block content %}
 
 <style>
-    /* O teu CSS da Dropdown e Ocultar */
-    #list_pai.dropdown-menu,
-    #list_mae.dropdown-menu {
+    /* 1. DROPDOWN DE PROGENITORES */
+    .custom-dropdown {
         background-color: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         padding: 5px 0 !important;
@@ -12,6 +11,13 @@
         display: none;
         max-height: 280px !important;
         overflow-y: auto !important;
+        position: absolute;
+        width: 100%;
+        z-index: 1050;
+    }
+
+    .custom-dropdown.show {
+        display: block !important;
     }
 
     .custom-dropdown::-webkit-scrollbar {
@@ -23,10 +29,7 @@
         border-radius: 4px;
     }
 
-    .custom-dropdown.show {
-        display: block !important;
-    }
-
+    /* 2. BOX OCULTAR */
     .box-ocultar {
         cursor: pointer;
         height: 38px;
@@ -38,58 +41,7 @@
         border-color: #0d6efd !important;
     }
 
-    /* CSS dos Botões Gravar e Voltar */
-    .btn-gravar {
-        color: #ffffff !important;
-        transition: all 0.3s ease;
-    }
-
-    .btn-gravar:hover {
-        color: #000000 !important;
-    }
-
-    .btn-voltar {
-        color: #000000 !important;
-        transition: all 0.3s ease;
-    }
-
-    .btn-voltar:hover {
-        color: #ffffff !important;
-    }
-</style>
-
-<style>
-    /* Botão Gravar: Azul, texto default Branco, hover Preto */
-    .btn-gravar {
-        color: #ffffff !important;
-        transition: all 0.3s ease;
-    }
-
-    .btn-gravar:hover {
-        color: #000000 !important;
-    }
-
-    /* Botão Voltar: Amarelo, texto default Preto, hover Branco */
-    .btn-voltar {
-        color: #000000 !important;
-        transition: all 0.3s ease;
-    }
-
-    .btn-voltar:hover {
-        color: #ffffff !important;
-    }
-</style>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="alert alert-{{ category }} p-2 small text-center" style="max-width: 700px; margin: 10px auto;">{{ message }}
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-<style>
+    /* 3. BOTÕES PADRÃO MYLOFT */
     .btn-voltar {
         background-color: #ffcc29 !important;
         color: #ffffff !important;
@@ -103,6 +55,7 @@
         align-items: center;
         box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
     }
+
     .btn-voltar:hover {
         background-color: #ffcc29 !important;
         color: #422006 !important;
@@ -121,51 +74,27 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-gravar:hover { background-color: #0d6efd !important; }
+
+    .btn-gravar:hover {
+        background-color: #0d6efd !important;
+        color: black !important;
+    }
 
     #linha_cedido {
         display: none;
         margin-top: 5px;
     }
-
-    #list_pai.dropdown-menu,
-    #list_mae.dropdown-menu {
-        background-color: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        padding: 5px 0 !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        display: none;
-        /* Adicionado o limite de altura e scroll vertical */
-        max-height: 280px !important;
-        overflow-y: auto !important;
-    }
-
-    /* Scrollbar estilizada e elegante para não ser pesada visualmente */
-    .custom-dropdown::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .custom-dropdown::-webkit-scrollbar-thumb {
-        background-color: #cbd5e1;
-        border-radius: 4px;
-    }
-
-    /* Nota: Classe utilitária para mostrar o menu via JS */
-    .custom-dropdown.show {
-        display: block !important;
-    }
-
-    .box-ocultar {
-        cursor: pointer;
-        height: 38px;
-        transition: all 0.3s ease;
-    }
-
-    .box-ocultar:hover {
-        background-color: #eef4ff !important;
-        border-color: #0d6efd !important;
-    }
 </style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} p-2 small text-center" style="max-width: 700px; margin: 10px auto;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -176,6 +105,8 @@
                     <h2 class="fw-bold text-primary mb-4 text-uppercase text-start">
                         {% if pombo %} EDITAR POMBO {% else %} Inserir Novo Pombo {% endif %}
                     </h2>
+
+                    <form method="POST">
 
                     <!-- CONTEÚDO COMPLETO E LIMPO DO FORMULÁRIO MYLOFT -->
 
@@ -232,7 +163,7 @@
                                 placeholder="-- Escolha o pai --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
                                 value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id == pombo.pai %}{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
-                                onfocus="filtrarDropdown('pai')" oninput="filtrarDropdown('pai')">
+                                onfocus="filtrarDropdown('pai')" oninput="filtrarDropdown('pai')" onclick="filtrarDropdown('pai')">
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
                             <div id="list_pai" class="dropdown-menu w-100 custom-dropdown"
                                 style="position: absolute; z-index: 1050;">
@@ -258,7 +189,7 @@
                                 placeholder="-- Escolha a mãe --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
                                 value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id == pombo.mae %}{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
-                                onfocus="filtrarDropdown('mae')" oninput="filtrarDropdown('mae')">
+                                onfocus="filtrarDropdown('mae')" oninput="filtrarDropdown('mae')" onclick="filtrarDropdown('mae')">
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
                             <div id="list_mae" class="dropdown-menu w-100 custom-dropdown"
                                 style="position: absolute; z-index: 1050;">
@@ -378,13 +309,9 @@
                     const lista = document.getElementById('list_' + tipo);
                     if (!input || !lista) return;
 
-                    // Fecha a lista oposta para evitar poluição visual em ecrãs pequenos
-                    const outroTipo = (tipo === 'pai') ? 'mae' : 'pai';
-                    const listaOutro = document.getElementById('list_' + outroTipo);
-                    if (listaOutro) listaOutro.style.display = 'none';
-
-                    // Mostra a lista atual
+                    // Mostra a lista e aplica a classe show
                     lista.style.display = 'block';
+                    lista.classList.add('show');
 
                     const termo = String(input.value).toLowerCase().trim();
 
@@ -433,7 +360,10 @@
 
                     if (inputVisual) inputVisual.value = texto;
                     if (inputHidden) inputHidden.value = id;
-                    if (lista) lista.style.display = 'none';
+                    if (lista) {
+                        lista.style.display = 'none';
+                        lista.classList.remove('show');
+                    }
                 }
 
                 // Event Listener para fechar dropdowns ao clicar fora (UX Mobile)
