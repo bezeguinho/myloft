@@ -140,7 +140,14 @@ def get_colony_stats(user_id):
 def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
     if not anilha or depth >= max_depth:
         return None
-    pombo = Pombo.query.filter_by(anilha=anilha, user_id=user_id).first()
+        
+    pombo = None
+    anilha_str = str(anilha)
+    if anilha_str.isdigit():
+        pombo = Pombo.query.filter_by(id=int(anilha_str), user_id=user_id).first()
+    if not pombo:
+        pombo = Pombo.query.filter_by(anilha=anilha_str, user_id=user_id).first()
+        
     if not pombo:
         return {'pombo': None, 'p_anilha': anilha, 'nome': 'Não Registado'} 
     return {
