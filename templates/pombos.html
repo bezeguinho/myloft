@@ -205,7 +205,7 @@
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="pomboTable">
-                <<thead class="table-light text-uppercase small fw-bold">
+                <thead class="table-light text-uppercase small fw-bold">
                     <tr>
                         <th class="ps-4 align-middle" style="height: 50px;">Anilha</th>
                         <th class="align-middle">Ano</th>
@@ -232,11 +232,11 @@
 
                             <td class="text-center align-middle">
                                 {% if p.sexo == 'Macho' %}
-                                <div class="sex-circle sex-m"><i class="bi bi-gender-male"></i></div>
+                                <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
                                 {% elif p.sexo == 'Fêmea' %}
-                                <div class="sex-circle sex-f"><i class="bi bi-gender-female"></i></div>
+                                <i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
                                 {% else %}
-                                <div class="sex-circle sex-u"><i class="bi bi-question"></i></div>
+                                <i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>
                                 {% endif %}
                             </td>
 

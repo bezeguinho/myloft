@@ -90,31 +90,38 @@
 {% endwith %}
 
 <style>
+    .btn-voltar {
+        background-color: #ffcc29 !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
+    }
+    .btn-voltar:hover {
+        background-color: #ffcc29 !important;
+        color: #422006 !important;
+        box-shadow: 0 8px 25px rgba(251, 192, 45, 0.4);
+    }
+
     .btn-gravar {
         background-color: #0d6efd !important;
         color: white !important;
-        transition: 0.3s;
         border: none;
-    }
-
-    .btn-gravar:hover {
-        color: black !important;
-    }
-
-    .btn-voltar {
-        background-color: #ffc107 !important;
-        color: black !important;
+        border-radius: 12px;
+        padding: 10px 24px;
+        font-weight: bold;
         transition: 0.3s;
-        border: none;
         text-decoration: none;
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
     }
-
-    .btn-voltar:hover {
-        color: white !important;
-    }
+    .btn-gravar:hover { background-color: #0d6efd !important; }
 
     #linha_cedido {
         display: none;
@@ -166,8 +173,8 @@
             <div class="card shadow border-0" style="border-radius: 10px;">
                 <div class="card-body p-4 p-md-5">
 
-                    <h2 class="fw-bold text-primary mb-4 text-uppercase text-center">
-                        {% if pombo %} Editar Pombo: {{ pombo.anilha }} {% else %} Inserir Novo Pombo {% endif %}
+                    <h2 class="fw-bold text-primary mb-4 text-uppercase text-start">
+                        {% if pombo %} EDITAR POMBO {% else %} Inserir Novo Pombo {% endif %}
                     </h2>
 
                     <!-- CONTEÚDO COMPLETO E LIMPO DO FORMULÁRIO MYLOFT -->
@@ -178,12 +185,12 @@
                             <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
                             <input type="text" name="anilha" id="anilha" class="form-control"
                                 value="{{ pombo.anilha if pombo else sugerir_anilha }}" required autocomplete="off"
-                                autofocus>
+                                {% if pombo %}readonly{% else %}autofocus{% endif %}>
                         </div>
 
                         <div class="col-6 col-md-2">
                             <label class="form-label fw-bold small text-uppercase">Ano</label>
-                            <select name="ano" id="ano_select" class="form-select" required>
+                            <select name="ano" id="ano_select" class="form-select" required {% if pombo %}disabled{% endif %}>
                                 <option value="" disabled hidden style="display: none;" {% if not pombo and not
                                     sugerir_ano %}selected{% endif %}>Escolha</option>
                                 {% for a in anos_lista %}
@@ -191,6 +198,9 @@
                                     %}selected{% endif %}>{{ a }}</option>
                                 {% endfor %}
                             </select>
+                            {% if pombo %}
+                            <input type="hidden" name="ano" value="{{ pombo.ano }}">
+                            {% endif %}
                         </div>
 
                         <div class="col-12 col-md-4">
@@ -341,11 +351,11 @@
                         <div class="col-auto">
                             <div class="d-flex flex-column gap-2 mt-md-4 pt-md-2">
                                 <button type="submit"
-                                    class="btn btn-primary fw-bold text-uppercase shadow-sm btn-gravar"
-                                    style="width: 140px; height: 45px; border-radius: 8px;">Gravar</button>
+                                    class="btn-gravar shadow-sm">
+                                    <i class="bi bi-check-lg me-2"></i> GRAVAR DADOS</button>
                                 <a href="{{ url_for('lista_pombos') }}"
-                                    class="btn btn-warning fw-bold text-uppercase shadow-sm d-flex align-items-center justify-content-center btn-voltar"
-                                    style="width: 140px; height: 45px; border-radius: 8px;">Voltar</a>
+                                    class="btn-voltar shadow-sm">
+                                    <i class="bi bi-arrow-left me-2"></i> VOLTAR</a>
                             </div>
                         </div>
                     </div>
@@ -408,9 +418,9 @@
                         notFoundBox.style.display = (visiveis === 0 && termo !== "") ? 'block' : 'none';
                     }
 
-                    // Reset do ID oculto para garantir que o utilizador seleciona uma opção válida
+                    // Reset do ID oculto APENAS se o utilizador apagar o texto
                     const hiddenInput = document.getElementById(tipo + '_id');
-                    if (hiddenInput) hiddenInput.value = '';
+                    if (hiddenInput && termo === "") hiddenInput.value = '';
                 }
 
                 /**
