@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 load_dotenv() 
 
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
-# ... resto do código igual ...
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -366,6 +364,7 @@ def editar_pombo(id):
                            cores_lista=cores_lista,
                            sugerir_anilha=None,
                            sugerir_ano=None)
+
 @app.route("/lista_pombos")
 @app.route("/lista_pombos/<categoria>")
 @login_required

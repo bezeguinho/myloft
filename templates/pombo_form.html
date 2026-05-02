@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block content %}
 
 <style>
@@ -18,6 +18,17 @@
 
     .custom-dropdown.show {
         display: block !important;
+    }
+
+    .custom-dropdown .dropdown-item:hover,
+    .custom-dropdown .dropdown-item:focus {
+        background-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+
+    .custom-dropdown .dropdown-item:hover span,
+    .custom-dropdown .dropdown-item:focus span {
+        color: #ffffff !important;
     }
 
     .custom-dropdown::-webkit-scrollbar {
@@ -141,7 +152,7 @@
                             <input type="text" name="cor" class="form-control" list="cores_user" autocomplete="off"
                                 value="{{ pombo.cor if pombo else '' }}">
                             <datalist id="cores_user">
-                                {% for cor in cores_lista %}<option value="{{ cor }}">{% endfor %}
+                                {% for cor in cores_lista %}<option value="{{ cor }}"></option>{% endfor %}
                             </datalist>
                         </div>
 
@@ -164,7 +175,7 @@
                             <input type="text" id="search_pai" class="form-control shadow-sm"
                                 placeholder="-- Escolha o pai --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id|string == pombo.pai|string %}{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
+                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id|string == pombo.pai|string %}{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('pai')" oninput="filtrarDropdown('pai')" onclick="filtrarDropdown('pai')">
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
                             <div id="list_pai" class="dropdown-menu w-100 custom-dropdown"
@@ -175,9 +186,9 @@
                                     class="dropdown-item pombo-opt-pai text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ m.id }}" data-anilha="{{ m.anilha }}"
                                     data-nome="{{ m.nome|lower or '' }}" data-ano="{{ m.ano }}"
-                                    onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onclick="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace("'", "\\'") }}{% endif %}')">
                                     <span class="fw-bold text-primary">{{ m.anilha }}</span>
-                                    <span class="text-dark fw-medium"> -{{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}</span>
+                                    <span class="text-dark fw-medium"> {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}</span>
                                 </button>
                                 {% endfor %}
                             </div>
@@ -189,7 +200,7 @@
                             <input type="text" id="search_mae" class="form-control shadow-sm"
                                 placeholder="-- Escolha a mãe --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id|string == pombo.mae|string %}{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
+                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id|string == pombo.mae|string %}{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('mae')" oninput="filtrarDropdown('mae')" onclick="filtrarDropdown('mae')">
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
                             <div id="list_mae" class="dropdown-menu w-100 custom-dropdown"
@@ -200,9 +211,9 @@
                                     class="dropdown-item pombo-opt-mae text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ f.id }}" data-anilha="{{ f.anilha }}"
                                     data-nome="{{ f.nome|lower or '' }}" data-ano="{{ f.ano }}"
-                                    onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onclick="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace("'", "\\'") }}{% endif %}')">
                                     <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
-                                    <span class="text-dark fw-medium"> -{{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}</span>
+                                    <span class="text-dark fw-medium"> {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}</span>
                                 </button>
                                 {% endfor %}
                             </div>
@@ -269,7 +280,7 @@
                             <label class="form-label fw-bold small text-uppercase mb-1">Descrição para o
                                 Pedigree...</label>
                             <textarea name="obs" id="obs" class="form-control shadow-sm"
-                                style="width: 250px; height: 180px; resize: none; border-radius: 8px;" maxlength="200"
+                                style="width: 250px; height: 204px; resize: none; border-radius: 8px;" maxlength="200"
                                 oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
                             <div class="text-start small text-muted mt-1">
                                 <span id="char_count">0</span> / 200 carateres
@@ -317,7 +328,13 @@
 
                     // Lógica de validação de idade (Pai/Mãe deve ser mais velho que o Filho)
                     const anoSelect = document.getElementById('ano_select');
-                    let anoFilho = (anoSelect && anoSelect.value) ? parseInt(anoSelect.value) : 0;
+                    const anoHidden = document.querySelector('input[type=\"hidden\"][name=\"ano\"]');
+                    let anoFilho = 0;
+                    if (anoHidden && anoHidden.value) {
+                        anoFilho = parseInt(anoHidden.value) || 0;
+                    } else if (anoSelect && anoSelect.value) {
+                        anoFilho = parseInt(anoSelect.value) || 0;
+                    }
 
                     let visiveis = 0;
                     const options = document.querySelectorAll('.pombo-opt-' + tipo);
@@ -373,6 +390,22 @@
                         const listMae = document.getElementById('list_mae');
                         if (listPai) listPai.style.display = 'none';
                         if (listMae) listMae.style.display = 'none';
+                    }
+                });
+
+                // Fechar dropdowns ao perder focus (blur)
+                ['pai', 'mae'].forEach(tipo => {
+                    const input = document.getElementById('search_' + tipo);
+                    if (input) {
+                        input.addEventListener('blur', function() {
+                            setTimeout(() => {
+                                const lista = document.getElementById('list_' + tipo);
+                                if (lista) {
+                                    lista.style.display = 'none';
+                                    lista.classList.remove('show');
+                                }
+                            }, 200);
+                        });
                     }
                 });
 
