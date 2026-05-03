@@ -39,13 +39,12 @@
 
     /* 2. CAIXA DE PESQUISA COM MOLDURA */
     .search-container {
-        border: 2px solid #dee2e6 !important;
-        border-radius: 10px;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px;
         background-color: white;
         display: flex;
         align-items: center;
-        padding: 5px 15px;
-        margin-bottom: 20px;
+        padding: 8px 15px;
     }
 
     /* 3. ÍCONES DE SEXO EM CÍRCULO */
@@ -106,6 +105,20 @@
     .print-container:hover {
         background-color: #0056d2 !important;
         color: white !important;
+    }
+
+    .counter-badge {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6 !important;
+        color: #0056d2 !important;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: default;
+        min-width: 60px;
     }
 
     /* 1. Remove espaços inúteis das células para os botões ganharem espaço */
@@ -170,7 +183,7 @@
         <div class="d-flex align-items-center gap-3">
             <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
             <div class="d-flex align-items-center gap-2">
-                <div class="btn-tabela-geral shadow-sm" style="cursor: default; min-width: 60px; justify-content: center;">
+                <div class="counter-badge shadow-sm">
                     {{ (pombos|length)|string|truncate(3, True, '') }}
                 </div>
                 <a href="{{ url_for('estatisticas') }}" class="btn btn-tabela-geral shadow-sm">
@@ -188,7 +201,7 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-4 no-print">
+    <div class="row g-3 mb-4 align-items-center no-print">
         <div class="col-md-5">
             <div class="search-container shadow-sm">
                 <i class="bi bi-search text-primary me-2"></i>

@@ -173,7 +173,7 @@
                             <input type="text" id="search_pai" class="form-control shadow-sm"
                                 placeholder="-- Escolha o pai --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id|string == pombo.pai|string %}{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
+                                value="{% if pombo and pombo.pai %}{% for m in machos %}{% if m.id|string == pombo.pai|string %}{{ m.anilha }}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('pai')" oninput="filtrarDropdown('pai')" onclick="filtrarDropdown('pai')">
                             <input type="hidden" name="pai_id" id="pai_id" value="{{ pombo.pai if pombo else '' }}">
                             <div id="list_pai" class="dropdown-menu w-100 custom-dropdown"
@@ -184,7 +184,7 @@
                                     class="dropdown-item pombo-opt-pai text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ m.id }}" data-anilha="{{ m.anilha }}"
                                     data-nome="{{ m.nome|lower or '' }}" data-ano="{{ m.ano }}"
-                                    onmousedown="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }} {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onmousedown="selecionarProgenitor('pai', '{{ m.id }}', '{{ m.anilha }}')">
                                     <span class="fw-bold text-primary">{{ m.anilha }}</span>
                                     <span class="text-dark fw-medium"> {{ (m.ano|string)[-2:] }}{% if m.nome %} {{ m.nome }}{% endif %}</span>
                                 </button>
@@ -198,7 +198,7 @@
                             <input type="text" id="search_mae" class="form-control shadow-sm"
                                 placeholder="-- Escolha a mãe --" autocomplete="off"
                                 style="border-radius: 8px; height: 38px;"
-                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id|string == pombo.mae|string %}{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}{% endif %}{% endfor %}{% endif %}"
+                                value="{% if pombo and pombo.mae %}{% for f in femeas %}{% if f.id|string == pombo.mae|string %}{{ f.anilha }}{% endif %}{% endfor %}{% endif %}"
                                 onfocus="filtrarDropdown('mae')" oninput="filtrarDropdown('mae')" onclick="filtrarDropdown('mae')">
                             <input type="hidden" name="mae_id" id="mae_id" value="{{ pombo.mae if pombo else '' }}">
                             <div id="list_mae" class="dropdown-menu w-100 custom-dropdown"
@@ -209,7 +209,7 @@
                                     class="dropdown-item pombo-opt-mae text-truncate border-bottom pb-2 pt-2"
                                     data-id="{{ f.id }}" data-anilha="{{ f.anilha }}"
                                     data-nome="{{ f.nome|lower or '' }}" data-ano="{{ f.ano }}"
-                                    onmousedown="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }} {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome|replace("'", "\\'") }}{% endif %}')">
+                                    onmousedown="selecionarProgenitor('mae', '{{ f.id }}', '{{ f.anilha }}')">
                                     <span class="fw-bold" style="color: #ff4d6d;">{{ f.anilha }}</span>
                                     <span class="text-dark fw-medium"> {{ (f.ano|string)[-2:] }}{% if f.nome %} {{ f.nome }}{% endif %}</span>
                                 </button>
