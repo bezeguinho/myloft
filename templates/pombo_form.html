@@ -260,7 +260,7 @@
 
                     <!-- LINHA 4: CAMPO CEDIDO A (Alinhado à box da categoria) -->
                     <div id="linha_cedido" class="row mb-3 align-items-center"
-                        style="display: {% if pombo and pombo.categoria == 'Cedido' %}flex{% else %}none{% endif %}; margin-top: -10px;">
+                        style="display: {{ 'flex' if pombo and pombo.categoria == 'Cedido' else 'none' }}; margin-top: -10px;">
                         <div class="col-md-4 text-md-end text-start mb-1 mb-md-0">
                             <label class="fw-bold small text-uppercase mb-0">Cedido A:</label>
                         </div>
