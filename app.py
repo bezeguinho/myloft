@@ -22,30 +22,28 @@ IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is n
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
-    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
+    db_url = 'sqlite:///local.db' # Simplificado para local
 
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
 elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
     db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-if "sslmode" in db_url:
-    if "?" in db_url:
-        base, query = db_url.split("?", 1)
-        params = [p for p in query.split("&") if not p.startswith("sslmode")]
-        db_url = base + ("?" + "&".join(params) if params else "")
+# Limpeza de sslmode redundante
+if "?sslmode=" in db_url:
+    db_url = db_url.split("?sslmode=")[0]
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Configuração de SSL para Supabase/PostgreSQL
 if "postgresql+pg8000" in db_url:
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
-else:
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
-
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {
+            "ssl_context": ssl._create_unverified_context()
+        }
+    }
+    
 # --- Configuração de Uploads ---
 if IS_VERCEL:
     UPLOAD_FOLDER = '/tmp/uploads'
@@ -146,7 +144,7 @@ def get_colony_stats(user_id):
             stats['cedidos' + sexo_s] += 1
             
     return stats
-    
+
 def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
     if not anilha or depth >= max_depth:
         return None
