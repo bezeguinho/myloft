@@ -100,11 +100,11 @@ class Pombo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 def get_colony_stats(user_id):
-    """Calcula estatísticas da colónia com apenas uma consulta à BD."""
+    """Calcula estatísticas da colónia com apenas uma volta no loop (O(n))."""
     pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
     current_year = datetime.now().year
     
-    # Inicialização do dicionário de estatísticas
+    # Inicialização rápida
     keys = [
         'total', 'total_f', 'total_m', 'total_i', 
         'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
@@ -119,41 +119,34 @@ def get_colony_stats(user_id):
     for p in pombos:
         stats['total'] += 1
         
-        # Determinação do sufixo de sexo (_f, _m, _i)
-        if p.sexo == 'Fêmea':
-            sexo_sufixo = '_f'
-        elif p.sexo == 'Macho':
-            sexo_sufixo = '_m'
-        else:
-            sexo_sufixo = '_i'
+        # Sufixo de sexo
+        if p.sexo == 'Fêmea': sexo_s = '_f'
+        elif p.sexo == 'Macho': sexo_s = '_m'
+        else: sexo_s = '_i'
             
-        stats['total' + sexo_sufixo] += 1
+        stats['total' + sexo_s] += 1
         
         if p.categoria == 'Voador':
             stats['voadores'] += 1
-            stats['voadores' + sexo_sufixo] += 1
+            stats['voadores' + sexo_s] += 1
             
-            # Classificação por idade
-            if p.ano < current_year - 1:
-                cat_idade = 'v_adultos'
-            elif p.ano == current_year - 1:
-                cat_idade = 'v_yearlings'
-            else:
-                cat_idade = 'v_borrachos'
+            if p.ano < current_year - 1: cat_idade = 'v_adultos'
+            elif p.ano == current_year - 1: cat_idade = 'v_yearlings'
+            else: cat_idade = 'v_borrachos'
                 
             stats[cat_idade] += 1
-            stats[cat_idade + sexo_sufixo] += 1
+            stats[cat_idade + sexo_s] += 1
             
         elif p.categoria == 'Reprodutor':
             stats['reprodutores'] += 1
-            stats['reprodutores' + sexo_sufixo] += 1
+            stats['reprodutores' + sexo_s] += 1
             
         elif p.categoria == 'Cedido':
             stats['cedidos'] += 1
-            stats['cedidos' + sexo_sufixo] += 1
+            stats['cedidos' + sexo_s] += 1
             
     return stats
-
+    
 def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
     if not anilha or depth >= max_depth:
         return None

@@ -1,7 +1,7 @@
-Flask
-Flask-SQLAlchemy
-Flask-Login
-Werkzeug
-Pillow
-pg8000
-python-dotenv
+Flask==3.0.2
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+pg8000==1.30.3
+Pillow==10.2.0
+python-dotenv==1.0.1
+Werkzeug==3.0.1
