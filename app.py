@@ -100,28 +100,33 @@ class Pombo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 def get_colony_stats(user_id):
-    pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
-    current_year = datetime.now().year
-    
-  def get_colony_stats(user_id):
     """Calcula estatísticas da colónia com apenas uma consulta à BD."""
     pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
     current_year = datetime.now().year
     
     # Inicialização do dicionário de estatísticas
-    stats = {key: 0 for key in [
-        'total', 'total_f', 'total_m', 'total_i', 'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
-        'v_adultos', 'v_adultos_f', 'v_adultos_m', 'v_adultos_i', 'v_yearlings', 'v_yearlings_f', 
-        'v_yearlings_m', 'v_yearlings_i', 'v_borrachos', 'v_borrachos_f', 'v_borrachos_m', 'v_borrachos_i',
-        'reprodutores', 'reprodutores_f', 'reprodutores_m', 'reprodutores_i', 'cedidos', 'cedidos_f', 
-        'cedidos_m', 'cedidos_i'
-    ]}
+    keys = [
+        'total', 'total_f', 'total_m', 'total_i', 
+        'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
+        'v_adultos', 'v_adultos_f', 'v_adultos_m', 'v_adultos_i', 
+        'v_yearlings', 'v_yearlings_f', 'v_yearlings_m', 'v_yearlings_i', 
+        'v_borrachos', 'v_borrachos_f', 'v_borrachos_m', 'v_borrachos_i',
+        'reprodutores', 'reprodutores_f', 'reprodutores_m', 'reprodutores_i', 
+        'cedidos', 'cedidos_f', 'cedidos_m', 'cedidos_i'
+    ]
+    stats = {key: 0 for key in keys}
 
     for p in pombos:
         stats['total'] += 1
         
         # Determinação do sufixo de sexo (_f, _m, _i)
-        sexo_sufixo = '_f' if p.sexo == 'Fêmea' else ('_m' if p.sexo == 'Macho' else '_i')
+        if p.sexo == 'Fêmea':
+            sexo_sufixo = '_f'
+        elif p.sexo == 'Macho':
+            sexo_sufixo = '_m'
+        else:
+            sexo_sufixo = '_i'
+            
         stats['total' + sexo_sufixo] += 1
         
         if p.categoria == 'Voador':
@@ -148,7 +153,6 @@ def get_colony_stats(user_id):
             stats['cedidos' + sexo_sufixo] += 1
             
     return stats
-
 
 def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
     if not anilha or depth >= max_depth:
