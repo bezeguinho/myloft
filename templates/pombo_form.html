@@ -129,12 +129,12 @@
                             <label class="form-label fw-bold small text-uppercase">Nº Anilha</label>
                             <input type="text" name="anilha" id="anilha" class="form-control"
                                 value="{{ pombo.anilha if pombo else sugerir_anilha }}" required autocomplete="off"
-                                {% if pombo %}readonly{% else %}autofocus{% endif %}>
+                                {% if pombo %}readonly style="background-color: #eef4ff !important;"{% else %}autofocus{% endif %}>
                         </div>
 
                         <div class="col-6 col-md-2">
                             <label class="form-label fw-bold small text-uppercase">Ano</label>
-                            <select name="ano" id="ano_select" class="form-select" required {% if pombo %}disabled{% endif %}>
+                            <select name="ano" id="ano_select" class="form-select" required {% if pombo %}disabled style="background-color: #eef4ff !important;"{% endif %}>
                                 <option value="" disabled hidden style="display: none;" {% if not pombo and not sugerir_ano %}selected{% endif %}>Escolha</option>
                                 {% for a in anos_lista %}
                                 <option value="{{ a }}" {% if (pombo and pombo.ano==a) or (sugerir_ano|string==a|string) %}selected{% endif %}>{{ a }}</option>
@@ -278,10 +278,10 @@
                             <label class="form-label fw-bold small text-uppercase mb-1">Descrição para o
                                 Pedigree...</label>
                             <textarea name="obs" id="obs" class="form-control shadow-sm"
-                                style="width: 250px; height: 204px; resize: none; border-radius: 8px;" maxlength="200"
+                                style="width: 250px; height: 204px; resize: none; border-radius: 8px;" maxlength="220"
                                 oninput="updateChars(this)">{{ pombo.obs if pombo else '' }}</textarea>
                             <div class="text-start small text-muted mt-1">
-                                <span id="char_count">0</span> / 200 carateres
+                                <span id="char_count">0</span> / 220 carateres
                             </div>
                         </div>
 
