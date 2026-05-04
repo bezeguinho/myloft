@@ -103,36 +103,50 @@ def get_colony_stats(user_id):
     pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
     current_year = datetime.now().year
     
-    stats = {
-        'total': len(pombos),
-        'total_f': sum(1 for p in pombos if p.sexo == 'Fêmea'),
-        'total_m': sum(1 for p in pombos if p.sexo == 'Macho'),
-        'total_i': sum(1 for p in pombos if p.sexo not in ['Fêmea', 'Macho']),
-        'voadores': sum(1 for p in pombos if p.categoria == 'Voador'),
-        'voadores_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Fêmea'),
-        'voadores_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo == 'Macho'),
-        'voadores_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.sexo not in ['Fêmea', 'Macho']),
-        'v_adultos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1),
-        'v_adultos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Fêmea'),
-        'v_adultos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo == 'Macho'),
-        'v_adultos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano < current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
-        'v_yearlings': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1),
-        'v_yearlings_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Fêmea'),
-        'v_yearlings_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo == 'Macho'),
-        'v_yearlings_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year - 1 and p.sexo not in ['Fêmea', 'Macho']),
-        'v_borrachos': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year),
-        'v_borrachos_f': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Fêmea'),
-        'v_borrachos_m': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo == 'Macho'),
-        'v_borrachos_i': sum(1 for p in pombos if p.categoria == 'Voador' and p.ano == current_year and p.sexo not in ['Fêmea', 'Macho']),
-        'reprodutores': sum(1 for p in pombos if p.categoria == 'Reprodutor'),
-        'reprodutores_f': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Fêmea'),
-        'reprodutores_m': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo == 'Macho'),
-        'reprodutores_i': sum(1 for p in pombos if p.categoria == 'Reprodutor' and p.sexo not in ['Fêmea', 'Macho']),
-        'cedidos': sum(1 for p in pombos if p.categoria == 'Cedido'),
-        'cedidos_f': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Fêmea'),
-        'cedidos_m': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo == 'Macho'),
-        'cedidos_i': sum(1 for p in pombos if p.categoria == 'Cedido' and p.sexo not in ['Fêmea', 'Macho']),
-    }
+  def get_colony_stats(user_id):
+    """Calcula estatísticas da colónia com apenas uma consulta à BD."""
+    pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
+    current_year = datetime.now().year
+    
+    # Inicialização do dicionário de estatísticas
+    stats = {key: 0 for key in [
+        'total', 'total_f', 'total_m', 'total_i', 'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
+        'v_adultos', 'v_adultos_f', 'v_adultos_m', 'v_adultos_i', 'v_yearlings', 'v_yearlings_f', 
+        'v_yearlings_m', 'v_yearlings_i', 'v_borrachos', 'v_borrachos_f', 'v_borrachos_m', 'v_borrachos_i',
+        'reprodutores', 'reprodutores_f', 'reprodutores_m', 'reprodutores_i', 'cedidos', 'cedidos_f', 
+        'cedidos_m', 'cedidos_i'
+    ]}
+
+    for p in pombos:
+        stats['total'] += 1
+        
+        # Determinação do sufixo de sexo (_f, _m, _i)
+        sexo_sufixo = '_f' if p.sexo == 'Fêmea' else ('_m' if p.sexo == 'Macho' else '_i')
+        stats['total' + sexo_sufixo] += 1
+        
+        if p.categoria == 'Voador':
+            stats['voadores'] += 1
+            stats['voadores' + sexo_sufixo] += 1
+            
+            # Classificação por idade
+            if p.ano < current_year - 1:
+                cat_idade = 'v_adultos'
+            elif p.ano == current_year - 1:
+                cat_idade = 'v_yearlings'
+            else:
+                cat_idade = 'v_borrachos'
+                
+            stats[cat_idade] += 1
+            stats[cat_idade + sexo_sufixo] += 1
+            
+        elif p.categoria == 'Reprodutor':
+            stats['reprodutores'] += 1
+            stats['reprodutores' + sexo_sufixo] += 1
+            
+        elif p.categoria == 'Cedido':
+            stats['cedidos'] += 1
+            stats['cedidos' + sexo_sufixo] += 1
+            
     return stats
 
 
