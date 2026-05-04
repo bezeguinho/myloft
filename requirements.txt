@@ -2,6 +2,6 @@ Flask
 Flask-SQLAlchemy
 Flask-Login
 Werkzeug
+Pillow
 pg8000
 python-dotenv
-SQLAlchemy
