@@ -43,7 +43,7 @@ if "postgresql+pg8000" in db_url:
             "ssl_context": ssl._create_unverified_context()
         }
     }
-    
+
 # --- Configuração de Uploads ---
 if IS_VERCEL:
     UPLOAD_FOLDER = '/tmp/uploads'
@@ -98,50 +98,43 @@ class Pombo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 def get_colony_stats(user_id):
-    """Calcula estatísticas da colónia com apenas uma volta no loop (O(n))."""
+    """Calcula estatísticas da colónia com apenas uma iteração na lista."""
     pombos = Pombo.query.filter_by(user_id=user_id, oculto=False).all()
     current_year = datetime.now().year
     
-    # Inicialização rápida
     keys = [
-        'total', 'total_f', 'total_m', 'total_i', 
-        'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
-        'v_adultos', 'v_adultos_f', 'v_adultos_m', 'v_adultos_i', 
-        'v_yearlings', 'v_yearlings_f', 'v_yearlings_m', 'v_yearlings_i', 
-        'v_borrachos', 'v_borrachos_f', 'v_borrachos_m', 'v_borrachos_i',
-        'reprodutores', 'reprodutores_f', 'reprodutores_m', 'reprodutores_i', 
-        'cedidos', 'cedidos_f', 'cedidos_m', 'cedidos_i'
+        'total', 'total_f', 'total_m', 'total_i', 'voadores', 'voadores_f', 'voadores_m', 'voadores_i',
+        'v_adultos', 'v_adultos_f', 'v_adultos_m', 'v_adultos_i', 'v_yearlings', 'v_yearlings_f', 
+        'v_yearlings_m', 'v_yearlings_i', 'v_borrachos', 'v_borrachos_f', 'v_borrachos_m', 'v_borrachos_i',
+        'reprodutores', 'reprodutores_f', 'reprodutores_m', 'reprodutores_i', 'cedidos', 'cedidos_f', 
+        'cedidos_m', 'cedidos_i'
     ]
     stats = {key: 0 for key in keys}
 
     for p in pombos:
         stats['total'] += 1
-        
-        # Sufixo de sexo
-        if p.sexo == 'Fêmea': sexo_s = '_f'
-        elif p.sexo == 'Macho': sexo_s = '_m'
-        else: sexo_s = '_i'
-            
-        stats['total' + sexo_s] += 1
+        sexo_sufixo = '_f' if p.sexo == 'Fêmea' else ('_m' if p.sexo == 'Macho' else '_i')
+        stats['total' + sexo_sufixo] += 1
         
         if p.categoria == 'Voador':
             stats['voadores'] += 1
-            stats['voadores' + sexo_s] += 1
-            
-            if p.ano < current_year - 1: cat_idade = 'v_adultos'
-            elif p.ano == current_year - 1: cat_idade = 'v_yearlings'
-            else: cat_idade = 'v_borrachos'
-                
+            stats['voadores' + sexo_sufixo] += 1
+            if p.ano < current_year - 1:
+                cat_idade = 'v_adultos'
+            elif p.ano == current_year - 1:
+                cat_idade = 'v_yearlings'
+            else:
+                cat_idade = 'v_borrachos'
             stats[cat_idade] += 1
-            stats[cat_idade + sexo_s] += 1
+            stats[cat_idade + sexo_sufixo] += 1
             
         elif p.categoria == 'Reprodutor':
             stats['reprodutores'] += 1
-            stats['reprodutores' + sexo_s] += 1
+            stats['reprodutores' + sexo_sufixo] += 1
             
         elif p.categoria == 'Cedido':
             stats['cedidos'] += 1
-            stats['cedidos' + sexo_s] += 1
+            stats['cedidos' + sexo_sufixo] += 1
             
     return stats
 
