@@ -13,32 +13,36 @@ from werkzeug.exceptions import HTTPException
 app = Flask(__name__)
 
 # --- CONFIGURAÇÃO DE SEGURANÇA ---
-# Removido o que causava o NameError
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
 
 # --- CONTEXTO DE AMBIENTE ---
-# Removida a tentativa de indexação inexistente
 IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS (MYLOFT PROFISSIONAL) ---
+# --- CONFIGURAÇÃO DA BASE DE DATOS (MYLOFT PROFISSIONAL) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
     db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 
-# 1. Ajuste do Dialeto para pg8000
+# 1. Ajuste do Dialeto para pg8000 (Obrigatório para Supabase na Vercel)
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
 elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
     db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-# 2. Limpeza de Parâmetros (Remove sslmode e outros que causam erro no pg8000)
-if "?" in db_url:
-    db_url = db_url.split("?")[0]
+# 2. Configuração de Engine Options (SSL para evitar quedas no Mobile/Web)
+engine_options = {}
+if "postgresql+pg8000" in db_url:
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    engine_options["connect_args"] = {"ssl_context": ctx}
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy(app)
 # 3. Configuração de SSL Nativa para Produção (Supabase)
 if "postgresql+pg8000" in db_url:
     ctx = ssl.create_default_context()
