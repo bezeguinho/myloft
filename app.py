@@ -1,3 +1,17 @@
+import os
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# --- INICIALIZAÇÃO DA APP ---
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-myloft-2026')
+
+# Deteta se o ambiente é Vercel para ajustes de caminhos e SSL
+IS_VERCEL = "VERCEL" in os.environ
+
 # --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO CORRIGIDA) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
@@ -21,24 +35,22 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
 }
-# 2. INICIALIZAÇÃO SEGURA
+
+# --- INICIALIZAÇÃO DE EXTENSÕES ---
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# --- INICIALIZAÇÃO SEGURA ---
 # Isto garante que a app não morra se a DB demorar a responder
 with app.app_context():
     try:
-        import models  # Garante que os modelos são carregados antes do create_all
+        # Nota: Se os modelos estiverem no mesmo ficheiro, o 'import models' 
+        # pode ser ignorado ou adaptado conforme a estrutura final.
         db.create_all()
-        print("Estrutura de tabelas verificada.")
+        print("Estrutura de tabelas verificada com sucesso.")
     except Exception as e:
-        print(f"Aviso: Não foi possível conectar à DB: {e}")
-        # Não bloqueamos o arranque aqui para podermos ver logs mais detalhados
-# Criar tabelas automaticamente (essencial para o primeiro deploy no Supabase)
-with app.app_context():
-    try:
-        db.create_all()
-        print("Tabelas verificadas/criadas com sucesso.")
-    except Exception as e:
-        print(f"Erro ao criar tabelas: {e}")
-
+        print(f"Aviso: Não foi possível conectar à DB ou criar tabelas: {e}")
 
 # --- MODELOS ---
 class User(UserMixin, db.Model):
