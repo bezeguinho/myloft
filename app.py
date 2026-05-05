@@ -1,55 +1,36 @@
-import os
-import re
-import ssl
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-
-# 1. Carregar ambiente e inicializar Flask (Evita o NameError)
-load_dotenv()
-app = Flask(__name__)
-
-# 2. Configurações de Ambiente
-IS_VERCEL = "VERCEL" in os.environ
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
-
-# 3. Configuração da Base de Dados (Supabase vs SQLite)
+# --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO CORRIGIDA) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
-    # Local: Usa SQLite
-    db_url = 'sqlite:///local.db'
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
+    # Fallback para SQLite local
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 else:
-    # Produção: Ajuste rigoroso para pg8000 e SSL (Supabase)
+    # Correção de prefixo para SQLAlchemy 2.0+
     if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
-    elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
-        db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
     
-    # Configuração de SSL para evitar erros de handshake no Vercel/Supabase
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
+    # Se estivermos na Vercel (Produção), garantimos o SSL via URL, que é mais estável
+    if IS_VERCEL and "sslmode" not in db_url:
+        db_url += "?sslmode=require"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 4. Gestão de Uploads (Mobile-Safe)
-if IS_VERCEL:
-    app.config['UPLOAD_FOLDER'] = '/tmp'
-else:
-    upload_path = os.path.join(app.root_path, 'static', 'uploads')
-    os.makedirs(upload_path, exist_ok=True)
-    app.config['UPLOAD_FOLDER'] = upload_path
-
-# 5. Inicialização das Extensões
-db = SQLAlchemy(app)
-
+# Removemos a configuração manual de SSL Context que estava a causar o erro
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+# 2. INICIALIZAÇÃO SEGURA
+# Isto garante que a app não morra se a DB demorar a responder
+with app.app_context():
+    try:
+        import models  # Garante que os modelos são carregados antes do create_all
+        db.create_all()
+        print("Estrutura de tabelas verificada.")
+    except Exception as e:
+        print(f"Aviso: Não foi possível conectar à DB: {e}")
+        # Não bloqueamos o arranque aqui para podermos ver logs mais detalhados
 # Criar tabelas automaticamente (essencial para o primeiro deploy no Supabase)
 with app.app_context():
     try:
