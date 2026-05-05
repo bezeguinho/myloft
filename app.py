@@ -1,34 +1,36 @@
 import os
 import ssl
-from flask import Flask
+from datetime import datetime, timedelta
+from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
+from sqlalchemy import text
 
 # --- 1. INICIALIZAÇÃO DA APP ---
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'static/uploads' # Garantir que isto está definido
 
 # --- 2. CONFIGURAÇÕES DE AMBIENTE ---
-# Chave secreta robusta para sessões seguras em Mobile/Desktop
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2026')
 
-# Gestão de URI (Prioridade: DATABASE_URL do Supabase > SQLite Local)
 uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
-    # Correção de dialeto para SQLAlchemy 2.0+ (Supabase exige postgresql+pg8000)
     if uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
     elif uri.startswith("postgresql://") and "pg8000" not in uri:
         uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
     
-    # Configuração de SSL para conexões seguras com Supabase
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
     
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {"ssl_context": ctx},
-        "pool_pre_ping": True, # Evita conexões "fantasma" após idle
+        "pool_pre_ping": True,
         "pool_recycle": 300,
     }
 else:
@@ -38,55 +40,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # --- 3. INICIALIZAÇÃO ÚNICA DAS EXTENSÕES ---
-# Aqui garantimos que o SQLAlchemy e o LoginManager são registados apenas UMA vez
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
-# --- 4. IMPORTAÇÃO DOS MODELOS (Após a criação do db para evitar importação circular) ---
-# Certifica-te que os teus modelos usam 'from app import db'
-# from models import User, Pigeon, Subscription
-
-# --- 4. IMPORTAÇÃO DOS MODELOS (Após a criação do db para evitar importação circular) ---
-# Certifica-te que os teus modelos usam 'from app import db'
-# from models import User, Pigeon, Subscription
-# --- ABAIXO DESTA LINHA FICAM OS TEUS MODELOS E ROTAS ---
-# Daqui para baixo continuam os teus modelos e rotas...# --- ERROR HANDLER CORRIGIDO ---
-@app.errorhandler(Exception)
-def handle_exception(e):
-    if isinstance(e, HTTPException):
-        return e
-    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
-    # Removido o da linha 78
-    return render_template("erro_db.html", erro="Erro de ligação ou base de dados não inicializada."), 500
-
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
-# --- INICIALIZAÇÃO SEGURA (Não bloqueia a Vercel) ---
-def init_db():
-    with app.app_context():
-        try:
-            # db.create_all() # Desativa isto na Vercel após a primeira execução
-            db.session.execute(text("SELECT 1"))
-            print("Conexão DB: OK")
-        except Exception as e:
-            print(f"Erro na conexão DB: {e}")
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    if isinstance(e, HTTPException):
-        return e
-    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
-    # Garante que não há nada depois do 500
-    return render_template("erro_db.html", erro="Erro de ligação."), 500
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))[cite: 1]
-
-# --- TRATAMENTO DE ERROS (A tua "Linha ~157") ---
+# --- 4. TRATAMENTO DE ERROS GLOBAL ---
 @app.errorhandler(Exception)
 def handle_exception(e):
     if isinstance(e, HTTPException):
@@ -95,22 +59,16 @@ def handle_exception(e):
     try:
         return render_template("erro_db.html", erro=str(e)), 500
     except Exception:
-        return f"<h1>Erro de Sistema</h1><p>{str(e)}</p>", 500        
+        return f"<h1>Erro de Sistema</h1><p>{str(e)}</p>", 500
 
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-# --- INICIALIZAÇÃO SEGURA ---
-# Isto garante que a app não morra se a DB demorar a responder
+# --- 5. INICIALIZAÇÃO DA DB ---
 with app.app_context():
     try:
-        # Nota: Se os modelos estiverem no mesmo ficheiro, o 'import models' 
-        # pode ser ignorado ou adaptado conforme a estrutura final.
         db.create_all()
         print("Estrutura de tabelas verificada com sucesso.")
     except Exception as e:
         print(f"Aviso: Não foi possível conectar à DB ou criar tabelas: {e}")
+
 
 # --- MODELOS ---
 class User(UserMixin, db.Model):
@@ -208,19 +166,7 @@ def get_pombo_tree(anilha, user_id, depth=0, max_depth=4):
         'mae': get_pombo_tree(pombo.mae, user_id, depth + 1, max_depth)
     }
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    if isinstance(e, HTTPException):
-        return e
-    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
-    try:
-        return render_template("erro_db.html", erro=str(e)), 500
-    except Exception:
-        return f"<h1>Erro de Sistema</h1><p>Não foi possível carregar o template de erro. Detalhes: {str(e)}</p>", 500
 
 # --- ROTAS DE ACESSO ---
 @app.route("/ping")
@@ -267,7 +213,7 @@ def register():
 
         try:
             hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_user = User(email=email, password=hashed_password, name=name)
+            new_user = User(email=email, password=hashed_password)
             
             db.session.add(new_user)
             db.session.commit() # Aqui é onde o erro 500 costuma acontecer
@@ -700,7 +646,6 @@ def eliminar_utilizador(user_id):
             Pombo.query.filter_by(user_id=user_id).delete()
             
             # 2. NOVO: Apaga o perfil associado na tabela 'utilizadores_perfil'
-            from sqlalchemy import text
             db.session.execute(text("DELETE FROM utilizadores_perfil WHERE user_id = :uid"), {"uid": user_id})
             
             # 3. Finalmente, apaga a conta do utilizador em si
