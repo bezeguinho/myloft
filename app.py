@@ -11,22 +11,24 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')[cite: 1]
+
+# --- CONFIGURAÇÃO DE SEGURANÇA ---
+# Removido o que causava o NameError
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
 
 # --- CONTEXTO DE AMBIENTE ---
-IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None[cite: 1]
+# Removida a tentativa de indexação inexistente
+IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS (SUPABASE / SQLITE) ---
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')[cite: 1]
+# --- CONFIGURAÇÃO DA BASE DE DADOS ---
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
-    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'[cite: 1]
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 else:
-    # Correção obrigatória para SQLAlchemy + Supabase
     if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)[cite: 1]
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
     
-    # Adiciona SSL mode de forma robusta via string de ligação
     if "sslmode" not in db_url:
         separator = "&" if "?" in db_url else "?"
         db_url += f"{separator}sslmode=require"
@@ -39,26 +41,32 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "connect_args": {"sslmode": "require"} if not db_url.startswith("sqlite") else {}
 }
 
-db = SQLAlchemy(app)[cite: 1]
-login_manager = LoginManager(app)[cite: 1]
-login_manager.login_view = 'login'[cite: 1]
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# --- ERROR HANDLER CORRIGIDO ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return e
+    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
+    # Removido o da linha 78
+    return render_template("erro_db.html", erro="Erro de ligação ou base de dados não inicializada."), 500
 
 # --- MODELOS (Definidos antes do loader) ---
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'[cite: 1]
-    id = db.Column(db.Integer, primary_key=True)[cite: 1]
-    email = db.Column(db.String(120), unique=True, nullable=False)[cite: 1]
-    password_hash = db.Column(db.String(255), nullable=False)[cite: 1]
-    is_admin = db.Column(db.Boolean, default=False)[cite: 1]
-    conta_ativa = db.Column(db.Boolean, default=True)[cite: 1]
-    data_expiracao = db.Column(db.DateTime, nullable=True)[cite: 1]
-
-# Outros modelos (Utilizador, Pombo) devem seguir aqui...
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    conta_ativa = db.Column(db.Boolean, default=True)
+    data_expiracao = db.Column(db.DateTime, nullable=True)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))[cite: 1]
-
+    return db.session.get(User, int(user_id))
 # --- INICIALIZAÇÃO SEGURA (Não bloqueia a Vercel) ---
 def init_db():
     with app.app_context():
