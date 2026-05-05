@@ -4,45 +4,53 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-
-# 1. Inicialização Global (Onde tens o azul)
+# --- 1. INICIALIZAÇÃO DA APP ---
 app = Flask(__name__)
 
-# 2. Configurações de Segurança e Ambiente
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-para-dev')
+# --- 2. CONFIGURAÇÕES DE AMBIENTE ---
+# Chave secreta robusta para sessões seguras em Mobile/Desktop
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2026')
 
-# 3. Gestão de Base de Dados (Lógica Híbrida Supabase/SQLite)
-uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL") or "sqlite:///myloft.db"
+# Gestão de URI (Prioridade: DATABASE_URL do Supabase > SQLite Local)
+uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
-# Correção de Dialeto para SQLAlchemy 2.0 + Supabase
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
-elif uri.startswith("postgresql://"):
-    uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
+if uri:
+    # Correção de dialeto para SQLAlchemy 2.0+ (Supabase exige postgresql+pg8000)
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
+    elif uri.startswith("postgresql://") and "pg8000" not in uri:
+        uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
+    
+    # Configuração de SSL para conexões seguras com Supabase
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {"ssl_context": ctx},
+        "pool_pre_ping": True, # Evita conexões "fantasma" após idle
+        "pool_recycle": 300,
+    }
+else:
+    uri = "sqlite:///myloft.db"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-# 3. Configuração de SSL para conexões Cloud (Supabase)
-if "postgresql" in app.config['SQLALCHEMY_DATABASE_URI']:
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "connect_args": {"ssl_context": ctx},
-        "pool_pre_ping": True,
-    }
-
-# 4. Inicialização Única das Extensões (Evita o erro de duplicação)
+# --- 3. INICIALIZAÇÃO ÚNICA DAS EXTENSÕES ---
+# Aqui garantimos que o SQLAlchemy e o LoginManager são registados apenas UMA vez
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 
+# --- 4. IMPORTAÇÃO DOS MODELOS (Após a criação do db para evitar importação circular) ---
+# Certifica-te que os teus modelos usam 'from app import db'
+# from models import User, Pigeon, Subscription
+
+# --- 4. IMPORTAÇÃO DOS MODELOS (Após a criação do db para evitar importação circular) ---
+# Certifica-te que os teus modelos usam 'from app import db'
+# from models import User, Pigeon, Subscription
 # --- ABAIXO DESTA LINHA FICAM OS TEUS MODELOS E ROTAS ---
 # Daqui para baixo continuam os teus modelos e rotas...# --- ERROR HANDLER CORRIGIDO ---
 @app.errorhandler(Exception)
