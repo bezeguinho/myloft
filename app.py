@@ -1,45 +1,58 @@
+import os
+import re
+import ssl
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+# 1. Carregar ambiente e inicializar Flask (Evita o NameError)
+load_dotenv()
 app = Flask(__name__)
+
+# 2. Configurações de Ambiente
+IS_VERCEL = "VERCEL" in os.environ
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
 
-# --- CONFIGURAÇÃO DE AMBIENTE ---
-IS_VERCEL = "VERCEL" in os.environ
-
-# --- CONFIGURAÇÃO DA BASE DE DADOS ---
+# 3. Configuração da Base de Dados (Supabase vs SQLite)
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
+    # Local: Usa SQLite
     db_url = 'sqlite:///local.db'
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 else:
-    # Garante o uso do pg8000 no Supabase/Vercel
+    # Produção: Ajuste rigoroso para pg8000 e SSL (Supabase)
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
     elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
         db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Ajuste de SSL para pg8000 no Supabase (Necessário para evitar erro de handshake)
-if "pg8000" in db_url:
-    import ssl
+    
+    # Configuração de SSL para evitar erros de handshake no Vercel/Supabase
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
 
-# --- GESTÃO DE UPLOADS (Mobile-Safe) ---
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# 4. Gestão de Uploads (Mobile-Safe)
 if IS_VERCEL:
-    UPLOAD_FOLDER = '/tmp'
+    app.config['UPLOAD_FOLDER'] = '/tmp'
 else:
-    UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    upload_path = os.path.join(app.root_path, 'static', 'uploads')
+    os.makedirs(upload_path, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = upload_path
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+# 5. Inicialização das Extensões
 db = SQLAlchemy(app)
-
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+
 
 # --- MODELOS ---
 class User(UserMixin, db.Model):
