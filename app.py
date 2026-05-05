@@ -10,67 +10,87 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
-# --- INICIALIZAÇÃO DA APP ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-myloft-2026')[cite: 1]
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')[cite: 1]
 
-# Deteta se o ambiente é Vercel para ajustes de caminhos e SSL
-IS_VERCEL = "VERCEL" in os.environ[cite: 1]
+# --- CONTEXTO DE AMBIENTE ---
+IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None[cite: 1]
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO ROBUSTA) ---
+# --- CONFIGURAÇÃO DA BASE DE DADOS (SUPABASE / SQLITE) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')[cite: 1]
 
 if not db_url:
-    # Fallback para SQLite local
     db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'[cite: 1]
 else:
-    # Correção de prefixo para SQLAlchemy 2.0+
+    # Correção obrigatória para SQLAlchemy + Supabase
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)[cite: 1]
     
-    # Garantir SSLmode para Supabase/Vercel via Query String (mais estável)
+    # Adiciona SSL mode de forma robusta via string de ligação
     if "sslmode" not in db_url:
         separator = "&" if "?" in db_url else "?"
         db_url += f"{separator}sslmode=require"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Configurações de Pool para performance e estabilidade da ligação
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
+    "connect_args": {"sslmode": "require"} if not db_url.startswith("sqlite") else {}
 }
 
-# --- CONFIGURAÇÃO DE UPLOADS (MOBILE-FRIENDLY) ---
-# Na Vercel usamos /tmp, localmente usamos a pasta static
-if IS_VERCEL:
-    UPLOAD_FOLDER = '/tmp/uploads'[cite: 1]
-else:
-    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')[cite: 1]
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)[cite: 1]
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# --- INICIALIZAÇÃO DAS EXTENSÕES ---
 db = SQLAlchemy(app)[cite: 1]
 login_manager = LoginManager(app)[cite: 1]
 login_manager.login_view = 'login'[cite: 1]
+
+# --- MODELOS (Definidos antes do loader) ---
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'[cite: 1]
+    id = db.Column(db.Integer, primary_key=True)[cite: 1]
+    email = db.Column(db.String(120), unique=True, nullable=False)[cite: 1]
+    password_hash = db.Column(db.String(255), nullable=False)[cite: 1]
+    is_admin = db.Column(db.Boolean, default=False)[cite: 1]
+    conta_ativa = db.Column(db.Boolean, default=True)[cite: 1]
+    data_expiracao = db.Column(db.DateTime, nullable=True)[cite: 1]
+
+# Outros modelos (Utilizador, Pombo) devem seguir aqui...
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))[cite: 1]
 
-# --- ERROR HANDLER GLOBAL ---
+# --- INICIALIZAÇÃO SEGURA (Não bloqueia a Vercel) ---
+def init_db():
+    with app.app_context():
+        try:
+            # db.create_all() # Desativa isto na Vercel após a primeira execução
+            db.session.execute(text("SELECT 1"))
+            print("Conexão DB: OK")
+        except Exception as e:
+            print(f"Erro na conexão DB: {e}")
+
+# --- ERROR HANDLER ---
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Agora o 'HTTPException' já será reconhecido
     if isinstance(e, HTTPException):
-        return render_template("error.html", e=e), e.code
-    
-    # Para erros inesperados de base de dados (como o que tiveste)
-    app.logger.error(f"Erro de Servidor: {e}")
-    return render_template("error.html", e="Erro interno de base de dados. Verifica a ligação."), 500
+        return e
+    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
+    return render_template("erro_db.html", erro="Erro de ligação ou base de dados não inicializada."), 500[cite: 1]
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))[cite: 1]
+
+# --- TRATAMENTO DE ERROS (A tua "Linha ~157") ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return e
+    app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
+    try:
+        return render_template("erro_db.html", erro=str(e)), 500
+    except Exception:
+        return f"<h1>Erro de Sistema</h1><p>{str(e)}</p>", 500        
 
 
 db = SQLAlchemy(app)
