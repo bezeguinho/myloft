@@ -17,15 +17,17 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads' # Garantir que isto está definid
 
 # --- 2. CONFIGURAÇÕES DE AMBIENTE ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2026')
-
-# Priorizar DATABASE_URL (onde deves colocar o link direto porta 5432)
-uri = os.environ.get("DATABASE_URL")
+# Priorizar MYLOFT_DB_URL (ou a versão curta MYLOF_DB_URL) para evitar overrides do Vercel
+uri = os.environ.get("MYLOFT_DB_URL") or os.environ.get("MYLOF_DB_URL")
 
 if not uri:
-    # Se não houver DATABASE_URL, tenta POSTGRES_URL (usado por integrações automáticas)
-    uri = os.environ.get("POSTGRES_URL")
+    # Fallback para as variáveis padrão
+    uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
+    # Limpeza automática de parâmetros que causam erro no psycopg2
+    uri = uri.replace("?pgbouncer=true", "")
+    uri = uri.replace("&pgbouncer=true", "")
     # Garantir o dialeto postgresql:// para psycopg2
     if uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql://", 1)
