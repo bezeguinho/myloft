@@ -20,9 +20,9 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2
 uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
-    # Ajuste para psycopg2 (Dialeto padrão do SQLAlchemy)
-    if uri.startswith("postgres://"):
-        uri = uri.replace("postgres://", "postgresql://", 1)
+    # Limpeza profunda da URI para evitar erros de driver (Força psycopg2)
+    uri = uri.replace("postgres://", "postgresql://", 1)
+    uri = uri.replace("postgresql+pg8000://", "postgresql://", 1)
     
     # Adiciona sslmode=require se for Supabase e não tiver parâmetros
     if "supabase" in uri and "?" not in uri:
