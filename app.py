@@ -26,8 +26,10 @@ if uri:
     elif uri.startswith("postgresql://") and "pg8000" not in uri:
         uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
     
-    # Configuração de SSL para Supabase (Garante o SNI necessário para o Pooler)
+    # Configuração de SSL para Supabase (Modo flexível para evitar erros de certificado)
     ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
 
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
