@@ -1,44 +1,67 @@
 import os
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash
+import re
+import ssl
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 
 # --- INICIALIZAÇÃO DA APP ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-myloft-2026')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-myloft-2026')[cite: 1]
 
 # Deteta se o ambiente é Vercel para ajustes de caminhos e SSL
-IS_VERCEL = "VERCEL" in os.environ
+IS_VERCEL = "VERCEL" in os.environ[cite: 1]
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO CORRIGIDA) ---
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+# --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO ROBUSTA) ---
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')[cite: 1]
 
 if not db_url:
     # Fallback para SQLite local
-    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'[cite: 1]
 else:
     # Correção de prefixo para SQLAlchemy 2.0+
     if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
+        db_url = db_url.replace("postgres://", "postgresql://", 1)[cite: 1]
     
-    # Se estivermos na Vercel (Produção), garantimos o SSL via URL, que é mais estável
-    if IS_VERCEL and "sslmode" not in db_url:
-        db_url += "?sslmode=require"
+    # Garantir SSLmode para Supabase/Vercel via Query String (mais estável)
+    if "sslmode" not in db_url:
+        separator = "&" if "?" in db_url else "?"
+        db_url += f"{separator}sslmode=require"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Removemos a configuração manual de SSL Context que estava a causar o erro
+# Configurações de Pool para performance e estabilidade da ligação
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
 }
-# No topo do ficheiro, junto aos outros imports:
-from werkzeug.exceptions import HTTPException
 
-# No teu Error Handler (Linha ~157):
+# --- CONFIGURAÇÃO DE UPLOADS (MOBILE-FRIENDLY) ---
+# Na Vercel usamos /tmp, localmente usamos a pasta static
+if IS_VERCEL:
+    UPLOAD_FOLDER = '/tmp/uploads'[cite: 1]
+else:
+    UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')[cite: 1]
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)[cite: 1]
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# --- INICIALIZAÇÃO DAS EXTENSÕES ---
+db = SQLAlchemy(app)[cite: 1]
+login_manager = LoginManager(app)[cite: 1]
+login_manager.login_view = 'login'[cite: 1]
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))[cite: 1]
+
+# --- ERROR HANDLER GLOBAL ---
 @app.errorhandler(Exception)
 def handle_exception(e):
     # Agora o 'HTTPException' já será reconhecido
@@ -49,8 +72,9 @@ def handle_exception(e):
     app.logger.error(f"Erro de Servidor: {e}")
     return render_template("error.html", e="Erro interno de base de dados. Verifica a ligação."), 500
 
-# --- INICIALIZAÇÃO DE EXTENSÕES ---
+
 db = SQLAlchemy(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
