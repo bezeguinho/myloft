@@ -20,35 +20,33 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-20
 # Removida a tentativa de indexação inexistente
 IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS (VERSÃO SÉNIOR) ---
+# --- CONFIGURAÇÃO DA BASE DE DADOS (MYLOFT PROFISSIONAL) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
-    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'[cite: 1]
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
 
-# Limpeza rigorosa para o driver pg8000
+# 1. Ajuste do Dialeto para pg8000
 if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)[cite: 1]
+    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
 elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
-    db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)[cite: 1]
+    db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-# Remove QUALQUER parâmetro que comece com ssl (como sslmode=require)
+# 2. Limpeza de Parâmetros (Remove sslmode e outros que causam erro no pg8000)
 if "?" in db_url:
-    base, query = db_url.split("?", 1)
-    # Filtra e remove parâmetros problemáticos para o pg8000
-    params = [p for p in query.split("&") if not p.lower().startswith("ssl")]
-    db_url = base + ("?" + "&".join(params) if params else "")[cite: 1]
+    db_url = db_url.split("?")[0]
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False[cite: 1]
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração de SSL Nativa para pg8000 (Obrigatória para Supabase na Vercel)
+# 3. Configuração de SSL Nativa para Produção (Supabase)
 if "postgresql+pg8000" in db_url:
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}[cite: 1]
-
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
+else:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
