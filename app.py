@@ -25,37 +25,35 @@ if not uri:
     uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
-    # Limpeza automática de parâmetros que causam erro no psycopg2
-    uri = uri.replace("?pgbouncer=true", "")
-    uri = uri.replace("&pgbouncer=true", "")
-    # Garantir o dialeto postgresql:// para psycopg2
+    # 1. Limpeza e Normalização
+    uri = uri.replace("?pgbouncer=true", "").replace("&pgbouncer=true", "")
     if uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql://", 1)
     
-    # Solução para Supabase Pooler (Porta 6543) no Vercel (IPv4)
-    # Resolve "no tenant identifier provided" injetando o project_id via options
-    if ":6543" in uri and "options=reference" not in uri:
+    # 2. Extração Segura do Project ID para o Pooler (6543)
+    connect_args = {}
+    if ":6543" in uri or "pooler.supabase.com" in uri:
         import re
         project_match = re.search(r'postgres\.([a-z0-9\-]+)', uri)
         if project_match:
             project_id = project_match.group(1)
-            separator = "&" if "?" in uri else "?"
-            uri += f"{separator}options=reference%3D{project_id}"
-    
-    # Adicionar sslmode=require se necessário
+            # Esta é a forma correta de passar o ID sem corromper o username
+            connect_args["options"] = f"-c project={project_id}"
+
+    # 3. Garantir SSL
     if "supabase" in uri and "sslmode" not in uri:
         separator = "&" if "?" in uri else "?"
         uri += f"{separator}sslmode=require"
 
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": connect_args,
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///myloft.db"
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    "pool_pre_ping": True,
-    "pool_recycle": 300,
-}
 
 # --- 3. INICIALIZAÇÃO ÚNICA DAS EXTENSÕES ---
 db = SQLAlchemy(app)
