@@ -49,9 +49,14 @@ else:
 
 # 5. Inicialização das Extensões
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
+# Criar tabelas automaticamente (essencial para o primeiro deploy no Supabase)
+with app.app_context():
+    try:
+        db.create_all()
+        print("Tabelas verificadas/criadas com sucesso.")
+    except Exception as e:
+        print(f"Erro ao criar tabelas: {e}")
 
 
 # --- MODELOS ---
@@ -194,22 +199,34 @@ def login():
         flash("Email ou Password incorretos.", "danger")
     return render_template('login.html')
 
-@app.route("/register", methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        logout_user() 
     if request.method == 'POST':
-        email = request.form.get('email').lower()
-        if User.query.filter_by(email=email).first():
-            flash("Email já registado.", "danger")
-            return redirect(url_for('register'))
-        new_user = User(email=email, password_hash=generate_password_hash(request.form.get('password')))
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Conta criada com sucesso! Faça login.", "success")
-        return redirect(url_for('login'))
-    return render_template('register.html')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        name = request.form.get('name')
 
+        # Verificar se o utilizador já existe
+        user_exists = User.query.filter_by(email=email).first()
+        if user_exists:
+            flash('Este email já está registado.', 'danger')
+            return redirect(url_for('register'))
+
+        try:
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            new_user = User(email=email, password=hashed_password, name=name)
+            
+            db.session.add(new_user)
+            db.session.commit() # Aqui é onde o erro 500 costuma acontecer
+            
+            flash('Conta criada com sucesso! Faça login.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            print(f"ERRO CRÍTICO NO REGISTO: {str(e)}") # Isto aparecerá nos Logs do Vercel
+            flash('Erro ao processar o registo. Tente novamente.', 'danger')
+            
+    return render_template('register.html')
 @app.route("/suspenso")
 def conta_suspensa():
     return render_template("suspenso.html")
