@@ -54,16 +54,6 @@ def handle_exception(e):
     # Removido o da linha 78
     return render_template("erro_db.html", erro="Erro de ligação ou base de dados não inicializada."), 500
 
-# --- MODELOS (Definidos antes do loader) ---
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
-    conta_ativa = db.Column(db.Boolean, default=True)
-    data_expiracao = db.Column(db.DateTime, nullable=True)
-
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
