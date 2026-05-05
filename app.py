@@ -1,4 +1,5 @@
 import os
+import ssl
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -25,10 +26,14 @@ if uri:
     elif uri.startswith("postgresql://") and "pg8000" not in uri:
         uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
     
-    # Configuração de SSL simplificada para Supabase
+    # Configuração de SSL para Supabase (pg8000 exige ssl_context)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
-            "ssl": True
+            "ssl_context": ctx
         },
         "pool_pre_ping": True,
         "pool_recycle": 300,
