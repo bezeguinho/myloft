@@ -35,6 +35,19 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
 }
+# No topo do ficheiro, junto aos outros imports:
+from werkzeug.exceptions import HTTPException
+
+# No teu Error Handler (Linha ~157):
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Agora o 'HTTPException' já será reconhecido
+    if isinstance(e, HTTPException):
+        return render_template("error.html", e=e), e.code
+    
+    # Para erros inesperados de base de dados (como o que tiveste)
+    app.logger.error(f"Erro de Servidor: {e}")
+    return render_template("error.html", e="Erro interno de base de dados. Verifica a ligação."), 500
 
 # --- INICIALIZAÇÃO DE EXTENSÕES ---
 db = SQLAlchemy(app)
