@@ -101,8 +101,6 @@ def handle_exception(e):
         return f"<h1>Erro de Sistema</h1><p>{str(e)}</p>", 500        
 
 
-db = SQLAlchemy(app)
-
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
