@@ -18,46 +18,42 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads' # Garantir que isto está definid
 # --- 2. CONFIGURAÇÕES DE AMBIENTE ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2026')
 
-uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+# Priorizar DATABASE_URL (onde deves colocar o link direto porta 5432)
+uri = os.environ.get("DATABASE_URL")
+
+if not uri:
+    # Se não houver DATABASE_URL, tenta POSTGRES_URL (usado por integrações automáticas)
+    uri = os.environ.get("POSTGRES_URL")
 
 if uri:
-    # 1. Limpeza básica
-    uri = uri.replace("postgres://", "postgresql://", 1)
-    uri = uri.replace("postgresql+pg8000://", "postgresql://", 1)
+    # Garantir o dialeto postgresql:// para psycopg2
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
     
-    # 2. Transformação Supabase Robusta: Pooler -> Direta
-    # Procuramos o project_id (ex: postgres.abcdef...) no link
-    import re
-    project_match = re.search(r'postgres\.([a-z0-9\-]+)', uri)
-    
-    if project_match and (":6543" in uri or "pooler.supabase.com" in uri):
-        try:
+    # Solução para Supabase Pooler (Porta 6543) no Vercel (IPv4)
+    # Resolve "no tenant identifier provided" injetando o project_id via options
+    if ":6543" in uri and "options=reference" not in uri:
+        import re
+        project_match = re.search(r'postgres\.([a-z0-9\-]+)', uri)
+        if project_match:
             project_id = project_match.group(1)
-            p = urlparse(uri)
-            # Reconstrói para ligação direta (Porta 5432)
-            # Host direto: db.PROJECT_ID.supabase.co
-            new_host = f"db.{project_id}.supabase.co"
-            # No modo direto o utilizador é apenas 'postgres'
-            auth_part = f"postgres:{p.password}" if p.password else "postgres"
-            new_netloc = f"{auth_part}@{new_host}:5432"
-            uri = urlunparse(p._replace(netloc=new_netloc, username=None, password=None))
-        except Exception:
-            pass
-
-    # 3. Forçar SSL Mode para Supabase
-    if "supabase.co" in uri and "sslmode" not in uri:
+            separator = "&" if "?" in uri else "?"
+            uri += f"{separator}options=reference%3D{project_id}"
+    
+    # Adicionar sslmode=require se necessário
+    if "supabase" in uri and "sslmode" not in uri:
         separator = "&" if "?" in uri else "?"
         uri += f"{separator}sslmode=require"
 
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "pool_pre_ping": True,
-        "pool_recycle": 300,
-    }
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
 else:
-    uri = "sqlite:///myloft.db"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///myloft.db"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 # --- 3. INICIALIZAÇÃO ÚNICA DAS EXTENSÕES ---
 db = SQLAlchemy(app)
