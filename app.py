@@ -4,23 +4,21 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-# 1. Inicialização da App
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+
+# 1. Inicialização Global (Onde tens o azul)
 app = Flask(__name__)
 
 # 2. Configurações de Segurança e Ambiente
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-para-dev')
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
-# ... (importações iniciais)
+# 3. Gestão de Base de Dados (Lógica Híbrida Supabase/SQLite)
+uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL") or "sqlite:///myloft.db"
 
-app = Flask(__name__)
-
-# --- INÍCIO DA SUBSTITUIÇÃO ---
-# 1. Vamos buscar a URL da base de dados ao ficheiro .env ou variáveis da Vercel
-uri = os.getenv("DATABASE_URL", "sqlite:///myloft.db")
-
-# 2. Correção de Dialeto (Crucial para o Supabase + SQLAlchemy 2.0)
-# O SQLAlchemy moderno exige que o driver seja especificado explicitamente
+# Correção de Dialeto para SQLAlchemy 2.0 + Supabase
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
 elif uri.startswith("postgresql://"):
@@ -28,10 +26,8 @@ elif uri.startswith("postgresql://"):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# --- FIM DA SUBSTITUIÇÃO ---
 
 db = SQLAlchemy(app)
-
 # 3. Configuração de SSL para conexões Cloud (Supabase)
 if "postgresql" in app.config['SQLALCHEMY_DATABASE_URI']:
     ctx = ssl.create_default_context()
