@@ -21,28 +21,31 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2
 uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
-    # 1. Limpeza básica para garantir o dialeto correto
+    # 1. Limpeza básica
     uri = uri.replace("postgres://", "postgresql://", 1)
     uri = uri.replace("postgresql+pg8000://", "postgresql://", 1)
     
-    # 2. Transformação Supabase: Pooler (6543) -> Direta (5432)
-    # Resolve o erro "no tenant identifier provided" ao ignorar o proxy Supavisor
-    if "pooler.supabase.com" in uri or ":6543" in uri:
+    # 2. Transformação Supabase Robusta: Pooler -> Direta
+    # Procuramos o project_id (ex: postgres.abcdef...) no link
+    import re
+    project_match = re.search(r'postgres\.([a-z0-9\-]+)', uri)
+    
+    if project_match and (":6543" in uri or "pooler.supabase.com" in uri):
         try:
+            project_id = project_match.group(1)
             p = urlparse(uri)
-            if p.username and "." in p.username:
-                project_id = p.username.split(".")[-1]
-                # Reconstrói para o endereço direto: db.[project_id].supabase.co na porta 5432
-                new_host = f"db.{project_id}.supabase.co"
-                # O username para ligação direta é apenas 'postgres'
-                auth_part = f"postgres:{p.password}" if p.password else "postgres"
-                new_netloc = f"{auth_part}@{new_host}:5432"
-                uri = urlunparse(p._replace(netloc=new_netloc))
+            # Reconstrói para ligação direta (Porta 5432)
+            # Host direto: db.PROJECT_ID.supabase.co
+            new_host = f"db.{project_id}.supabase.co"
+            # No modo direto o utilizador é apenas 'postgres'
+            auth_part = f"postgres:{p.password}" if p.password else "postgres"
+            new_netloc = f"{auth_part}@{new_host}:5432"
+            uri = urlunparse(p._replace(netloc=new_netloc, username=None, password=None))
         except Exception:
             pass
 
-    # 3. Garantir SSL para o Supabase
-    if "supabase" in uri and "sslmode" not in uri:
+    # 3. Forçar SSL Mode para Supabase
+    if "supabase.co" in uri and "sslmode" not in uri:
         separator = "&" if "?" in uri else "?"
         uri += f"{separator}sslmode=require"
 
