@@ -1,5 +1,4 @@
 import os
-import ssl
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -13,7 +12,7 @@ from sqlalchemy import text
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads' # Garantir que isto está definido
 
-from urllib.parse import urlparse
+
 
 # --- 2. CONFIGURAÇÕES DE AMBIENTE ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2026')
@@ -26,21 +25,10 @@ if uri:
     elif uri.startswith("postgresql://") and "pg8000" not in uri:
         uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
     
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    
-    # Extrair o host para garantir SNI (necessário para Supabase Pooler)
-    try:
-        parsed = urlparse(uri)
-        db_host = parsed.hostname
-    except Exception:
-        db_host = None
-
+    # Configuração de SSL simplificada para Supabase
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         "connect_args": {
-            "ssl_context": ctx,
-            "server_hostname": db_host
+            "ssl": True
         },
         "pool_pre_ping": True,
         "pool_recycle": 300,
