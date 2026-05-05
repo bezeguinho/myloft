@@ -1,5 +1,4 @@
 import os
-import ssl
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -21,20 +20,15 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'myloft_dev_secret_key_2
 uri = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 
 if uri:
+    # Ajuste para psycopg2 (Dialeto padrão do SQLAlchemy)
     if uri.startswith("postgres://"):
-        uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
-    elif uri.startswith("postgresql://") and "pg8000" not in uri:
-        uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
+        uri = uri.replace("postgres://", "postgresql://", 1)
     
-    # Configuração de SSL para Supabase (Modo flexível para evitar erros de certificado)
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    # Adiciona sslmode=require se for Supabase e não tiver parâmetros
+    if "supabase" in uri and "?" not in uri:
+        uri += "?sslmode=require"
 
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "connect_args": {
-            "ssl_context": ctx
-        },
         "pool_pre_ping": True,
         "pool_recycle": 300,
     }
