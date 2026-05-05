@@ -1,48 +1,53 @@
 import os
-import re
 import ssl
-from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
+from flask_login import LoginManager
+
+# 1. Inicialização da App
+app = Flask(__name__)
+
+# 2. Configurações de Segurança e Ambiente
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-para-dev')
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+
+# ... (importações iniciais)
 
 app = Flask(__name__)
 
-# --- 1. CONFIGURAÇÕES DE AMBIENTE ---
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
-IS_VERCEL = "VERCEL" in os.environ or os.environ.get('VERCEL_URL') is not None
+# --- INÍCIO DA SUBSTITUIÇÃO ---
+# 1. Vamos buscar a URL da base de dados ao ficheiro .env ou variáveis da Vercel
+uri = os.getenv("DATABASE_URL", "sqlite:///myloft.db")
 
-# --- 2. CONFIGURAÇÃO DA BASE DE DATOS ---
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+# 2. Correção de Dialeto (Crucial para o Supabase + SQLAlchemy 2.0)
+# O SQLAlchemy moderno exige que o driver seja especificado explicitamente
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql+pg8000://", 1)
+elif uri.startswith("postgresql://"):
+    uri = uri.replace("postgresql://", "postgresql+pg8000://", 1)
 
-if not db_url:
-    # Fallback para desenvolvimento local
-    db_url = 'sqlite:///local.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- FIM DA SUBSTITUIÇÃO ---
 
-# Correção do protocolo para SQLAlchemy + Driver pg8000
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
-elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
-    db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+db = SQLAlchemy(app)
 
-# Configuração SSL para Supabase (Crucial para Mobile/Deploy)
-engine_options = {}
-if "postgresql+pg8000" in db_url:
+# 3. Configuração de SSL para conexões Cloud (Supabase)
+if "postgresql" in app.config['SQLALCHEMY_DATABASE_URI']:
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    engine_options["connect_args"] = {"ssl_context": ctx}
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "connect_args": {"ssl_context": ctx},
+        "pool_pre_ping": True,
+    }
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# --- 3. INICIALIZAÇÃO ÚNICA (Resolve o Erro do Log) ---
+# 4. Inicialização Única das Extensões (Evita o erro de duplicação)
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
+# --- ABAIXO DESTA LINHA FICAM OS TEUS MODELOS E ROTAS ---
 # Daqui para baixo continuam os teus modelos e rotas...# --- ERROR HANDLER CORRIGIDO ---
 @app.errorhandler(Exception)
 def handle_exception(e):
