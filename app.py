@@ -1,8 +1,16 @@
 import os
-import re
-import ssl
 from dotenv import load_dotenv
-load_dotenv() 
+load_dotenv()
+
+db_url = os.getenv("DATABASE_URL")
+
+# Se estivermos a usar PostgreSQL (Supabase), garantimos o driver pg8000 e SSL
+if db_url and db_url.startswith("postgres://"):
+    # Corrige o prefixo para SQLAlchemy 1.4+ e força o driver pg8000
+    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
