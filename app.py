@@ -77,13 +77,13 @@ def init_db():
         except Exception as e:
             print(f"Erro na conexão DB: {e}")
 
-# --- ERROR HANDLER ---
 @app.errorhandler(Exception)
 def handle_exception(e):
     if isinstance(e, HTTPException):
         return e
     app.logger.error(f"Erro Crítico: {str(e)}", exc_info=True)
-    return render_template("erro_db.html", erro="Erro de ligação ou base de dados não inicializada."), 500[cite: 1]
+    # Garante que não há nada depois do 500
+    return render_template("erro_db.html", erro="Erro de ligação."), 500
 
 @login_manager.user_loader
 def load_user(user_id):
