@@ -1,52 +1,62 @@
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
 db = SQLAlchemy()
 
-class Pombo(db.Model):
-    __tablename__ = 'pombos'
-    
-    id = db.Column(db.BigInteger, primary_key=True) # BigInteger para alinhar com Supabase
-    anilha = db.Column(db.String(50), unique=True, nullable=False)
-    numero = db.Column(db.String(20))
-    ano = db.Column(db.Integer)
-    nome = db.Column(db.String(100))
-    sexo = db.Column(db.String(20), default='Indefinido')
-    cor = db.Column(db.String(50), default='Indefinido')
-    linhagem = db.Column(db.String(200))
-    pai_anilha = db.Column(db.String(50))
-    mae_anilha = db.Column(db.String(50))
-    categoria = db.Column(db.String(50))
-    status = db.Column(db.String(20), default='Ativo')
-    cedido_para = db.Column(db.String(100))
-    observacoes = db.Column(db.Text)
-    oculto = db.Column(db.Boolean, default=False)
-    
-    # ESTA LINHA É A CHAVE: Liga o pombo a um utilizador específico
-    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'))
-
-    def __repr__(self):
-        return f'<Pombo {self.anilha}>'
-
-
-class User(db.Model, UserMixin): # UserMixin permite que o Flask-Login funcione
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True)
-    password_hash = db.Column(db.Text, nullable=False) # Para guardar a senha segura
-    role = db.Column(db.String(20), default='user')    # 'user' ou 'admin'
-    is_active = db.Column(db.Boolean, default=True)   # Para tu bloqueares contas
+    password_hash = db.Column(db.Text, nullable=False)
+    role = db.Column(db.String(20), default='user')  # 'user', 'admin'
+    is_active = db.Column(db.Boolean, default=True)
     
-    # Campos de perfil que já tinhas
+    # --- Gestão de Subscrição ---
+    plano = db.Column(db.String(20), default='free') # 'free', 'premium', 'pro'
+    data_expiracao = db.Column(db.DateTime, nullable=True)
+    
+    # Perfil
     nome = db.Column(db.String(60))
     telefone = db.Column(db.String(25))
     localidade = db.Column(db.String(60))
     foto = db.Column(db.String(300))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relacionamento: permite ver todos os pombos de um user facilmente
     pombos = db.relationship('Pombo', backref='dono', lazy=True)
 
-    def __repr__(self):
-        return f'<User {self.username}>'
+class Pombo(db.Model):
+    __tablename__ = 'pombos'
+    
+    id = db.Column(db.BigInteger, primary_key=True)
+    anilha = db.Column(db.String(50), nullable=False) # Removido unique=True aqui
+    numero = db.Column(db.String(20))
+    ano = db.Column(db.Integer)
+    nome = db.Column(db.String(100))
+    sexo = db.Column(db.String(20), default='Indefinido')
+    cor = db.Column(db.String(50))
+    linhagem = db.Column(db.String(200))
+    
+    # --- Evolução para Pedigrees Complexos ---
+    # Guardamos a anilha como texto (para pais externos), 
+    # mas podemos adicionar campos de ID para pais que já estão no sistema.
+    pai_id = db.Column(db.BigInteger, db.ForeignKey('pombos.id'), nullable=True)
+    mae_id = db.Column(db.BigInteger, db.ForeignKey('pombos.id'), nullable=True)
+    
+    pai_anilha = db.Column(db.String(50)) # Backup visual/externo
+    mae_anilha = db.Column(db.String(50))
+    
+    categoria = db.Column(db.String(50)) # Reprodutor, Voador, etc.
+    status = db.Column(db.String(20), default='Ativo')
+    observacoes = db.Column(db.Text)
+    oculto = db.Column(db.Boolean, default=False)
+    
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Constraint de Unicidade: Um user não pode ter duas anilhas iguais
+    __table_args__ = (
+        db.UniqueConstraint('anilha', 'user_id', name='_anilha_user_uc'),
+    )

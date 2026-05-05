@@ -14,39 +14,47 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'chave-secreta-myloft-2026'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-secreta-myloft-2026')
 
+# --- DETEÇÃO DE AMBIENTE ---
 IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_URL') is not None
 
-# --- CONFIGURAÇÃO DA BASE DE DADOS ---
+# --- CONFIGURAÇÃO DA BASE DE DADOS (SUPABASE / LOCAL) ---
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if not db_url:
-    db_url = 'sqlite:///local.db' # Simplificado para local
+    # Se estiver na Vercel sem DB configurada, usa tmp. Fora da Vercel, usa local.db
+    db_url = 'sqlite:////tmp/local.db' if IS_VERCEL else 'sqlite:///local.db'
+else:
+    # Correção de protocolo para PostgreSQL (Essencial para Vercel + Supabase)
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
+    elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
+        db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
-elif db_url.startswith("postgresql://") and "+pg8000" not in db_url:
-    db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
-
-# Limpeza de sslmode redundante
-if "?sslmode=" in db_url:
-    db_url = db_url.split("?sslmode=")[0]
+    # Limpeza de sslmode para evitar conflitos com o driver pg8000
+    if "sslmode" in db_url:
+        if "?" in db_url:
+            base, query = db_url.split("?", 1)
+            params = [p for p in query.split("&") if not p.startswith("sslmode")]
+            db_url = base + ("?" + "&".join(params) if params else "")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração de SSL para Supabase/PostgreSQL
+# --- CONFIGURAÇÃO DE SSL CRÍTICA PARA SUPABASE ---
 if "postgresql+pg8000" in db_url:
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "connect_args": {
-            "ssl_context": ssl._create_unverified_context()
-        }
-    }
+    # Cria um contexto SSL que não exige verificação de certificado (necessário para serverless)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"connect_args": {"ssl_context": ctx}}
+else:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 
-# --- Configuração de Uploads ---
+# --- GESTÃO DE UPLOADS (MOBILE-READY) ---
 if IS_VERCEL:
-    UPLOAD_FOLDER = '/tmp/uploads'
+    UPLOAD_FOLDER = '/tmp/uploads' # Pasta temporária permitida na Vercel
 else:
     UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
 
@@ -57,6 +65,7 @@ except Exception:
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# --- INICIALIZAÇÃO DO BANCO ---
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
