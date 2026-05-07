@@ -69,7 +69,6 @@
         font-weight: bold;
         margin-top: 12px;
         color: #0d6efd;
-        text-transform: uppercase;
     }
 
     .owner-photo {
@@ -127,7 +126,7 @@
     .col-1 .pombo-box:nth-child(2) {
         margin-left: 0;
     }
-    
+
     .col-1 .pombo-box:nth-child(2) .box-title {
         color: #000;
     }
@@ -262,7 +261,10 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-imprimir-pedigree:hover { background-color: #0d6efd !important; }
+
+    .btn-imprimir-pedigree:hover {
+        background-color: #0d6efd !important;
+    }
 
     .btn-voltar {
         background-color: #ffcc29 !important;
@@ -277,6 +279,7 @@
         align-items: center;
         box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
     }
+
     .btn-voltar:hover {
         background-color: #ffcc29 !important;
         color: #422006 !important;
@@ -284,8 +287,13 @@
     }
 
     @media print {
-        body { margin: 0; padding: 0; }
-        .container, .container-fluid {
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container,
+        .container-fluid {
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
@@ -307,7 +315,8 @@
             max-width: 100%;
         }
 
-        .no-print, .navbar {
+        .no-print,
+        .navbar {
             display: none !important;
         }
 
@@ -333,7 +342,8 @@
         <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
         <span class="sex-badge-pedigree">
             {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary" title="Macho"></i>
-            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;" title="Fêmea"></i>
+            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;"
+                title="Fêmea"></i>
             {% else %}<i class="bi bi-question-circle text-secondary" title="Indefinido"></i>{% endif %}
         </span>
     </div>
@@ -360,7 +370,8 @@
         <span>{{ node.pombo.anilha }}{% if node.pombo.ano %} / {{ node.pombo.ano }}{% endif %}</span>
         <span class="sex-badge-pedigree" style="top: 2px; right: 2px; font-size: 0.75rem;">
             {% if node.pombo.sexo == 'Macho' %}<i class="bi bi-gender-male text-primary" title="Macho"></i>
-            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;" title="Fêmea"></i>
+            {% elif node.pombo.sexo == 'Fêmea' %}<i class="bi bi-gender-female" style="color: #ff69b4;"
+                title="Fêmea"></i>
             {% else %}<i class="bi bi-question-circle text-secondary" title="Indefinido"></i>{% endif %}
         </span>
     </div>
@@ -379,7 +390,7 @@
                 <h1>Pedigree</h1>
             </div>
             <div class="header-owner-info">
-                <div class="owner-name">{{ utilizador.nome or 'NOME NÃO CONFIGURADO' }}</div>
+                <div class="owner-name">{{ utilizador.nome or 'Nome Não Configurado' }}</div>
                 <div>{{ utilizador.localidade or '' }}</div>
                 <div>{{ utilizador.telefone or '' }}</div>
                 <div>{{ utilizador.email or current_user.email }}</div>
@@ -387,11 +398,14 @@
         </div>
 
         <div class="header-right">
-            <div class="pigeon-id">{{ tree.pombo.anilha }}{% if tree.pombo.ano %} / {{ tree.pombo.ano }}{% endif %}</div>
+            <div class="pigeon-id">{{ tree.pombo.anilha }}{% if tree.pombo.ano %} / {{ tree.pombo.ano }}{% endif %}
+            </div>
             {% if utilizador and utilizador.foto %}
             <img src="{{ url_for('static', filename=utilizador.foto) }}" alt="Logo" class="owner-photo">
             {% else %}
-            <div class="owner-photo d-flex align-items-center justify-content-center bg-light text-muted owner-photo-text">Foto</div>
+            <div
+                class="owner-photo d-flex align-items-center justify-content-center bg-light text-muted owner-photo-text">
+                Foto</div>
             {% endif %}
         </div>
     </div>
@@ -420,20 +434,20 @@
             {{ render_box(tree.mae.mae.pai if tree.mae and tree.mae.mae else None, 'rect-box') }}
             {{ render_box(tree.mae.mae.mae if tree.mae and tree.mae.mae else None, 'rect-box') }}
         </div>
-        
+
         {% if geracoes == '5' %}
         <div class="generation col-4">
             {% set bisavos = [
-                tree.pai.pai.pai if tree.pai and tree.pai.pai else None,
-                tree.pai.pai.mae if tree.pai and tree.pai.pai else None,
-                tree.pai.mae.pai if tree.pai and tree.pai.mae else None,
-                tree.pai.mae.mae if tree.pai and tree.pai.mae else None,
-                tree.mae.pai.pai if tree.mae and tree.mae.pai else None,
-                tree.mae.pai.mae if tree.mae and tree.mae.pai else None,
-                tree.mae.mae.pai if tree.mae and tree.mae.mae else None,
-                tree.mae.mae.mae if tree.mae and tree.mae.mae else None
+            tree.pai.pai.pai if tree.pai and tree.pai.pai else None,
+            tree.pai.pai.mae if tree.pai and tree.pai.pai else None,
+            tree.pai.mae.pai if tree.pai and tree.pai.mae else None,
+            tree.pai.mae.mae if tree.pai and tree.pai.mae else None,
+            tree.mae.pai.pai if tree.mae and tree.mae.pai else None,
+            tree.mae.pai.mae if tree.mae and tree.mae.pai else None,
+            tree.mae.mae.pai if tree.mae and tree.mae.mae else None,
+            tree.mae.mae.mae if tree.mae and tree.mae.mae else None
             ] %}
-            
+
             {% for bisavo in bisavos %}
             <div class="tetravo-pair">
                 {{ render_micro_box(bisavo.pai if bisavo else None) }}

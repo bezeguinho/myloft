@@ -3,7 +3,7 @@
 <style>
     .btn-voltar {
         background-color: #ffcc29 !important;
-        color: #ffffff !important;
+        color: #000000 !important;
         border: none;
         border-radius: 12px;
         padding: 10px 24px;
@@ -15,19 +15,34 @@
         text-decoration: none;
         box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
     }
-    
+
     .btn-voltar:hover {
         background-color: #ffcc29 !important;
-        color: #422006 !important;
+        color: #ffffff !important;
         box-shadow: 0 8px 25px rgba(251, 192, 45, 0.4);
+    }
+
+    .btn-gerar {
+        background-color: #0d6efd !important;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 12px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-gerar:hover {
+        background-color: #0d6efd !important;
+        color: #000000 !important;
     }
 </style>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow border-0 p-5 mt-5" style="border-radius: 20px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
-            <h2 class="text-primary fw-bold mb-4 text-start">GERAR PEDIGREE</h2>
-            
+        <div class="card shadow border-0 p-5 mt-5"
+            style="border-radius: 20px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+            <h2 class="text-primary fw-bold mb-4 text-start">Gerar Pedigree</h2>
+
             <form action="{{ url_for('view_pedigree') }}" method="POST">
                 <div class="mb-4 text-start">
                     <div class="form-check mb-2">
@@ -42,20 +57,20 @@
                             5 Gerações
                         </label>
                     </div>
-                    
-                    <label class="form-label fw-bold text-muted small text-uppercase">Nº DE ANILHA / NOME</label>
-                    <input list="pombosList" name="anilha" class="form-control form-control-lg border-2" 
-                           placeholder="Pesquisar pombo..." autocomplete="off" required autofocus
-                           style="border-radius: 12px; padding: 15px;">
+
+                    <label class="form-label fw-bold text-muted small ">Nº de Anilha / Nome</label>
+                    <input list="pombosList" name="anilha" class="form-control form-control-lg border-2"
+                        placeholder="Pesquisar pombo..." autocomplete="off" required autofocus
+                        style="border-radius: 12px; padding: 15px;">
                     <datalist id="pombosList">
                         {% for p in pombos %}
                         <option value="{{ p.anilha }} - {{ p.nome or 'Sem Nome' }}"></option>
                         {% endfor %}
                     </datalist>
                 </div>
-                
+
                 <div class="d-flex flex-column gap-3">
-                    <button type="submit" class="btn btn-primary btn-lg w-100 p-3 shadow-sm border-0" style="border-radius: 12px; font-weight: bold; background-color: #0d6efd !important;">
+                    <button type="submit" class="btn btn-gerar btn-lg w-100 p-3 shadow-sm">
                         <i class="bi bi-file-earmark-pdf-fill me-2"></i> Gerar Documento
                     </button>
                     <a href="{{ url_for('index') }}" class="btn btn-voltar btn-lg w-100 p-3 shadow-sm">

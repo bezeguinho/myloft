@@ -2,12 +2,12 @@
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
   <div class="col-12 text-center">
-    <h1 class="display-1 fw-bold text-primary mb-3">MYLOFT</h1>
+    <h1 class="display-1 fw-bold text-primary mb-3">Myloft</h1>
     <h2 class="text-muted fw-light mb-5">Gestão de Colónias</h2>
     {% if not current_user.is_authenticated %}
     <div class="d-flex justify-content-center gap-4">
-      <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">ENTRAR</a>
-      <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 py-3 shadow">CRIAR CONTA</a>
+      <a href="{{ url_for('login') }}" class="btn btn-executar btn-lg px-5 py-3 shadow">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-retroceder btn-lg px-5 py-3 shadow">Registar</a>
     </div>
     {% endif %}
   </div>
