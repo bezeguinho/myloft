@@ -111,7 +111,7 @@
             <div class="card-body p-4 p-md-5 bg-white border-bottom">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
-                        <h2 class="fw-bold text-primary m-0 text-uppercase">Meus Pombos</h2>
+                        <h2 class="fw-bold text-primary m-0 ">Meus Pombos</h2>
                         <p class="text-muted small mb-0">Gestão geral de todo o pombal</p>
                     </div>
 
@@ -119,11 +119,11 @@
                         <span class="count-box fs-5">{{ pombos|length }}</span>
                         <a href="{{ url_for('novo_pombo') }}"
                             class="btn btn-primary shadow-sm px-4 fw-bold rounded-pill">
-                            <i class="bi bi-plus-lg me-2"></i>INSERIR NOVO
+                            <i class="bi bi-plus-lg me-2"></i>Inserir Novo
                         </a>
                         <a href="{{ url_for('estatisticas') }}"
                             class="btn btn-outline-primary shadow-sm px-3 fw-bold border-2 rounded-pill">
-                            <i class="bi bi-table me-2"></i>TABELA GERAL
+                            <i class="bi bi-table me-2"></i>Tabela Geral
                         </a>
                     </div>
                 </div>
@@ -137,16 +137,16 @@
             <div class="card-body p-0 bg-white">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="pomboTable">
-                        <thead class="table-light text-uppercase small fw-bold">
+                        <thead class="table-light small fw-bold">
                             <tr>
-                                <th class="ps-3">Anilha</th>
-                                <th>Ano</th>
-                                <th class="d-none d-md-table-cell">Cor</th>
-                                <th>Nome</th>
-                                <th class="text-center">Sexo</th>
-                                <th class="d-none d-lg-table-cell">Categoria</th>
-                                <th class="d-none d-xl-table-cell">Pai</th>
-                                <th class="d-none d-xl-table-cell">Mãe</th>
+                                <th class="ps-3">Anilha:</th>
+                                <th>Ano:</th>
+                                <th class="d-none d-md-table-cell">Cor:</th>
+                                <th>Nome:</th>
+                                <th class="text-center">Sexo:</th>
+                                <th class="d-none d-lg-table-cell">Categoria:</th>
+                                <th class="d-none d-xl-table-cell">Pai:</th>
+                                <th class="d-none d-xl-table-cell">Mãe:</th>
                                 <th class="text-center pe-3">Ações</th>
                             </tr>
                         </thead>
@@ -204,9 +204,9 @@
                                 </div>
                                 <div class="modal-footer justify-content-center">
                                     <button type="button" class="btn btn-secondary fw-bold"
-                                        data-bs-dismiss="modal">CANCELAR</button>
-                                    <a href="#" id="linkConfirmarEliminar" class="btn btn-danger fw-bold">ELIMINAR
-                                        AGORA</a>
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <a href="#" id="linkConfirmarEliminar" class="btn btn-danger fw-bold">Eliminar
+                                        Agora</a>
                                 </div>
                             </div>
                         </div>

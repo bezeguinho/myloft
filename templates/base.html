@@ -25,7 +25,6 @@
     .navbar-brand {
       color: #ffffff !important;
       font-weight: bold;
-      text-transform: uppercase;
       font-size: 1.6rem;
       text-decoration: none;
     }
@@ -40,7 +39,6 @@
     .nav-link {
       color: #ffffff !important;
       font-weight: bold;
-      text-transform: uppercase;
       margin: 0 5px;
       border-radius: 6px;
       padding: 8px 15px !important;
@@ -67,7 +65,6 @@
       font-weight: bold;
       border-radius: 6px;
       padding: 8px 15px;
-      text-transform: uppercase;
       text-decoration: none;
     }
 
@@ -80,7 +77,6 @@
       border: none;
       transition: 0.3s;
       padding: 10px 24px;
-      text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -100,7 +96,6 @@
       border: none;
       transition: 0.3s;
       padding: 10px 24px;
-      text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -117,7 +112,7 @@
 <body>
   <nav class="navbar navbar-expand-lg mb-5 shadow sticky-top">
     <div class="container-fluid px-4">
-      <a class="navbar-brand" href="{{ url_for('index') }}">MYLOFT</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">Myloft</a>
 
       <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
@@ -128,42 +123,42 @@
           {% if current_user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="menuPombos" role="button" data-bs-toggle="dropdown">
-              GESTÃO DE POMBOS
+              Gestão de Pombos
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">INSERIR POMBO</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('novo_pombo') }}">Inserir Pombo</a></li>
               <li>
                 <hr class="dropdown-divider border-white">
               </li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">TODOS OS POMBOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Voador') }}">VOADORES</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Reprodutor') }}">REPRODUTORES</a>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos') }}">Todos os Pombos</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Voador') }}">Voador</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Reprodutor') }}">Reprodutor</a>
               </li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Cedido') }}">CEDIDOS</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Oculto') }}">POMBOS OCULTOS</a>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Cedido') }}">Cedidos</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('lista_pombos', categoria='Oculto') }}">Pombos Ocultos</a>
               </li>
-              <li><a class="dropdown-item" href="{{ url_for('estatisticas') }}">TABELA GERAL</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('estatisticas') }}">Tabela Geral</a></li>
             </ul>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">PEDIGREE</a>
+            <a class="nav-link" href="{{ url_for('gerar_pedigree') }}">Pedigree</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('ver_dados') }}">OS MEUS DADOS</a>
+            <a class="nav-link" href="{{ url_for('ver_dados') }}">Os Meus Dados</a>
           </li>
 
           {% if current_user.is_admin %}
           <li class="nav-item ms-lg-3">
             <a class="nav-link bg-warning text-dark shadow-sm" href="{{ url_for('admin_dashboard') }}">
-              <i class="bi bi-shield-lock-fill me-1"></i> ADMIN
+              <i class="bi bi-shield-lock-fill me-1"></i> Admin
             </a>
           </li>
           {% endif %}
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}">SAIR</a>
+            <a class="nav-link" href="{{ url_for('logout') }}">Sair</a>
           </li>
           {% endif %}
         </ul>

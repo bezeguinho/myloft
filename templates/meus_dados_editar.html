@@ -15,6 +15,7 @@
         align-items: center;
         box-shadow: 0 4px 15px rgba(251, 192, 45, 0.3);
     }
+
     .btn-voltar:hover {
         background-color: #ffcc29 !important;
         color: #422006 !important;
@@ -33,18 +34,20 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-gravar:hover { background-color: #0d6efd !important; }
+
+    .btn-gravar:hover {
+        background-color: #0d6efd !important;
+    }
 
     .card-editar {
         border-radius: 15px;
         border: none;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     .form-label-top {
         font-weight: bold;
         color: #555;
-        text-transform: uppercase;
         font-size: 0.85rem;
         margin-bottom: 8px;
         display: block;
@@ -56,6 +59,7 @@
         padding: 12px !important;
         background-color: #fdfdfd !important;
     }
+
     .input-custom:focus {
         border-color: #0056d2 !important;
         box-shadow: 0 0 0 0.25rem rgba(0, 86, 210, 0.1) !important;
@@ -75,6 +79,7 @@
         transition: 0.3s;
         position: relative;
     }
+
     .foto-placeholder:hover {
         background-color: #eef4ff;
         border-color: #0044a8;
@@ -88,40 +93,45 @@
                 <!-- Cabeçalho Interno: Título e Botão Voltar -->
                 <div class="row align-items-center mb-5 pb-3">
                     <div class="col-12 col-md-6 text-start">
-                        <h2 class="fw-bold text-primary m-0">EDITAR PERFIL</h2>
+                        <h2 class="fw-bold text-primary m-0">Editar Perfil</h2>
                     </div>
                     <div class="col-12 col-md-6 text-end d-flex justify-content-end gap-3 mt-3 mt-md-0">
                         <a href="{{ url_for('ver_dados') }}" class="btn-voltar shadow-sm">
-                            <i class="bi bi-arrow-left me-2"></i> VOLTAR
+                            <i class="bi bi-arrow-left me-2"></i> Voltar
                         </a>
                         <button type="submit" form="form-perfil" class="btn-gravar shadow-sm">
-                            <i class="bi bi-check-lg me-2"></i> GRAVAR DADOS
+                            <i class="bi bi-check-lg me-2"></i> Gravar
                         </button>
                     </div>
                 </div>
 
                 <div class="row g-5">
                     <!-- Coluna Foto -->
-                    <div class="col-12 col-md-4 text-center d-flex flex-column align-items-center justify-content-center border-end">
+                    <div
+                        class="col-12 col-md-4 text-center d-flex flex-column align-items-center justify-content-center border-end">
                         <label for="foto-upload" class="foto-placeholder shadow-sm mb-3">
                             <div id="preview-container" style="width: 100%; height: 100%;">
                                 {% if utilizador.foto %}
-                                <img src="{{ url_for('static', filename=utilizador.foto) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="{{ url_for('static', filename=utilizador.foto) }}"
+                                    style="width: 100%; height: 100%; object-fit: cover;">
                                 {% else %}
                                 <i class="bi bi-person-bounding-box text-primary" style="font-size: 60px;"></i>
                                 {% endif %}
                             </div>
                         </label>
-                        <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*" onchange="previewImage(this)">
+                        <input type="file" id="foto-upload" name="foto" class="d-none" accept="image/*"
+                            onchange="previewImage(this)">
                         <input type="hidden" name="remover_foto" id="remover_foto" value="0">
-                        
+
                         <div class="d-flex flex-column gap-2 w-100 px-4">
-                            <label for="foto-upload" class="btn btn-sm btn-outline-primary fw-bold p-2" style="border-radius: 8px;">
-                                <i class="bi bi-camera me-1"></i> SELECIONAR FOTO
+                            <label for="foto-upload" class="btn btn-sm btn-outline-primary fw-bold p-2"
+                                style="border-radius: 8px;">
+                                <i class="bi bi-camera me-1"></i> Selecionar Foto
                             </label>
                             {% if utilizador.foto %}
-                            <button type="button" class="btn btn-sm btn-outline-danger fw-bold p-2" style="border-radius: 8px;" onclick="removerFotoVisual()">
-                                <i class="bi bi-trash me-1"></i> ELIMINAR FOTO
+                            <button type="button" class="btn btn-sm btn-outline-danger fw-bold p-2"
+                                style="border-radius: 8px;" onclick="removerFotoVisual()">
+                                <i class="bi bi-trash me-1"></i> Eliminar Foto
                             </button>
                             {% endif %}
                         </div>
@@ -132,20 +142,24 @@
                     <div class="col-12 col-md-8">
                         <div class="row g-4">
                             <div class="col-12 col-md-6">
-                                <label class="form-label-top">Nome</label>
-                                <input type="text" name="nome" class="form-control input-custom" value="{{ utilizador.nome }}" required>
+                                <label class="form-label-top">Nome:</label>
+                                <input type="text" name="nome" class="form-control input-custom"
+                                    value="{{ utilizador.nome }}" required>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label-top">Localidade</label>
-                                <input type="text" name="localidade" class="form-control input-custom" value="{{ utilizador.localidade or '' }}">
+                                <label class="form-label-top">Localidade:</label>
+                                <input type="text" name="localidade" class="form-control input-custom"
+                                    value="{{ utilizador.localidade or '' }}">
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label-top">Telefone</label>
-                                <input type="text" name="telefone" class="form-control input-custom" value="{{ utilizador.telefone or '' }}">
+                                <label class="form-label-top">Telefone:</label>
+                                <input type="text" name="telefone" class="form-control input-custom"
+                                    value="{{ utilizador.telefone or '' }}">
                             </div>
                             <div class="col-12 col-md-6">
-                                <label class="form-label-top">E-mail</label>
-                                <input type="email" name="email" class="form-control input-custom" value="{{ utilizador.email or current_user.email }}">
+                                <label class="form-label-top">E-mail:</label>
+                                <input type="email" name="email" class="form-control input-custom"
+                                    value="{{ utilizador.email or current_user.email }}">
                             </div>
                         </div>
 
@@ -161,7 +175,7 @@
     function previewImage(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 var container = document.getElementById('preview-container');
                 container.innerHTML = '<img src="' + e.target.result + '" style="width: 100%; height: 100%; object-fit: cover;">';
                 document.getElementById('remover_foto').value = '0';

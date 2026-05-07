@@ -401,14 +401,14 @@ def lista_pombos(categoria=None):
 
     if categoria == 'Oculto':
         query = query.filter_by(oculto=True)
-        titulo = "POMBOS OCULTOS"
+        titulo = "Pombos Ocultos"
     elif categoria:
         query = query.filter_by(categoria=categoria, oculto=False)
-        nomes = {"Reprodutor": "REPRODUTORES", "Voador": "VOADORES", "Cedido": "CEDIDOS"}
+        nomes = {"Reprodutor": "Reprodutores", "Voador": "Voador", "Cedido": "Cedidos"}
         titulo = nomes.get(categoria, categoria.upper())
     else:
         query = query.filter_by(oculto=False)
-        titulo = "TODOS OS POMBOS"
+        titulo = "Todos os Pombos"
 
     pombos = query.order_by(Pombo.ano, Pombo.anilha).all()
     

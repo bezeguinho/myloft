@@ -181,7 +181,7 @@
 <div class="container py-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 no-print">
         <div class="d-flex align-items-center gap-3">
-            <h2 class="fw-bold text-primary m-0 text-uppercase">{{ titulo }}</h2>
+            <h2 class="fw-bold text-primary m-0 ">{{ titulo }}</h2>
             <div class="d-flex align-items-center gap-2">
                 <div class="counter-badge shadow-sm">
                     {{ (pombos|length)|string|truncate(3, True, '') }}
@@ -193,10 +193,10 @@
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
             <a href="{{ url_for('index') }}" class="btn btn-voltar shadow-sm">
-                <i class="bi bi-arrow-left me-2"></i> VOLTAR
+                <i class="bi bi-arrow-left me-2"></i> Voltar
             </a>
             <a href="{{ url_for('novo_pombo') }}" class="btn btn-adicionar shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i> ADICIONAR POMBO
+                <i class="bi bi-plus-lg me-2"></i> Adicionar Pombo
             </a>
         </div>
     </div>
@@ -219,104 +219,106 @@
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="pomboTable">
-                <thead class="table-light text-uppercase small fw-bold">
+                <thead class="table-light small fw-bold">
                     <tr>
-                        <th class="ps-4 align-middle" style="height: 50px;">Anilha</th>
-                        <th class="align-middle">Ano</th>
-                        <th class="align-middle">Cor</th>
-                        <th class="align-middle">Nome</th>
-                        <th class="text-center align-middle">Sexo</th>
-                        <th class="align-middle">Categoria</th>
-                        <th class="align-middle">Pai</th>
+                        <th class="ps-4 align-middle" style="height: 50px;">Anilha:</th>
+                        <th class="align-middle">Ano:</th>
+                        <th class="align-middle">Cor:</th>
+                        <th class="align-middle">Nome:</th>
+                        <th class="text-center align-middle">Sexo:</th>
+                        <th class="align-middle">Categoria:</th>
+                        <th class="align-middle">Pai:</th>
                         <th class="align-middle"></th>
-                        <th class="align-middle">Mãe</th>
+                        <th class="align-middle">Mãe:</th>
                         <th class="align-middle"></th>
                         <th class="text-center pe-4 align-middle">Ações</th>
                     </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in pombos %}
-                        <tr id="pombo-{{ p.id }}" class="pombo-row">
-                            <td class="ps-4 align-middle">
-                                <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
-                            </td>
+                </thead>
+                <tbody>
+                    {% for p in pombos %}
+                    <tr id="pombo-{{ p.id }}" class="pombo-row">
+                        <td class="ps-4 align-middle">
+                            <a href="{{ url_for('ver_pombo', id=p.id) }}" class="anilha-link">{{ p.anilha }}</a>
+                        </td>
 
-                            <td class="align-middle">{{ p.ano }}</td>
-                            <td class="align-middle">{{ p.cor or '---' }}</td>
+                        <td class="align-middle">{{ p.ano }}</td>
+                        <td class="align-middle">{{ p.cor or '---' }}</td>
 
-                            <td class="align-middle">{{ p.nome or '---' }}</td>
+                        <td class="align-middle">{{ p.nome or '---' }}</td>
 
-                            <td class="text-center align-middle">
-                                {% if p.sexo == 'Macho' %}
-                                <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
-                                {% elif p.sexo == 'Fêmea' %}
-                                <i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
-                                {% else %}
-                                <i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>
-                                {% endif %}
-                            </td>
+                        <td class="text-center align-middle">
+                            {% if p.sexo == 'Macho' %}
+                            <i class="bi bi-gender-male text-primary fs-5" title="Macho"></i>
+                            {% elif p.sexo == 'Fêmea' %}
+                            <i class="bi bi-gender-female fs-5" style="color: #ff69b4;" title="Fêmea"></i>
+                            {% else %}
+                            <i class="bi bi-question-circle text-secondary fs-5" title="Indefinido"></i>
+                            {% endif %}
+                        </td>
 
-                            <td class="align-middle text-dark fw-medium">
-                                {{ p.categoria }}
-                            </td>
+                        <td class="align-middle text-dark fw-medium">
+                            {{ p.categoria }}
+                        </td>
 
-                            <td class="align-middle">
-                                {% if p.pai %}
-                                {% set pai_str = p.pai | string %}
-                                {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
-                                <a href="{{ url_for('ver_pombo', id=p.pai|int) }}" class="anilha-link">{{ mapa_pombos.get(pai_str).anilha }}</a>
-                                {% else %}
-                                <span class="anilha-link" style="cursor: default;">{{ p.pai }}</span>
-                                {% endif %}
-                                {% else %}
-                                <span class="anilha-link" style="cursor: default;">---</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle">
-                                {% if p.pai %}
-                                {% set pai_str = p.pai | string %}
-                                {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
-                                {{ mapa_pombos.get(pai_str).ano }}
-                                {% endif %}
-                                {% endif %}
-                            </td>
+                        <td class="align-middle">
+                            {% if p.pai %}
+                            {% set pai_str = p.pai | string %}
+                            {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
+                            <a href="{{ url_for('ver_pombo', id=p.pai|int) }}" class="anilha-link">{{
+                                mapa_pombos.get(pai_str).anilha }}</a>
+                            {% else %}
+                            <span class="anilha-link" style="cursor: default;">{{ p.pai }}</span>
+                            {% endif %}
+                            {% else %}
+                            <span class="anilha-link" style="cursor: default;">---</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% if p.pai %}
+                            {% set pai_str = p.pai | string %}
+                            {% if pai_str.isdigit() and mapa_pombos.get(pai_str) %}
+                            {{ mapa_pombos.get(pai_str).ano }}
+                            {% endif %}
+                            {% endif %}
+                        </td>
 
-                            <td class="align-middle">
-                                {% if p.mae %}
-                                {% set mae_str = p.mae | string %}
-                                {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
-                                <a href="{{ url_for('ver_pombo', id=p.mae|int) }}" class="anilha-link">{{ mapa_pombos.get(mae_str).anilha }}</a>
-                                {% else %}
-                                <span class="anilha-link" style="cursor: default;">{{ p.mae }}</span>
-                                {% endif %}
-                                {% else %}
-                                <span class="anilha-link" style="cursor: default;">---</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle">
-                                {% if p.mae %}
-                                {% set mae_str = p.mae | string %}
-                                {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
-                                {{ mapa_pombos.get(mae_str).ano }}
-                                {% endif %}
-                                {% endif %}
-                            </td>
+                        <td class="align-middle">
+                            {% if p.mae %}
+                            {% set mae_str = p.mae | string %}
+                            {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
+                            <a href="{{ url_for('ver_pombo', id=p.mae|int) }}" class="anilha-link">{{
+                                mapa_pombos.get(mae_str).anilha }}</a>
+                            {% else %}
+                            <span class="anilha-link" style="cursor: default;">{{ p.mae }}</span>
+                            {% endif %}
+                            {% else %}
+                            <span class="anilha-link" style="cursor: default;">---</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% if p.mae %}
+                            {% set mae_str = p.mae | string %}
+                            {% if mae_str.isdigit() and mapa_pombos.get(mae_str) %}
+                            {{ mapa_pombos.get(mae_str).ano }}
+                            {% endif %}
+                            {% endif %}
+                        </td>
 
-                            <td class="text-center align-middle" style="width: 230px;">
-                                <div class="d-flex justify-content-center align-items-center gap-2">
-                                    <a href="{{ url_for('editar_pombo', id=p.id) }}"
-                                        class="btn btn-sm btn-outline-primary fw-bold">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
-                                        onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                        <td class="text-center align-middle" style="width: 230px;">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <a href="{{ url_for('editar_pombo', id=p.id) }}"
+                                    class="btn btn-sm btn-outline-primary fw-bold">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
+                                    onclick="confirmarEliminar('{{ p.id }}', '{{ p.anilha }}')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
